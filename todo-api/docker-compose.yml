@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16.2
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    container_name: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.${ENV}
+    container_name: todo-api
+    environment:
+      - PORT=${PORT}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app/src
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PG_ADMIN_PASSWORD}
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  pgadmin:

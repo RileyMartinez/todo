@@ -17,5 +17,8 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true
+  },
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval"
   }
 }
