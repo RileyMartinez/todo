@@ -2,12 +2,18 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/typeorm.config';
 import { TodoModule } from './todo/todo.module';
 import { TodolistModule } from './todolist/todolist.module';
+import { ConfigModule } from '@nestjs/config';
+import { typeOrmConfigAsync } from './config/typeorm.config';
 
 @Module({
-    imports: [TypeOrmModule.forRoot(typeOrmConfig), TodoModule, TodolistModule],
+    imports: [
+        ConfigModule.forRoot(),
+        TypeOrmModule.forRootAsync(typeOrmConfigAsync),
+        TodoModule,
+        TodolistModule,
+    ],
     controllers: [AppController],
     providers: [AppService],
 })

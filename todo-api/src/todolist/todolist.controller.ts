@@ -6,6 +6,7 @@ import {
     Patch,
     Param,
     Delete,
+    ParseIntPipe,
 } from '@nestjs/common';
 import { TodolistService } from './todolist.service';
 import { CreateTodolistDto } from './dto/create-todolist.dto';
@@ -26,20 +27,20 @@ export class TodolistController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.todolistService.findOne(+id);
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.todolistService.findOne(id);
     }
 
     @Patch(':id')
     update(
-        @Param('id') id: string,
+        @Param('id', ParseIntPipe) id: number,
         @Body() updateTodolistDto: UpdateTodolistDto,
     ) {
-        return this.todolistService.update(+id, updateTodolistDto);
+        return this.todolistService.update(id, updateTodolistDto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.todolistService.remove(+id);
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.todolistService.remove(id);
     }
 }
