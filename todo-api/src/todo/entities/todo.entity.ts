@@ -21,6 +21,9 @@ export class Todo {
     @Column({ type: 'int', nullable: true })
     order: number;
 
+    @Column()
+    todoListId: number;
+
     @ManyToOne(() => TodoList, (todoList) => todoList.todos)
     todoList: TodoList;
 }

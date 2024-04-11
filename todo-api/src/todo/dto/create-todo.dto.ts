@@ -21,16 +21,16 @@ export class CreateTodoDto {
     description?: string;
 
     @IsBoolean()
-    @IsOptional()
-    completed?: boolean;
+    @IsNotEmpty()
+    completed: boolean;
 
     @IsDate()
     @IsOptional()
     dueDate?: Date;
 
     @IsNumber()
-    @IsOptional()
-    order?: number;
+    @IsNotEmpty()
+    order: number;
 
     @IsNumber()
     @IsNotEmpty()
