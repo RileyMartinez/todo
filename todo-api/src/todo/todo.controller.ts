@@ -11,31 +11,33 @@ import {
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
+import { Todo } from './entities/todo.entity';
 
 @Controller('todo')
 export class TodoController {
     constructor(private readonly todoService: TodoService) {}
 
     @Post()
-    create(@Body() createTodoDto: CreateTodoDto) {
-        return this.todoService.create(createTodoDto);
+    async create(@Body() createTodoDto: CreateTodoDto): Promise<InsertResult> {
+        return await this.todoService.create(createTodoDto);
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.todoService.findOne(id);
+    async findOne(@Param('id', ParseIntPipe) id: number): Promise<Todo | null> {
+        return await this.todoService.findOne(id);
     }
 
     @Patch(':id')
-    update(
+    async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateTodoDto: UpdateTodoDto,
-    ) {
-        return this.todoService.update(id, updateTodoDto);
+    ): Promise<UpdateResult> {
+        return await this.todoService.update(id, updateTodoDto);
     }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) {
-        return this.todoService.remove(id);
+    async remove(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+        return await this.todoService.remove(id);
     }
 }
