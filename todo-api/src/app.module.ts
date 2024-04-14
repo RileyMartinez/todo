@@ -6,6 +6,8 @@ import { TodoModule } from './todo/todo.module';
 import { TodolistModule } from './todolist/todolist.module';
 import { ConfigModule } from '@nestjs/config';
 import { typeOrmConfigAsync } from './config/typeorm.config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
     imports: [
@@ -13,6 +15,8 @@ import { typeOrmConfigAsync } from './config/typeorm.config';
         TypeOrmModule.forRootAsync(typeOrmConfigAsync),
         TodoModule,
         TodolistModule,
+        AuthModule,
+        UsersModule,
     ],
     controllers: [AppController],
     providers: [AppService],
