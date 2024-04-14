@@ -18,12 +18,14 @@ export class Todo {
     @Column({ type: 'timestamp', nullable: true })
     dueDate: Date;
 
-    @Column({ type: 'int', nullable: true })
+    @Column()
     order: number;
 
     @Column()
     todoListId: number;
 
-    @ManyToOne(() => TodoList, (todoList) => todoList.todos)
+    @ManyToOne(() => TodoList, (todoList) => todoList.todos, {
+        onDelete: 'CASCADE',
+    })
     todoList: TodoList;
 }
