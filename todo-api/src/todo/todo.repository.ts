@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 export class TodoRepository {
     constructor(
         @InjectRepository(Todo)
-        private repository: Repository<Todo>,
+        private readonly repository: Repository<Todo>,
     ) {}
 
     async upsert(createTodoDto: CreateTodoDto): Promise<InsertResult> {

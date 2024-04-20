@@ -7,7 +7,7 @@ import { TodoList } from './entities/todolist.entity';
 
 @Injectable()
 export class TodolistService {
-    constructor(private todolistRepository: TodolistRepository) {}
+    constructor(private readonly todolistRepository: TodolistRepository) {}
 
     async create(createTodolistDto: CreateTodolistDto): Promise<InsertResult> {
         return await this.todolistRepository.upsert(createTodolistDto);

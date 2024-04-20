@@ -9,7 +9,7 @@ import { UpdateTodolistDto } from './dto/update-todolist.dto';
 export class TodolistRepository {
     constructor(
         @InjectRepository(TodoList)
-        private repository: Repository<TodoList>,
+        private readonly repository: Repository<TodoList>,
     ) {}
 
     async upsert(createTodolistDto: CreateTodolistDto): Promise<InsertResult> {

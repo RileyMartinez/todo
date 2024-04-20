@@ -6,8 +6,8 @@ import { TodolistRepository } from './todolist.repository';
 import { TodoList } from './entities/todolist.entity';
 
 @Module({
-    controllers: [TodolistController],
     imports: [TypeOrmModule.forFeature([TodoList])],
+    controllers: [TodolistController],
     providers: [TodolistService, TodolistRepository],
 })
 export class TodolistModule {}
