@@ -4,7 +4,7 @@ import {
     TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
 
-export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
+export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
     imports: [ConfigModule],
     useFactory: async (
         configService: ConfigService,
