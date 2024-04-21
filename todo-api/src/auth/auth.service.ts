@@ -12,7 +12,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) {}
 
-    async validateUser({ username, password }: AuthLoginDto) {
+    async validate({ username, password }: AuthLoginDto) {
         const user = await this.usersService.findOneByUsername(username);
 
         if (!user) {
