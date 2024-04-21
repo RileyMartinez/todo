@@ -12,15 +12,12 @@ export class UsersRepository {
         private repository: Repository<User>,
     ) {}
 
-    async upsert(createUserDto: CreateUserDto): Promise<InsertResult> {
+    async insert(createUserDto: CreateUserDto): Promise<InsertResult> {
         return await this.repository
             .createQueryBuilder()
             .insert()
             .into(User)
             .values(createUserDto)
-            .orUpdate(['username', 'password'], ['id'], {
-                skipUpdateIfNoValuesChanged: true,
-            })
             .execute();
     }
 

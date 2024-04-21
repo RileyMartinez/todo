@@ -7,14 +7,19 @@ import {
     Param,
     Delete,
     ParseIntPipe,
+    UseGuards,
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { Todo } from './entities/todo.entity';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('todo')
+@UseGuards(JwtGuard)
+@SkipThrottle()
 export class TodoController {
     constructor(private readonly todoService: TodoService) {}
 

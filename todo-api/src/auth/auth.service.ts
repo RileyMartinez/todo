@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { SafeUserDto } from 'src/users/dto/safe-user.dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
+import { InsertResult } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -19,18 +21,20 @@ export class AuthService {
             return null;
         }
 
-        if (password !== user.password) {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
             return null;
         }
 
         const safeUser: SafeUserDto = SafeUserDto.createFromEntity(user);
-
         return await this.jwtService.signAsync(safeUser);
     }
 
-    async logout() {}
-
-    async register({ username, password }: AuthRegisterDto) {
+    async register({
+        username,
+        password,
+    }: AuthRegisterDto): Promise<InsertResult | null> {
         const user = await this.usersService.findOneByUsername(username);
 
         if (user) {
@@ -41,5 +45,9 @@ export class AuthService {
             username,
             password,
         });
+    }
+
+    async logout() {
+        throw new NotImplementedException();
     }
 }

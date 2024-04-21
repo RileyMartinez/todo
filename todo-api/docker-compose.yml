@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     db:
         image: postgres:16.2
@@ -25,7 +23,7 @@ services:
         depends_on:
             - db
         volumes:
-            - ./:/app
+            - ./src:/app/src
 
     pgadmin:
         image: dpage/pgadmin4
