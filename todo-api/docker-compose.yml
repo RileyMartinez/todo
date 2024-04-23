@@ -4,7 +4,7 @@ services:
         restart: always
         environment:
             - POSTGRES_PASSWORD=${DB_PASSWORD}
-            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_DB=todo
         container_name: postgres
         volumes:
             - pgdata:/var/lib/postgresql/data

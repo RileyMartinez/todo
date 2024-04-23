@@ -1,0 +1,12 @@
+services:
+    ui:
+        build:
+            context: .
+            dockerfile: Dockerfile.${ENV}
+        container_name: todo-ui
+        environment:
+            - PORT=${PORT}
+        ports:
+            - '${PORT}:${PORT}'
+        volumes:
+            - ./src:/app/src

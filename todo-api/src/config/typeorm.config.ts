@@ -14,7 +14,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         port: configService.get('DB_PORT'),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
+        database: 'todo',
         synchronize: configService.get('ENV') === 'dev',
         autoLoadEntities: configService.get('DB_AUTOLOAD_ENTITIES'),
     }),
