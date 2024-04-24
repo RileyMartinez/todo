@@ -1,15 +1,18 @@
 # toado
 Todo list web app built with Postgres, NestJS, Angular, and Node.
 
+## Prereqs
+1. Docker
+
 ## Setup
 1. Populate the following .env files (see .env.sample at each path):
-  a. /.env
-  b. /todo-ui/.env
-  c. /todo-api/.env
-2. Recommend setting DB_AUTOLOAD_ENTITIES to true for local dev schema creation
-3. From project root, `run docker compose up`
-4. Login to pgadmin
-5. Set server name, host, admin username/password, and save
+   * /.env
+   * /todo-ui/.env
+   * /todo-api/.env
+3. Recommend setting `DB_AUTOLOAD_ENTITIES` to true for local dev schema creation
+4. From project root, `run docker compose up`
+5. Login to pgadmin
+6. Set server name, host, admin username/password, and save
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⡤⠤⠤⠤⠤⢤⣀⡀⠀⠀⠀⢀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⠾⠋⠉⠀⠀⠀⠀⠀⠀⠀⠈⠉⣳⣶⠶⠛⠉⠉⠉⠉⠉⠛⠷⣦⡀⠀⠀
