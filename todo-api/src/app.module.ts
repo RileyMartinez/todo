@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { throttlerConfig } from './config/throttle.config';
+import { AppConstants } from './app.constants';
 
 @Module({
     imports: [
@@ -25,7 +26,7 @@ import { throttlerConfig } from './config/throttle.config';
     providers: [
         AppService,
         {
-            provide: 'APP_GUARD',
+            provide: AppConstants.APP_GUARD,
             useClass: ThrottlerGuard,
         },
     ],

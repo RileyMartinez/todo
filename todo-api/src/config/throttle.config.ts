@@ -3,6 +3,7 @@ import {
     ThrottlerAsyncOptions,
     ThrottlerModuleOptions,
 } from '@nestjs/throttler';
+import { ConfigConstants } from './config.constants';
 
 export const throttlerConfig: ThrottlerAsyncOptions = {
     imports: [ConfigModule],
@@ -11,8 +12,10 @@ export const throttlerConfig: ThrottlerAsyncOptions = {
     ): Promise<ThrottlerModuleOptions> => ({
         throttlers: [
             {
-                limit: +configService.get('THROTTLE_LIMIT'),
-                ttl: +configService.get('THROTTLE_TTL'),
+                limit: Number(
+                    configService.get(ConfigConstants.THROTTLE_LIMIT),
+                ),
+                ttl: Number(configService.get(ConfigConstants.THROTTLE_TTL)),
             },
         ],
     }),
