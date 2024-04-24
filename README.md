@@ -11,8 +11,9 @@ Todo list web app built with Postgres, NestJS, Angular, and Node.
    * /todo-api/.env
 3. Recommend setting `DB_AUTOLOAD_ENTITIES` to true for local dev schema creation
 4. From project root, run `docker compose up`
-5. Login to pgadmin
-6. Set server name, host, admin username/password, and save
+5. Login to pgadmin (i.e. http://localhost:5050)
+6. Register a server name
+7. Configure connection host, username, password, then save
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⡤⠤⠤⠤⠤⢤⣀⡀⠀⠀⠀⢀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⠾⠋⠉⠀⠀⠀⠀⠀⠀⠀⠈⠉⣳⣶⠶⠛⠉⠉⠉⠉⠉⠛⠷⣦⡀⠀⠀
