@@ -14,4 +14,3 @@ Todo list web app built with Postgres, NestJS, Angular, and Node.
 5. Login to pgadmin (i.e. http://localhost:5050)
 6. Register a server name
 7. Configure connection host, username, password, then save
-8. 
