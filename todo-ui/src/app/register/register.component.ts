@@ -9,6 +9,7 @@ import {
     FormBuilder,
     Validators,
     ReactiveFormsModule,
+    FormControl,
 } from '@angular/forms';
 
 @Component({
@@ -26,12 +27,21 @@ import {
     styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
-    registerForm: FormGroup = this.formBuilder.group({
-        username: ['', Validators.required],
-        password: ['', Validators.required],
-    });
-
     constructor(private formBuilder: FormBuilder) {}
+
+    emailFormControl = new FormControl('', [
+        Validators.email,
+        Validators.required,
+    ]);
+    passwordFormControl = new FormControl('', [
+        Validators.minLength(8),
+        Validators.required,
+    ]);
+
+    registerForm: FormGroup = this.formBuilder.group({
+        email: this.emailFormControl,
+        password: this.passwordFormControl,
+    });
 
     ngOnInit(): void {}
 

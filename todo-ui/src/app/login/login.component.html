@@ -1,1 +1,62 @@
-<p>login works!</p>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="flex justify-center pt-20">
+        <mat-card class="min-w-96 mx-auto">
+            <mat-card-header class="mb-4">
+                <mat-card-title>Login</mat-card-title>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="mb-4">
+                    <mat-form-field appearance="fill" class="w-3/4">
+                        <mat-label>Email</mat-label>
+                        <input
+                            matInput
+                            type="email"
+                            [formControl]="emailFormControl"
+                            autocomplete="email"
+                            required
+                        />
+                        @if (
+                            emailFormControl.hasError('email') &&
+                            !emailFormControl.hasError('required')
+                        ) {
+                            <mat-error>
+                                Please enter a valid email address
+                            </mat-error>
+                        }
+                        @if (emailFormControl.hasError('required')) {
+                            <mat-error> Email is required </mat-error>
+                        }
+                    </mat-form-field>
+                </div>
+
+                <div class="mb-4">
+                    <mat-form-field appearance="fill" class="w-3/4">
+                        <mat-label>Password</mat-label>
+                        <input
+                            matInput
+                            [formControl]="passwordFormControl"
+                            autocomplete="current-password"
+                            type="password"
+                            required
+                        />
+                        @if (passwordFormControl.hasError('required')) {
+                            <mat-error>Password is required </mat-error>
+                        }
+                    </mat-form-field>
+                </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+                <button
+                    mat-raised-button
+                    color="primary"
+                    type="submit"
+                    [disabled]="loginForm.invalid"
+                >
+                    Submit
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</form>
