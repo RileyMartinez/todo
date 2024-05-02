@@ -11,6 +11,7 @@ import {
     ReactiveFormsModule,
     FormControl,
 } from '@angular/forms';
+import { LoadingService } from '../loading.service';
 
 @Component({
     selector: 'app-login',
@@ -27,26 +28,37 @@ import {
     styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
-    constructor(private formBuilder: FormBuilder) {}
+    emailFormControl!: FormControl;
+    passwordFormControl!: FormControl;
+    loginForm!: FormGroup;
 
-    emailFormControl = new FormControl('', [
-        Validators.email,
-        Validators.required,
-    ]);
-    passwordFormControl = new FormControl('', Validators.required);
+    constructor(
+        private formBuilder: FormBuilder,
+        private loadingService: LoadingService,
+    ) {}
 
-    loginForm: FormGroup = this.formBuilder.group({
-        email: this.emailFormControl,
-        password: this.passwordFormControl,
-    });
+    ngOnInit(): void {
+        this.loadingService.triggerLoading();
 
-    ngOnInit(): void {}
+        this.emailFormControl = new FormControl('', [
+            Validators.email,
+            Validators.required,
+        ]);
+        this.passwordFormControl = new FormControl('', Validators.required);
+
+        this.loginForm = this.formBuilder.group({
+            email: this.emailFormControl,
+            password: this.passwordFormControl,
+        });
+    }
 
     onSubmit(): void {
+        this.loadingService.setLoading(true);
         if (this.loginForm?.invalid) {
             return;
         }
 
         console.log(this.loginForm?.value);
+        this.loadingService.setLoading(false);
     }
 }

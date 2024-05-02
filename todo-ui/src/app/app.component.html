@@ -1,8 +1,15 @@
-<mat-toolbar class="flex justify-between">
-    <mat-icon>checklist</mat-icon>
-    <div>
-        <button mat-button [routerLink]="['/login']">Login</button>
-        <button mat-button [routerLink]="['/register']">Register</button>
-    </div>
-</mat-toolbar>
-<router-outlet />
+<div class="relative h-16">
+    <mat-toolbar class="flex justify-between h-full">
+        <mat-icon>checklist</mat-icon>
+        <div>
+            <button mat-button [routerLink]="['/login']">Login</button>
+            <button mat-button [routerLink]="['/register']">Register</button>
+        </div>
+    </mat-toolbar>
+    <mat-progress-bar
+        class="absolute bottom-0 w-full"
+        mode="indeterminate"
+        *ngIf="loadingService.loading$ | async"
+    ></mat-progress-bar>
+</div>
+<router-outlet></router-outlet>
