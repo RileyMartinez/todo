@@ -14,4 +14,28 @@ export class AuthService {
     login(username: string, password: string) {
         return this.http.post('/api/login', { username, password });
     }
+
+    logout() {
+        return this.http.post('/api/logout', {});
+    }
+
+    getUser() {
+        return this.http.get('/api/user');
+    }
+
+    getToken() {
+        return localStorage.getItem('token');
+    }
+
+    setToken(token: string) {
+        localStorage.setItem('token', token);
+    }
+
+    removeToken() {
+        localStorage.removeItem('token');
+    }
+
+    isLoggedIn() {
+        return !!this.getToken();
+    }
 }
