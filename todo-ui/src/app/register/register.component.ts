@@ -12,6 +12,7 @@ import {
     FormControl,
 } from '@angular/forms';
 import { LoadingService } from '../loading.service';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-register',
@@ -35,6 +36,7 @@ export class RegisterComponent implements OnInit {
     constructor(
         private formBuilder: FormBuilder,
         private loadingService: LoadingService,
+        private authService: AuthService,
     ) {}
 
     ngOnInit(): void {
@@ -57,11 +59,16 @@ export class RegisterComponent implements OnInit {
 
     onSubmit(): void {
         this.loadingService.setLoading(true);
-        if (this.registerForm?.invalid) {
+        if (this.registerForm.invalid) {
             return;
         }
 
-        console.log(this.registerForm?.value);
+        this.authService.register(
+            this.registerForm.value.email,
+            this.registerForm.value.password,
+        );
+
+        console.log(this.registerForm.value);
         this.loadingService.setLoading(false);
     }
 }
