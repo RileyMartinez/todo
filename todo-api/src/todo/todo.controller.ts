@@ -16,9 +16,12 @@ import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { Todo } from './entities/todo.entity';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { SkipThrottle } from '@nestjs/throttler';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('todo')
 @UseGuards(JwtGuard)
+@ApiTags('todo')
+@ApiBearerAuth()
 @SkipThrottle()
 export class TodoController {
     constructor(private readonly todoService: TodoService) {}

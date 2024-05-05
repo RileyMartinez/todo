@@ -5,8 +5,11 @@ import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 import { JwtGuard } from './guards/jwt.guard';
 import { InsertResult } from 'typeorm';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
@@ -17,6 +20,10 @@ export class AuthController {
      */
     @Post('login')
     @UseGuards(LocalGuard)
+    @ApiBody({
+        description: 'Login credentials',
+        type: CreateUserDto,
+    })
     async login(@Req() req: Request): Promise<Express.User | undefined> {
         return req.user;
     }
@@ -27,6 +34,7 @@ export class AuthController {
      */
     @Post('logout')
     @UseGuards(JwtGuard)
+    @ApiBearerAuth()
     async logout() {
         return await this.authService.logout();
     }
@@ -50,6 +58,7 @@ export class AuthController {
      */
     @Get('status')
     @UseGuards(JwtGuard)
+    @ApiBearerAuth()
     async status(@Req() req: Request): Promise<Express.User | undefined> {
         return req.user;
     }
