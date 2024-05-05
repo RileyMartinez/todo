@@ -1,25 +1,25 @@
-<div class="relative h-16">
-    <mat-toolbar class="flex h-full">
-        <button mat-icon-button [matMenuTriggerFor]="menu" class="mr-4">
-            <mat-icon>menu</mat-icon>
-        </button>
-        <span>Todo App</span>
-        <mat-menu #menu="matMenu">
-            <button mat-menu-item [routerLink]="['/login']">Login</button>
-            <button mat-menu-item [routerLink]="['/register']">Register</button>
-            <button
-                mat-menu-item
-                [routerLink]="['/todoLists']"
-                *ngIf="authService.isLoggedIn()"
+<mat-toolbar color="primary">
+    <button mat-icon-button (click)="sidenav.toggle()" class="mr-4">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <span>Todo App</span>
+</mat-toolbar>
+<mat-progress-bar
+    mode="indeterminate"
+    *ngIf="loadingService.loading$ | async"
+></mat-progress-bar>
+<mat-sidenav-container>
+    <mat-sidenav #sidenav mode="push">
+        <mat-nav-list>
+            <a
+                mat-list-item
+                (click)="sidenav.close()"
+                [routerLink]="['/loginOrRegister']"
+                >Login</a
             >
-                Todo Lists
-            </button>
-        </mat-menu>
-    </mat-toolbar>
-    <mat-progress-bar
-        class="absolute bottom-0 w-full"
-        mode="indeterminate"
-        *ngIf="loadingService.loading$ | async"
-    ></mat-progress-bar>
-</div>
-<router-outlet></router-outlet>
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>

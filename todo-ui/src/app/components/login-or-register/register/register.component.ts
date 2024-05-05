@@ -11,10 +11,11 @@ import {
     ReactiveFormsModule,
     FormControl,
 } from '@angular/forms';
-import { LoadingService } from '../loading.service';
+import { LoadingService } from '../../../services/loading.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
-    selector: 'app-login',
+    selector: 'app-register',
     standalone: true,
     imports: [
         CommonModule,
@@ -24,17 +25,18 @@ import { LoadingService } from '../loading.service';
         MatButtonModule,
         ReactiveFormsModule,
     ],
-    templateUrl: './login.component.html',
-    styleUrl: './login.component.scss',
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.scss',
 })
-export class LoginComponent implements OnInit {
+export class RegisterComponent implements OnInit {
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
-    loginForm!: FormGroup;
+    registerForm!: FormGroup;
 
     constructor(
         private formBuilder: FormBuilder,
         private loadingService: LoadingService,
+        private authService: AuthService,
     ) {}
 
     ngOnInit(): void {
@@ -44,9 +46,12 @@ export class LoginComponent implements OnInit {
             Validators.email,
             Validators.required,
         ]);
-        this.passwordFormControl = new FormControl('', Validators.required);
+        this.passwordFormControl = new FormControl('', [
+            Validators.minLength(8),
+            Validators.required,
+        ]);
 
-        this.loginForm = this.formBuilder.group({
+        this.registerForm = this.formBuilder.group({
             email: this.emailFormControl,
             password: this.passwordFormControl,
         });
@@ -54,11 +59,16 @@ export class LoginComponent implements OnInit {
 
     onSubmit(): void {
         this.loadingService.setLoading(true);
-        if (this.loginForm?.invalid) {
+        if (this.registerForm.invalid) {
             return;
         }
 
-        console.log(this.loginForm?.value);
+        this.authService.register(
+            this.registerForm.value.email,
+            this.registerForm.value.password,
+        );
+
+        console.log(this.registerForm.value);
         this.loadingService.setLoading(false);
     }
 }

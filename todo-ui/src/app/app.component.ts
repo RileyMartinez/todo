@@ -5,9 +5,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { LoadingService } from './loading.service';
+import { LoadingService } from './services/loading.service';
 import { CommonModule } from '@angular/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
     selector: 'app-root',
@@ -21,6 +23,8 @@ import { AuthService } from './auth.service';
         MatProgressBarModule,
         CommonModule,
         MatMenuModule,
+        MatSidenavModule,
+        MatListModule,
     ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
