@@ -19,21 +19,42 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    /**
+     * Create a new user.
+     * @param createUserDto - The data for creating a new user.
+     * @returns The created user.
+     */
     @Post()
     async create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);
     }
 
+    /**
+     * Find a user by their ID.
+     * @param id - The ID of the user to find.
+     * @returns The found user.
+     */
     @Get(':id')
     async findOneById(@Param('id', ParseIntPipe) id: number) {
         return await this.usersService.findOneById(id);
     }
 
+    /**
+     * Find a user by their username.
+     * @param username - The username of the user to find.
+     * @returns The found user.
+     */
     @Get('username/:username')
     async findOneByEmail(@Param('username') username: string) {
         return await this.usersService.findOneByUsername(username);
     }
 
+    /**
+     * Update a user by their ID.
+     * @param id - The ID of the user to update.
+     * @param updateUserDto - The data for updating the user.
+     * @returns The updated user.
+     */
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
@@ -42,6 +63,11 @@ export class UsersController {
         return this.usersService.update(id, updateUserDto);
     }
 
+    /**
+     * Remove a user by their ID.
+     * @param id - The ID of the user to remove.
+     * @returns The removed user.
+     */
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.remove(id);

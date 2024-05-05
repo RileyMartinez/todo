@@ -10,18 +10,32 @@ import { InsertResult } from 'typeorm';
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
+    /**
+     * Handles the login request.
+     * @param req - The request object.
+     * @returns A Promise that resolves to the authenticated user or undefined.
+     */
     @Post('login')
     @UseGuards(LocalGuard)
     async login(@Req() req: Request): Promise<Express.User | undefined> {
         return req.user;
     }
 
+    /**
+     * Handles the logout request.
+     * @returns A Promise that resolves to the result of the logout operation.
+     */
     @Post('logout')
     @UseGuards(JwtGuard)
     async logout() {
         return await this.authService.logout();
     }
 
+    /**
+     * Handles the registration request.
+     * @param authRegisterDto - The DTO containing registration data.
+     * @returns A Promise that resolves to the result of the registration operation.
+     */
     @Post('register')
     async register(
         @Body() authRegisterDto: AuthRegisterDto,
@@ -29,6 +43,11 @@ export class AuthController {
         return await this.authService.register(authRegisterDto);
     }
 
+    /**
+     * Handles the status request.
+     * @param req - The request object.
+     * @returns A Promise that resolves to the authenticated user or undefined.
+     */
     @Get('status')
     @UseGuards(JwtGuard)
     async status(@Req() req: Request): Promise<Express.User | undefined> {
