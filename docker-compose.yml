@@ -46,6 +46,7 @@ services:
       - PORT=${API_PORT}
     ports:
       - "${API_PORT}:${API_PORT}"
+      - "${API_DEBUG_PORT}:${API_DEBUG_PORT}"
     depends_on:
       - db
     volumes:
@@ -62,6 +63,7 @@ services:
       - "${UI_PORT}:${UI_PORT}"
     volumes:
       - ./todo-ui/src:/app/src
+    # command: npm run start:debug
 
 volumes:
   pgdata:
