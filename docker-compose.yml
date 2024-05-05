@@ -51,6 +51,7 @@ services:
       - db
     volumes:
       - ./todo-api/src:/app/src
+    # command: npm run start:debug
 
   ui:
     build:
@@ -63,7 +64,6 @@ services:
       - "${UI_PORT}:${UI_PORT}"
     volumes:
       - ./todo-ui/src:/app/src
-    # command: npm run start:debug
 
 volumes:
   pgdata:
