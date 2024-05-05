@@ -24,8 +24,8 @@ export class AuthController {
         description: 'Login credentials',
         type: CreateUserDto,
     })
-    async login(@Req() req: Request): Promise<Express.User | undefined> {
-        return req.user;
+    login(@Req() req: Request): string {
+        return JSON.stringify(req.user);
     }
 
     /**
@@ -59,7 +59,7 @@ export class AuthController {
     @Get('status')
     @UseGuards(JwtGuard)
     @ApiBearerAuth()
-    async status(@Req() req: Request): Promise<Express.User | undefined> {
-        return req.user;
+    status(@Req() req: Request): string {
+        return JSON.stringify(req.user);
     }
 }

@@ -12,7 +12,8 @@ import {
     FormControl,
 } from '@angular/forms';
 import { LoadingService } from '../../../services/loading.service';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../../openapi-client';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-register',
@@ -57,15 +58,17 @@ export class RegisterComponent implements OnInit {
         });
     }
 
-    onSubmit(): void {
+    async onSubmit(): Promise<void> {
         this.loadingService.setLoading(true);
         if (this.registerForm.invalid) {
             return;
         }
 
-        this.authService.register(
-            this.registerForm.value.email,
-            this.registerForm.value.password,
+        await firstValueFrom(
+            this.authService.authControllerRegister({
+                username: this.emailFormControl.value,
+                password: this.passwordFormControl.value,
+            }),
         );
 
         console.log(this.registerForm.value);

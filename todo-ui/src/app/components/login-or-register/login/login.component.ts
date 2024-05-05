@@ -12,6 +12,8 @@ import {
     FormControl,
 } from '@angular/forms';
 import { LoadingService } from '../../../services/loading.service';
+import { AuthService } from '../../../openapi-client';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-login',
@@ -35,11 +37,10 @@ export class LoginComponent implements OnInit {
     constructor(
         private formBuilder: FormBuilder,
         private loadingService: LoadingService,
+        private authService: AuthService,
     ) {}
 
     ngOnInit(): void {
-        this.loadingService.triggerLoading();
-
         this.emailFormControl = new FormControl('', [
             Validators.email,
             Validators.required,
@@ -52,11 +53,18 @@ export class LoginComponent implements OnInit {
         });
     }
 
-    onSubmit(): void {
+    async onSubmit(): Promise<void> {
         this.loadingService.setLoading(true);
         if (this.loginForm?.invalid) {
             return;
         }
+
+        await firstValueFrom(
+            this.authService.authControllerLogin({
+                username: this.emailFormControl.value,
+                password: this.passwordFormControl.value,
+            }),
+        );
 
         console.log(this.loginForm?.value);
         this.loadingService.setLoading(false);

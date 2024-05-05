@@ -7,7 +7,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './services/loading.service';
 import { CommonModule } from '@angular/common';
-import { AuthService } from './services/auth.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 
@@ -30,10 +29,7 @@ import { MatListModule } from '@angular/material/list';
     styleUrl: './app.component.scss',
 })
 export class AppComponent {
-    constructor(
-        public loadingService: LoadingService,
-        public authService: AuthService,
-    ) {
+    constructor(public loadingService: LoadingService) {
         this.loadingService.triggerLoading();
     }
 

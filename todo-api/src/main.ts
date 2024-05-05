@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppConstants } from './app.constants';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigConstants } from './config/config.constants';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -25,6 +26,11 @@ async function bootstrap() {
 
     const configService = app.get(ConfigService);
     const port = configService.get(AppConstants.PORT);
+    const env = configService.get(ConfigConstants.ENV);
+
+    if (env === AppConstants.DEV) {
+        app.enableCors();
+    }
 
     await app.listen(port);
 }
