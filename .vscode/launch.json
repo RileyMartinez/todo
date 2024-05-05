@@ -7,12 +7,14 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "Attach to NestJS",
-      "skipFiles": ["<node_internals>/**"],
+      "name": "nest",
       "port": 9229,
-      "address": "localhost",
+      "protocol": "inspector",
+      "address": "0.0.0.0",
       "restart": true,
-      "sourceMaps": true
+      "remoteRoot": "/app",
+      "localRoot": "${workspaceFolder}/todo-api/",
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

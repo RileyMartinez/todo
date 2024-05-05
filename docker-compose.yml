@@ -51,7 +51,7 @@ services:
       - db
     volumes:
       - ./todo-api/src:/app/src
-    # command: npm run start:debug
+    command: npm run start:debug
 
   ui:
     build:
