@@ -11,7 +11,7 @@ async function bootstrap() {
 
     const swaggerConfig = new DocumentBuilder()
         .setTitle('Todo API')
-        .setDescription('The Todo API description')
+        .setDescription('Todo List API with NestJS, TypeORM, and PostgreSQL')
         .setVersion('1.0')
         .addBearerAuth({
             type: 'http',
