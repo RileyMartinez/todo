@@ -51,6 +51,7 @@ services:
       - db
     volumes:
       - ./todo-api/src:/app/src
+      - openapi:/share/openapi-client
     command: npm run start:debug
 
   ui:
@@ -64,7 +65,11 @@ services:
       - "${UI_PORT}:${UI_PORT}"
     volumes:
       - ./todo-ui/src:/app/src
+      - openapi:/app/src/app/openapi-client
+    depends_on:
+      - api
 
 volumes:
   pgdata:
   pgadmin:
+  openapi:

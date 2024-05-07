@@ -1,13 +1,24 @@
 import { execSync } from 'child_process';
 import { rimraf } from 'rimraf';
 
-const generatePath = '../todo-ui/src/app/openapi-client';
+const basePath = 'http://localhost:3000';
+const inputPath = `${basePath}/api-json`;
+const outputPath = '../todo-ui/src/app/openapi-client';
 
-rimraf.sync(generatePath);
+rimraf.sync(outputPath);
 
 const output = execSync(
-    `npx openapi-generator-cli generate -g typescript-angular -i http://localhost:3000/api-json -o ${generatePath}`,
-    { encoding: 'utf-8' },
+    [
+        'npx openapi-generator-cli generate -g typescript-angular',
+        `-i ${inputPath}`,
+        `-o ${outputPath}`,
+        `--additional-properties=basePath=${basePath}`,
+    ].join(' '),
+    {
+        encoding: 'utf-8',
+    },
 );
 
-console.log(output);
+if (output) {
+    console.log('openapi-generator-cli-output:', output);
+}

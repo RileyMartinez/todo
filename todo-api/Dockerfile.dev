@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY package*.json /app
 
-RUN npm install
+RUN apk update && \
+    apk add --no-cache openjdk11-jre && \ 
+    npm install
 
 COPY . .
 
