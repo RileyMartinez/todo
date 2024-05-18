@@ -25,17 +25,18 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
 
     const configService = app.get(ConfigService);
+    const basePath = configService.get(AppConstants.BASE_PATH);
     const port = configService.get(AppConstants.PORT);
-    const env = configService.get(AppConstants.ENV);
+    const uiPort = configService.get(AppConstants.UI_PORT);
 
-    if (env === AppConstants.DEV) {
-        app.enableCors();
-    }
+    await OpenAPIUtil.generateOpenAPIClient(document);
+
+    app.enableCors({
+        origin: `${basePath}:${uiPort}`,
+        credentials: true,
+    });
 
     await app.listen(port);
-
-    const appUrl = env === AppConstants.DEV ? `http://localhost:${port}` : '';
-    await OpenAPIUtil.generateOpenAPIClient(appUrl);
 }
 
 bootstrap();
