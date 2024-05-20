@@ -7,7 +7,7 @@ import { ConfigConstants } from 'src/constants/config.constants';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-    constructor(private readonly configService: ConfigService) {
+    constructor(readonly configService: ConfigService) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: configService.get(ConfigConstants.JWT_REFRESH_SECRET),
