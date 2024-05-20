@@ -12,7 +12,9 @@ export class UsersRepository {
     constructor(
         @InjectRepository(User)
         private repository: Repository<User>,
-    ) {}
+    ) {
+        this.repository = repository;
+    }
 
     /**
      * Inserts a new user into the database.

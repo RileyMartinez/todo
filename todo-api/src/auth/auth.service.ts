@@ -16,7 +16,11 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
-    ) {}
+    ) {
+        this.usersService = usersService;
+        this.jwtService = jwtService;
+        this.configService = configService;
+    }
 
     /**
      * Authenticates a user by checking their email and password.

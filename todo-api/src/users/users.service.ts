@@ -8,7 +8,9 @@ import { SafeUserDto } from './dto/safe-user.dto';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly usersRepository: UsersRepository) {}
+    constructor(private readonly usersRepository: UsersRepository) {
+        this.usersRepository = usersRepository;
+    }
 
     /**
      * Creates a new user.
