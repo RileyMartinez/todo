@@ -1,14 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    ParseIntPipe,
-    UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -43,13 +33,13 @@ export class UsersController {
     }
 
     /**
-     * Find a user by their username.
-     * @param username - The username of the user to find.
+     * Find a user by their email.
+     * @param email - The email of the user to find.
      * @returns The found user.
      */
-    @Get('username/:username')
-    async findOneByEmail(@Param('username') username: string) {
-        return await this.usersService.findOneByUsername(username);
+    @Get('email/:email')
+    async findOneByEmail(@Param('email') email: string) {
+        return await this.usersService.findOneByEmail(email);
     }
 
     /**
@@ -59,10 +49,7 @@ export class UsersController {
      * @returns The updated user.
      */
     @Patch(':id')
-    update(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() updateUserDto: UpdateUserDto,
-    ) {
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
         return this.usersService.update(id, updateUserDto);
     }
 

@@ -33,10 +33,7 @@ export class TodolistService {
         return todoList;
     }
 
-    async update(
-        id: number,
-        updateTodolistDto: UpdateTodolistDto,
-    ): Promise<UpdateResult> {
+    async update(id: number, updateTodolistDto: UpdateTodolistDto): Promise<UpdateResult> {
         return await this.todolistRepository.update(id, updateTodolistDto);
     }
 

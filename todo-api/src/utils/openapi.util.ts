@@ -13,11 +13,7 @@ export class OpenAPIUtil {
         const basePath = process.env.BASE_PATH || '';
         const port = process.env.PORT || '3000';
 
-        await writeFile(
-            swaggerFilePath,
-            JSON.stringify(swaggerDocument),
-            'utf8',
-        );
+        await writeFile(swaggerFilePath, JSON.stringify(swaggerDocument), 'utf8');
 
         const { stdout, stderr } = await execAsync(
             [

@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
 
         await firstValueFrom(
             this.authService.authControllerLogin({
-                username: this.emailFormControl.value,
+                email: this.emailFormControl.value,
                 password: this.passwordFormControl.value,
             }),
         );

@@ -23,10 +23,7 @@ export class TodoService {
         return todo;
     }
 
-    async update(
-        id: number,
-        updateTodoDto: UpdateTodoDto,
-    ): Promise<UpdateResult> {
+    async update(id: number, updateTodoDto: UpdateTodoDto): Promise<UpdateResult> {
         return await this.todoRepository.update(id, updateTodoDto);
     }
 

@@ -2,9 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppConstants } from './app.constants';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { OpenAPIUtil } from './utils/openapi.util';
+import { ConfigConstants } from './constants/config.constants';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -25,16 +25,18 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
 
     const configService = app.get(ConfigService);
-    const basePath = configService.get(AppConstants.BASE_PATH);
-    const port = configService.get(AppConstants.PORT);
-    const uiPort = configService.get(AppConstants.UI_PORT);
+    // const basePath = configService.get(ConfigConstants.BASE_PATH);
+    const port = configService.get(ConfigConstants.PORT);
+    // const uiPort = configService.get(ConfigConstants.UI_PORT);
 
     await OpenAPIUtil.generateOpenAPIClient(document);
-
+    /*
     app.enableCors({
         origin: `${basePath}:${uiPort}`,
         credentials: true,
     });
+    */
+    app.enableCors();
 
     await app.listen(port);
 }

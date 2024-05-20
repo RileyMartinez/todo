@@ -39,10 +39,7 @@ export class TodolistRepository {
             .getOne();
     }
 
-    async update(
-        id: number,
-        updateTodolistDto: UpdateTodolistDto,
-    ): Promise<UpdateResult> {
+    async update(id: number, updateTodolistDto: UpdateTodolistDto): Promise<UpdateResult> {
         return await this.repository
             .createQueryBuilder()
             .update()
@@ -52,10 +49,6 @@ export class TodolistRepository {
     }
 
     async delete(id: number): Promise<DeleteResult> {
-        return await this.repository
-            .createQueryBuilder()
-            .delete()
-            .where('id = :id', { id })
-            .execute();
+        return await this.repository.createQueryBuilder().delete().where('id = :id', { id }).execute();
     }
 }

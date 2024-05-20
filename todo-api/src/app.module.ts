@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { throttlerConfig } from './config/throttle.config';
-import { AppConstants } from './app.constants';
+import { AppConstants } from './constants/app.constants';
 
 @Module({
     imports: [

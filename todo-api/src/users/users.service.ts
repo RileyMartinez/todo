@@ -3,48 +3,57 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
-import { InsertResult, UpdateResult } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { UpdateResult } from 'typeorm';
+import { SafeUserDto } from './dto/safe-user.dto';
 
 @Injectable()
 export class UsersService {
-    constructor(private usersRepository: UsersRepository) {}
+    constructor(private readonly usersRepository: UsersRepository) {}
 
-    async create(createUserDto: CreateUserDto): Promise<InsertResult> {
-        const salt = await bcrypt.genSalt();
-        createUserDto.password = await bcrypt.hash(
-            createUserDto.password,
-            salt,
-        );
-
+    /**
+     * Creates a new user.
+     * @param createUserDto - The data for creating a new user.
+     * @returns A promise that resolves to the created user, excluding their password.
+     */
+    async create(createUserDto: CreateUserDto): Promise<SafeUserDto> {
         return await this.usersRepository.insert(createUserDto);
     }
 
+    /**
+     * Finds a user by their ID.
+     * @param id - The ID of the user to find.
+     * @returns A promise that resolves to the found user, or null if not found.
+     */
     async findOneById(id: number): Promise<User | null> {
         const user = await this.usersRepository.getOneById(id);
         return user;
     }
 
-    async findOneByUsername(username: string): Promise<User | null> {
-        const user = await this.usersRepository.getOneByUsername(username);
+    /**
+     * Finds a user by their email.
+     * @param email - The email of the user to find.
+     * @returns A promise that resolves to the found user, or null if not found.
+     */
+    async findOneByEmail(email: string): Promise<User | null> {
+        const user = await this.usersRepository.getOneByEmail(email);
         return user;
     }
 
-    async update(
-        id: number,
-        updateUserDto: UpdateUserDto,
-    ): Promise<UpdateResult> {
-        if (updateUserDto.password) {
-            const salt = await bcrypt.genSalt();
-            updateUserDto.password = await bcrypt.hash(
-                updateUserDto.password,
-                salt,
-            );
-        }
-
+    /**
+     * Updates a user.
+     * @param id - The ID of the user to update.
+     * @param updateUserDto - The data for updating the user.
+     * @returns A promise that resolves to the update result.
+     */
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
         return await this.usersRepository.update(id, updateUserDto);
     }
 
+    /**
+     * Removes a user.
+     * @param id - The ID of the user to remove.
+     * @returns A promise that resolves when the user is removed.
+     */
     async remove(id: number) {
         return await this.usersRepository.delete(id);
     }

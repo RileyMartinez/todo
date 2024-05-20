@@ -1,12 +1,13 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { LocalGuard } from './guards/local.guard';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { JwtGuard } from './guards/jwt.guard';
-import { InsertResult } from 'typeorm';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { AuthTokenDto } from './dto/auth-token.dto';
+import { AuthLoginDto } from './dto/auth-login.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -24,19 +25,8 @@ export class AuthController {
         description: 'Login credentials',
         type: CreateUserDto,
     })
-    login(
-        @Req() req: Request,
-        @Res({ passthrough: true }) res: Response,
-    ): { status: string; message: string } {
-        res.cookie('jwt', req.user, {
-            httpOnly: true,
-            expires: new Date(Date.now() + 1000 * 60 * 60 * 1),
-        });
-
-        return {
-            status: 'success',
-            message: 'Login successful',
-        };
+    async login(@Req() req: Request, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
+        return req.user as AuthTokenDto;
     }
 
     /**
@@ -56,9 +46,7 @@ export class AuthController {
      * @returns A Promise that resolves to the result of the registration operation.
      */
     @Post('register')
-    async register(
-        @Body() authRegisterDto: AuthRegisterDto,
-    ): Promise<InsertResult | null> {
+    async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);
     }
 }

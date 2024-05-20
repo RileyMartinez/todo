@@ -12,16 +12,17 @@
       "webRoot": "${workspaceFolder}/todo-ui/"
     },
     {
-      "type": "api: attach",
+      "name": "api: attach",
       "request": "attach",
-      "name": "nest",
+      "type": "node",
       "port": 9229,
       "protocol": "inspector",
       "address": "0.0.0.0",
       "restart": true,
       "remoteRoot": "/app",
       "localRoot": "${workspaceFolder}/todo-api/",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true
     }
   ]
 }

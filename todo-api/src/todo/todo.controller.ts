@@ -1,14 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    ParseIntPipe,
-    UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -53,10 +43,7 @@ export class TodoController {
      * @returns A promise that resolves to the result of the todo update.
      */
     @Patch(':id')
-    async update(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() updateTodoDto: UpdateTodoDto,
-    ): Promise<UpdateResult> {
+    async update(@Param('id', ParseIntPipe) id: number, @Body() updateTodoDto: UpdateTodoDto): Promise<UpdateResult> {
         return await this.todoService.update(id, updateTodoDto);
     }
 

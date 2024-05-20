@@ -18,27 +18,17 @@ export class TodoRepository {
             .insert()
             .into(Todo)
             .values(createTodoDto)
-            .orUpdate(
-                ['title', 'description', 'completed', 'dueDate', 'order'],
-                ['id'],
-                {
-                    skipUpdateIfNoValuesChanged: true,
-                },
-            )
+            .orUpdate(['title', 'description', 'completed', 'dueDate', 'order'], ['id'], {
+                skipUpdateIfNoValuesChanged: true,
+            })
             .execute();
     }
 
     async getOne(id: number): Promise<Todo | null> {
-        return await this.repository
-            .createQueryBuilder()
-            .where('id = :id', { id })
-            .getOne();
+        return await this.repository.createQueryBuilder().where('id = :id', { id }).getOne();
     }
 
-    async update(
-        id: number,
-        updateTodoDto: UpdateTodoDto,
-    ): Promise<UpdateResult> {
+    async update(id: number, updateTodoDto: UpdateTodoDto): Promise<UpdateResult> {
         return await this.repository
             .createQueryBuilder()
             .update()
@@ -48,10 +38,6 @@ export class TodoRepository {
     }
 
     async delete(id: number): Promise<DeleteResult> {
-        return await this.repository
-            .createQueryBuilder()
-            .delete()
-            .where('id = :id', { id })
-            .execute();
+        return await this.repository.createQueryBuilder().delete().where('id = :id', { id }).execute();
     }
 }
