@@ -14,19 +14,63 @@
       }
     },
     {
+      "label": "todo-api cli",
+      "type": "shell",
+      "command": "cd ./todo-api; pwsh -NoExit",
+      "options": {
+        "executable": "pwsh",
+        "args": ["-Command"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "todo-ui cli",
+      "type": "shell",
+      "command": "cd ./todo-ui; pwsh -NoExit",
+      "options": {
+        "executable": "pwsh",
+        "args": ["-Command"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
       "label": "todo-api",
       "type": "shell",
-      "command": "cd ./todo-api && echo 'Open Terminal Here'",
+      "command": "cd ./todo-api; yarn build;",
+      "options": {
+        "executable": "pwsh",
+        "args": ["-Command"]
+      },
       "runOptions": {
         "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
+        "close": true
       }
     },
     {
       "label": "todo-ui",
       "type": "shell",
-      "command": "cd ./todo-ui && echo 'Open Terminal Here'",
+      "command": "cd ./todo-ui; yarn build;",
+      "options": {
+        "executable": "pwsh",
+        "args": ["-Command"]
+      },
       "runOptions": {
         "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
+        "close": true
       }
     }
   ]
