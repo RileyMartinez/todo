@@ -131,3 +131,7 @@ dist
 
 # docker
 pgdata/
+
+# OpenAPI
+openapi-client/
+openapi.json
