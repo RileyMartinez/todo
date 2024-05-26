@@ -11,12 +11,15 @@ import { UsersModule } from './users/users.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { throttlerConfig } from './config/throttle.config';
 import { AppConstants } from './constants/app.constants';
+import { AutomapperModule } from '@automapper/nestjs';
+import { automapperConfig } from './config/automapper.config';
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
         TypeOrmModule.forRootAsync(typeOrmConfig),
         ThrottlerModule.forRootAsync(throttlerConfig),
+        AutomapperModule.forRootAsync(automapperConfig),
         TodoModule,
         TodolistModule,
         AuthModule,
