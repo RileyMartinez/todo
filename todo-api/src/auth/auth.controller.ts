@@ -12,7 +12,9 @@ import { AuthLoginDto } from './dto/auth-login.dto';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {
+        this.authService = authService;
+    }
 
     /**
      * Handles the login request.
