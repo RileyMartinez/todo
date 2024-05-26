@@ -12,6 +12,22 @@
       "runOptions": {
         "runOn": "folderOpen"
       }
+    },
+    {
+      "label": "todo-api",
+      "type": "shell",
+      "command": "cd ./todo-api && echo 'Open Terminal Here'",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "todo-ui",
+      "type": "shell",
+      "command": "cd ./todo-ui && echo 'Open Terminal Here'",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
     }
   ]
 }
