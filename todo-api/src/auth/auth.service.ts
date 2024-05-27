@@ -9,10 +9,15 @@ import { ConfigService } from '@nestjs/config';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { UserAlreadyExistsException } from 'src/exceptions/user/user-already-exists.exception';
 import { SafeUserDto } from 'src/users/dto/safe-user.dto';
+import { Mapper } from '@automapper/core';
+import { InjectMapper } from '@automapper/nestjs';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
     constructor(
+        @InjectMapper()
+        private readonly mapper: Mapper,
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
@@ -20,6 +25,7 @@ export class AuthService {
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
+        this.mapper = mapper;
     }
 
     /**
@@ -42,7 +48,8 @@ export class AuthService {
             throw new ForbiddenException(exceptionMessage);
         }
 
-        const tokens = await this.getTokens(user.toSafeUserDto());
+        const safeUser = this.mapper.map(user, User, SafeUserDto);
+        const tokens = await this.getTokens(safeUser);
         await this.updateUserRefreshToken(user.id, tokens.refreshToken);
 
         return tokens;

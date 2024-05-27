@@ -1,12 +1,14 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { SafeUserDto } from '../dto/safe-user.dto';
+import { AutoMap } from '@automapper/classes';
 
 @Entity()
 @Unique(['email'])
 export class User {
+    @AutoMap()
     @PrimaryGeneratedColumn()
     id: number;
 
+    @AutoMap()
     @Column()
     email: string;
 
@@ -15,11 +17,4 @@ export class User {
 
     @Column({ nullable: true })
     refreshToken: string;
-
-    toSafeUserDto(): SafeUserDto {
-        return {
-            id: this.id,
-            email: this.email,
-        };
-    }
 }
