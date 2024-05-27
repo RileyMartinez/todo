@@ -14,35 +14,9 @@
       }
     },
     {
-      "label": "todo-api cli",
+      "label": "build-api",
       "type": "shell",
-      "command": "cd ./todo-api; pwsh -NoExit",
-      "options": {
-        "executable": "pwsh",
-        "args": ["-Command"]
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    },
-    {
-      "label": "todo-ui cli",
-      "type": "shell",
-      "command": "cd ./todo-ui; pwsh -NoExit",
-      "options": {
-        "executable": "pwsh",
-        "args": ["-Command"]
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      }
-    },
-    {
-      "label": "todo-api",
-      "type": "shell",
-      "command": "cd ./todo-api; yarn build;",
+      "command": "Start-Sleep -Seconds 5; cd ./todo-api; yarn build; yarn generate:client;",
       "options": {
         "executable": "pwsh",
         "args": ["-Command"]
@@ -57,7 +31,7 @@
       }
     },
     {
-      "label": "todo-ui",
+      "label": "build-ui",
       "type": "shell",
       "command": "cd ./todo-ui; yarn build;",
       "options": {
@@ -71,7 +45,8 @@
         "reveal": "silent",
         "revealProblems": "onProblem",
         "close": true
-      }
+      },
+      "dependsOn": ["build-api"]
     }
   ]
 }
