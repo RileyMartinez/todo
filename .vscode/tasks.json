@@ -4,7 +4,7 @@
     {
       "label": "docker compose up",
       "type": "shell",
-      "command": "docker-compose up",
+      "command": "docker compose up",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -16,7 +16,7 @@
     {
       "label": "build-api",
       "type": "shell",
-      "command": "Start-Sleep -Seconds 5; cd ./todo-api; yarn build; yarn generate:client;",
+      "command": "start-sleep -seconds 5; cd ./todo-api; yarn build; yarn generate:client;",
       "options": {
         "executable": "pwsh",
         "args": ["-Command"]
