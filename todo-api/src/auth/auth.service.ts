@@ -22,10 +22,10 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
     ) {
+        this.mapper = mapper;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
-        this.mapper = mapper;
     }
 
     /**
@@ -92,7 +92,7 @@ export class AuthService {
      * @param email - The email of the user.
      * @returns An object containing the access and refresh tokens.
      */
-    private async getTokens(safeUser: SafeUserDto) {
+    private async getTokens(safeUser: SafeUserDto): Promise<{ accessToken: string; refreshToken: string }> {
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
         const accessTokenExpiration = this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION);
@@ -130,7 +130,7 @@ export class AuthService {
      * @param refreshToken - The new refresh token.
      * @returns A Promise that resolves when the refresh token is updated.
      */
-    private async updateUserRefreshToken(userId: number, refreshToken: string) {
+    private async updateUserRefreshToken(userId: number, refreshToken: string): Promise<void> {
         const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
         const hash = await bcrypt.hash(refreshToken, saltRounds);
 
