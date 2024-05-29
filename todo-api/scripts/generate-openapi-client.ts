@@ -66,7 +66,7 @@ async function moveClientToUiProject() {
         }
     }
 
-    await fs.move(sourcePath, destinationPath);
+    await fs.move(sourcePath, destinationPath, { overwrite: true });
 }
 
 generateOpenAPIClient(fetchPath);
