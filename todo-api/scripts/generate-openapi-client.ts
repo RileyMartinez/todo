@@ -1,10 +1,10 @@
 import { execSync } from 'child_process';
 import { config } from 'dotenv';
 import * as os from 'os';
-import * as http from 'http';
 import { writeFile } from 'fs';
 import { promisify } from 'util';
 import * as fs from 'fs-extra';
+import axios from 'axios';
 
 config();
 
@@ -20,24 +20,6 @@ const outputPath = 'local/openapi-client';
 const destinationPath = '../todo-ui/src/app/openapi-client';
 const writeFileAsync = promisify(writeFile);
 
-const fetchOpenApiSpec = (fetchPath: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        http.get(fetchPath, (res) => {
-            let data = '';
-
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
-
-            res.on('end', () => {
-                resolve(data);
-            });
-        }).on('error', (err) => {
-            reject(err);
-        });
-    });
-};
-
 const generateOpenAPIClient = async (fetchPath: string) => {
     try {
         const spec = await fetchOpenApiSpec(fetchPath);
@@ -48,6 +30,11 @@ const generateOpenAPIClient = async (fetchPath: string) => {
         console.error('Error generating OpenAPI client:', error);
     }
 };
+
+async function fetchOpenApiSpec(fetchPath: string): Promise<string> {
+    const response = await axios.get<string>(fetchPath, { responseType: 'text' });
+    return response.data;
+}
 
 function generateClient() {
     const output = execSync(
@@ -71,12 +58,15 @@ function generateClient() {
 async function moveClientToUiProject() {
     const sourcePath = './openapi-client';
 
-    try {
-        await fs.copy(sourcePath, destinationPath);
-        await fs.rm(sourcePath, { recursive: true });
-    } catch (error) {
-        console.error('Error moving OpenAPI client to UI project:', error);
+    if (!isWindows) {
+        execSync(`sudo chmod 777 ${sourcePath}`);
+
+        if (await fs.exists(destinationPath)) {
+            execSync(`sudo rm -rf ${destinationPath}`);
+        }
     }
+
+    await fs.move(sourcePath, destinationPath);
 }
 
 generateOpenAPIClient(fetchPath);
