@@ -8,7 +8,7 @@ function Load-EnvironmentVariables {
 
     if (Test-Path $InputFile) {
         Write-Host "Loading environment variables from $InputFile to $OutputFile"
-        op.exe inject -i $InputFile -o $OutputFile
+        op.exe inject -f -i $InputFile -o $OutputFile
     } else {
         Write-Host "File not found: $InputFile"
     }
