@@ -13,7 +13,7 @@ import { throttlerConfig } from './config/throttle.config';
 import { AppConstants } from './constants/app.constants';
 import { AutomapperModule } from '@automapper/nestjs';
 import { automapperConfig } from './config/automapper.config';
-import { UserProfile } from './mappers/user.profile';
+import { UserMappingProfile } from './mappers/user-mapping.profile';
 
 @Module({
     imports: [
@@ -33,7 +33,7 @@ import { UserProfile } from './mappers/user.profile';
             provide: AppConstants.APP_GUARD,
             useClass: ThrottlerGuard,
         },
-        UserProfile,
+        UserMappingProfile,
     ],
 })
 export class AppModule {}

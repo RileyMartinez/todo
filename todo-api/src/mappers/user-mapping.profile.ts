@@ -3,7 +3,7 @@ import { AutomapperProfile, InjectMapper } from '@automapper/nestjs';
 import { SafeUserDto } from 'src/users/dto/safe-user.dto';
 import { User } from 'src/users/entities/user.entity';
 
-export class UserProfile extends AutomapperProfile {
+export class UserMappingProfile extends AutomapperProfile {
     constructor(@InjectMapper() mapper: Mapper) {
         super(mapper);
     }
