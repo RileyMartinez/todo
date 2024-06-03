@@ -48,6 +48,10 @@ export class AuthController {
      * @returns A Promise that resolves to the result of the registration operation.
      */
     @Post('register')
+    @ApiBody({
+        description: 'Registration info',
+        type: AuthRegisterDto,
+    })
     async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);
     }

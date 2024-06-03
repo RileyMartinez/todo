@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotImplementedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotImplementedException } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import { ConfigConstants } from 'src/constants/config.constants';
 import { ConfigService } from '@nestjs/config';
 import { AuthTokenDto } from './dto/auth-token.dto';
-import { UserAlreadyExistsException } from 'src/exceptions/user/user-already-exists.exception';
 import { SafeUserDto } from 'src/users/dto/safe-user.dto';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
@@ -59,13 +58,13 @@ export class AuthService {
      * Registers a new user with the provided email and password.
      * @param {AuthRegisterDto} data - The registration data containing email and password.
      * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
-     * @throws {UserAlreadyExistsException} - If a user with the provided email already exists.
+     * @throws {ConflictException} - If a user with the provided email already exists.
      */
     async register({ email, password }: AuthRegisterDto): Promise<AuthTokenDto> {
         const user = await this.usersService.findOneByEmail(email);
 
         if (user) {
-            throw new UserAlreadyExistsException();
+            throw new ConflictException(`User with email ${email} already exists`);
         }
 
         const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
