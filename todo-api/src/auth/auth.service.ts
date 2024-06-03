@@ -31,7 +31,8 @@ export class AuthService {
      * Authenticates a user by checking their email and password.
      * If the user is authenticated, a JWT token is generated and returned.
      * @param {AuthLoginDto} credentials - The email and password of the user.
-     * @returns {Promise<AuthTokenDto | null>} - A promise that resolves to the authentication tokens for the authenticated user.
+     * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the authenticated user.
+     * @throws {ForbiddenException} - If the email or password is incorrect.
      */
     async login({ email, password }: AuthLoginDto): Promise<AuthTokenDto> {
         const user = await this.usersService.findOneByEmail(email);
@@ -91,7 +92,7 @@ export class AuthService {
      * @param email - The email of the user.
      * @returns An object containing the access and refresh tokens.
      */
-    private async getTokens(safeUser: SafeUserDto): Promise<{ accessToken: string; refreshToken: string }> {
+    private async getTokens(safeUser: SafeUserDto): Promise<AuthTokenDto> {
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
         const accessTokenExpiration = this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION);

@@ -1,13 +1,16 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 import { JwtGuard } from './guards/jwt.guard';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
+
+export interface AuthTokenRequest extends Request {
+    user?: AuthTokenDto;
+}
 
 @Controller('auth')
 @ApiTags('auth')
@@ -18,22 +21,26 @@ export class AuthController {
 
     /**
      * Handles the login request.
-     * @param req - The request object.
-     * @returns A Promise that resolves to the authenticated user or undefined.
      */
     @Post('login')
-    @UseGuards(LocalGuard)
-    @ApiBody({
-        description: 'Login credentials',
-        type: CreateUserDto,
+    @ApiCreatedResponse({
+        description: 'User session created successfully',
+        type: AuthTokenDto,
     })
-    async login(@Req() req: Request, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
-        return req.user as AuthTokenDto;
+    @ApiForbiddenResponse({
+        description: 'Invalid email or password',
+    })
+    @UseGuards(LocalGuard)
+    async login(@Req() req: AuthTokenRequest, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
+        if (!req.user) {
+            throw new ForbiddenException('Access denied. Invalid email or password');
+        }
+
+        return req.user;
     }
 
     /**
      * Handles the logout request.
-     * @returns A Promise that resolves to the result of the logout operation.
      */
     @Post('logout')
     @UseGuards(JwtGuard)
@@ -44,13 +51,14 @@ export class AuthController {
 
     /**
      * Handles the registration request.
-     * @param authRegisterDto - The DTO containing registration data.
-     * @returns A Promise that resolves to the result of the registration operation.
      */
     @Post('register')
-    @ApiBody({
-        description: 'Registration info',
-        type: AuthRegisterDto,
+    @ApiCreatedResponse({
+        description: 'User registered successfully',
+        type: AuthTokenDto,
+    })
+    @ApiConflictResponse({
+        description: 'User with email ${email} already exists',
     })
     async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);
