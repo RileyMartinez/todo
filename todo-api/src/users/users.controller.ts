@@ -9,15 +9,26 @@ import {
     ParseIntPipe,
     UseGuards,
     UseInterceptors,
+    Res,
+    HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiCreatedResponse,
+    ApiInternalServerErrorResponse,
+    ApiNoContentResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { SafeUserDto } from './dto/safe-user.dto';
 import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
+import { Response } from 'express';
 
 @Controller('users')
 @ApiTags('users')
@@ -30,10 +41,15 @@ export class UsersController {
 
     /**
      * Create a new user.
-     * @param createUserDto - The data for creating a new user.
-     * @returns The created user.
      */
     @Post()
+    @ApiCreatedResponse({
+        description: 'The created user',
+        type: SafeUserDto,
+    })
+    @ApiInternalServerErrorResponse({
+        description: 'Failed to create user',
+    })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
         return this.usersService.create(createUserDto);
@@ -41,10 +57,15 @@ export class UsersController {
 
     /**
      * Find a user by their ID.
-     * @param id - The ID of the user to find.
-     * @returns The found user.
      */
     @Get(':id')
+    @ApiOkResponse({
+        description: 'The found user',
+        type: SafeUserDto,
+    })
+    @ApiNotFoundResponse({
+        description: 'User with ID ${id} not found',
+    })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneById(@Param('id', ParseIntPipe) id: number): Promise<SafeUserDto> {
         return await this.usersService.findOneById(id);
@@ -52,22 +73,37 @@ export class UsersController {
 
     /**
      * Find a user by their email.
-     * @param email - The email of the user to find.
-     * @returns The found user.
      */
     @Get('email/:email')
+    @ApiOkResponse({
+        description: 'The found user',
+        type: SafeUserDto,
+    })
+    @ApiNoContentResponse({
+        description: 'User not found',
+    })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
-    async findOneByEmail(@Param('email') email: string): Promise<SafeUserDto | null> {
-        return await this.usersService.findOneByEmail(email);
+    async findOneByEmail(@Param('email') email: string, @Res() res: Response): Promise<SafeUserDto | null> {
+        const user = await this.usersService.findOneByEmail(email);
+
+        if (!user) {
+            res.status(HttpStatus.NO_CONTENT).send();
+        }
+
+        return user;
     }
 
     /**
      * Update a user by their ID.
-     * @param id - The ID of the user to update.
-     * @param updateUserDto - The data for updating the user.
-     * @returns The updated user.
      */
     @Patch(':id')
+    @ApiOkResponse({
+        description: 'The updated user',
+        type: SafeUserDto,
+    })
+    @ApiNotFoundResponse({
+        description: 'User with ID ${id} not found',
+    })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<SafeUserDto> {
         return this.usersService.update(id, updateUserDto);
@@ -75,10 +111,15 @@ export class UsersController {
 
     /**
      * Remove a user by their ID.
-     * @param id - The ID of the user to remove.
-     * @returns The removed user.
      */
     @Delete(':id')
+    @ApiOkResponse({
+        description: 'The number of deleted users',
+        type: Number,
+    })
+    @ApiNotFoundResponse({
+        description: 'User with ID ${id} not found',
+    })
     remove(@Param('id', ParseIntPipe) id: number): Promise<number> {
         return this.usersService.remove(id);
     }
