@@ -5,9 +5,12 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { OpenAPIUtil } from './utils/openapi.util';
 import { ConfigConstants } from './constants/config.constants';
+import { AllExceptionsFilter } from './exception-filters/all-exceptions.filter';
+import { HttpExceptionsFilter } from './exception-filters/http-exceptions.filter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.useGlobalFilters(new HttpExceptionsFilter(), new AllExceptionsFilter());
     app.useGlobalPipes(new ValidationPipe());
 
     const swaggerConfig = new DocumentBuilder()
