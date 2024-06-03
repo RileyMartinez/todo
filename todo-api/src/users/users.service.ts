@@ -3,8 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
-import { UpdateResult } from 'typeorm';
-import { SafeUserDto } from './dto/safe-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,20 +13,21 @@ export class UsersService {
     /**
      * Creates a new user.
      * @param createUserDto - The data for creating a new user.
-     * @returns A promise that resolves to the created user, excluding their password.
+     * @returns A promise that resolves to the created user.
+     * @throws {InternalServerErrorException} If the user creation fails.
      */
-    async create(createUserDto: CreateUserDto): Promise<SafeUserDto> {
+    async create(createUserDto: CreateUserDto): Promise<User> {
         return await this.usersRepository.insert(createUserDto);
     }
 
     /**
      * Finds a user by their ID.
      * @param id - The ID of the user to find.
-     * @returns A promise that resolves to the found user, or null if not found.
+     * @returns A promise that resolves to the found user.
+     * @throws {NotFoundException} If the user is not found.
      */
-    async findOneById(id: number): Promise<User | null> {
-        const user = await this.usersRepository.getOneById(id);
-        return user;
+    async findOneById(id: number): Promise<User> {
+        return await this.usersRepository.getOneById(id);
     }
 
     /**
@@ -37,8 +36,7 @@ export class UsersService {
      * @returns A promise that resolves to the found user, or null if not found.
      */
     async findOneByEmail(email: string): Promise<User | null> {
-        const user = await this.usersRepository.getOneByEmail(email);
-        return user;
+        return await this.usersRepository.getOneByEmail(email);
     }
 
     /**
@@ -46,15 +44,17 @@ export class UsersService {
      * @param id - The ID of the user to update.
      * @param updateUserDto - The data for updating the user.
      * @returns A promise that resolves to the update result.
+     * @throws {NotFoundException} If the user to update is not found.
      */
-    async update(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
         return await this.usersRepository.update(id, updateUserDto);
     }
 
     /**
      * Removes a user.
      * @param id - The ID of the user to remove.
-     * @returns A promise that resolves when the user is removed.
+     * @returns A promise that resolves to the number of deleted rows.
+     * @throws {NotFoundException} If the user to delete is not found.
      */
     async remove(id: number) {
         return await this.usersRepository.delete(id);

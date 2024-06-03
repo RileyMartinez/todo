@@ -1,11 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { SafeUserDto } from './dto/safe-user.dto';
-import { DatabaseException } from 'src/exceptions/database/database.exception';
 
 @Injectable()
 export class UsersRepository {
@@ -19,20 +17,20 @@ export class UsersRepository {
     /**
      * Inserts a new user into the database.
      * @param insertUserDto - The data for creating a new user.
-     * @returns A Promise that resolves to the created user.
-     * @throws {DatabaseException} If the user creation fails.
+     * @returns A Promise that resolves to the created user entity.
+     * @throws {InternalServerErrorException} If the user creation fails.
      */
-    async insert(insertUserDto: CreateUserDto): Promise<SafeUserDto> {
+    async insert(insertUserDto: CreateUserDto): Promise<User> {
         const result = await this.repository
             .createQueryBuilder()
             .insert()
             .into(User)
             .values(insertUserDto)
-            .returning(['id', 'email'])
+            .returning('*')
             .execute();
 
         if (!result.raw[0]) {
-            throw new DatabaseException('Failed to create user');
+            throw new InternalServerErrorException('Failed to create user');
         }
 
         return result.raw[0];
@@ -41,10 +39,17 @@ export class UsersRepository {
     /**
      * Retrieves a user by their ID.
      * @param id - The ID of the user to retrieve.
-     * @returns A Promise that resolves to the user object if found, or null if not found.
+     * @returns A Promise that resolves to the user.
+     * @throws {NotFoundException} If the user is not found.
      */
-    async getOneById(id: number): Promise<User | null> {
-        return await this.repository.createQueryBuilder().where('id = :id', { id }).getOne();
+    async getOneById(id: number): Promise<User> {
+        const result = await this.repository.createQueryBuilder().where('id = :id', { id }).getOne();
+
+        if (!result) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        return result;
     }
 
     /**
@@ -61,23 +66,38 @@ export class UsersRepository {
      *
      * @param id - The ID of the user to update.
      * @param updateUserDto - The data to update the user with.
-     * @returns A promise that resolves to an object containing the update result.
+     * @returns A promise that resolves to the updated user entity.
+     * @throws {NotFoundException} If the user to update is not found.
      */
-    async update(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
-        return await this.repository
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+        const result = await this.repository
             .createQueryBuilder()
             .update()
             .set(updateUserDto)
             .where('id = :id', { id })
+            .returning('*')
             .execute();
+
+        if (!result.raw[0]) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        return result.raw[0];
     }
 
     /**
      * Deletes a user by their ID.
      * @param id - The ID of the user to delete.
-     * @returns A promise that resolves to a `DeleteResult` object.
+     * @returns A promise that resolves to the number of deleted rows.
+     * @throws {NotFoundException} If the user to delete is not found.
      */
-    async delete(id: number): Promise<DeleteResult> {
-        return await this.repository.createQueryBuilder().delete().where('id = :id', { id }).execute();
+    async delete(id: number): Promise<number> {
+        const result = await this.repository.createQueryBuilder().delete().where('id = :id', { id }).execute();
+
+        if (!result.affected) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        return result.affected;
     }
 }

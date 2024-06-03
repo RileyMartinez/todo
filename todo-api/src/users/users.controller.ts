@@ -1,9 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    ParseIntPipe,
+    UseGuards,
+    UseInterceptors,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { SafeUserDto } from './dto/safe-user.dto';
+import { MapInterceptor } from '@automapper/nestjs';
+import { User } from './entities/user.entity';
 
 @Controller('users')
 @ApiTags('users')
@@ -20,7 +34,8 @@ export class UsersController {
      * @returns The created user.
      */
     @Post()
-    async create(@Body() createUserDto: CreateUserDto) {
+    @UseInterceptors(MapInterceptor(User, SafeUserDto))
+    async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
         return this.usersService.create(createUserDto);
     }
 
@@ -30,7 +45,8 @@ export class UsersController {
      * @returns The found user.
      */
     @Get(':id')
-    async findOneById(@Param('id', ParseIntPipe) id: number) {
+    @UseInterceptors(MapInterceptor(User, SafeUserDto))
+    async findOneById(@Param('id', ParseIntPipe) id: number): Promise<SafeUserDto> {
         return await this.usersService.findOneById(id);
     }
 
@@ -40,7 +56,8 @@ export class UsersController {
      * @returns The found user.
      */
     @Get('email/:email')
-    async findOneByEmail(@Param('email') email: string) {
+    @UseInterceptors(MapInterceptor(User, SafeUserDto))
+    async findOneByEmail(@Param('email') email: string): Promise<SafeUserDto | null> {
         return await this.usersService.findOneByEmail(email);
     }
 
@@ -51,7 +68,8 @@ export class UsersController {
      * @returns The updated user.
      */
     @Patch(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+    @UseInterceptors(MapInterceptor(User, SafeUserDto))
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<SafeUserDto> {
         return this.usersService.update(id, updateUserDto);
     }
 
@@ -61,7 +79,7 @@ export class UsersController {
      * @returns The removed user.
      */
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) {
+    remove(@Param('id', ParseIntPipe) id: number): Promise<number> {
         return this.usersService.remove(id);
     }
 }
