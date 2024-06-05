@@ -68,6 +68,7 @@ export class AuthService {
         const user = await this.usersService.findOneByEmail(email);
 
         if (user) {
+            this.logger.warn(`User with email ${email} already exists`, AuthService.name);
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
