@@ -12,11 +12,15 @@ export const loggerConfig: LoggerOptions = {
         : format.combine(
               format.colorize(),
               format.timestamp(),
+              format.ms(),
               format.align(),
               format.splat(),
-              format.printf((info) => `${info.timestamp} [${info.level}][${process.pid}]: ${info.message}`),
+              format.printf(
+                  (info) =>
+                      `${info.timestamp} [${info.level}][${info.context}][${process.pid}]: ${info.message} ${info.ms} ${info.stack ? `\n${info.stack}` : ''}`,
+              ),
           ),
-    defaultMeta: { service: 'todo-api' },
+    defaultMeta: { service: 'todo-api', pid: process.pid },
     handleExceptions: true,
     handleRejections: true,
     transports: [

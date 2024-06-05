@@ -1,11 +1,16 @@
-import { ArgumentsHost, Catch } from '@nestjs/common';
+import { ArgumentsHost, Catch, Logger } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
+    private readonly logger = new Logger(AllExceptionsFilter.name);
+
     catch(exception: unknown, host: ArgumentsHost) {
-        // Add custom logging here for all exceptions
-        // Consider using nest-winston: https://github.com/gremo/nest-winston
+        if (exception instanceof Error) {
+            this.logger.error(exception.message, exception.stack);
+        } else {
+            this.logger.error(JSON.stringify(exception));
+        }
 
         super.catch(exception, host);
     }

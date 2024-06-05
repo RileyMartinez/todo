@@ -11,12 +11,16 @@ export class HttpExceptionsFilter implements ExceptionFilter {
         const status = exception.getStatus();
 
         this.logger.error(
-            JSON.stringify({
-                method: request.method,
-                url: request.url,
-                status: status,
-                message: exception.message,
-            }),
+            JSON.stringify(
+                {
+                    method: request.method,
+                    url: request.url,
+                    status: status,
+                    message: exception.message,
+                },
+                null,
+                2,
+            ),
             exception.stack,
         );
 

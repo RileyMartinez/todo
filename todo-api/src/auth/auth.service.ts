@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotImplementedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotImplementedException } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -20,11 +20,13 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
+        private readonly logger: Logger,
     ) {
         this.mapper = mapper;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
+        this.logger = logger;
     }
 
     /**
@@ -39,6 +41,7 @@ export class AuthService {
         const exceptionMessage = 'Access denied. Invalid email or password.';
 
         if (!user) {
+            this.logger.warn(`User with email ${email} not found`, AuthService.name);
             throw new ForbiddenException(exceptionMessage);
         }
 

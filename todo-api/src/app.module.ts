@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,7 +28,6 @@ import { UserMappingProfile } from './mappers/user-mapping.profile';
     ],
     controllers: [AppController],
     providers: [
-        Logger,
         AppService,
         {
             provide: AppConstants.APP_GUARD,
