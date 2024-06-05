@@ -19,7 +19,6 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import {
     ApiBearerAuth,
     ApiCreatedResponse,
-    ApiInternalServerErrorResponse,
     ApiNoContentResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
@@ -29,6 +28,7 @@ import { SafeUserDto } from './dto/safe-user.dto';
 import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
 import { Response } from 'express';
+import { ExceptionConstants } from 'src/constants/exception.constants';
 
 @Controller('users')
 @ApiTags('users')
@@ -44,11 +44,7 @@ export class UsersController {
      */
     @Post()
     @ApiCreatedResponse({
-        description: 'The created user',
         type: SafeUserDto,
-    })
-    @ApiInternalServerErrorResponse({
-        description: 'Failed to create user',
     })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
@@ -60,11 +56,10 @@ export class UsersController {
      */
     @Get(':id')
     @ApiOkResponse({
-        description: 'The found user',
         type: SafeUserDto,
     })
     @ApiNotFoundResponse({
-        description: 'User with ID ${id} not found',
+        description: ExceptionConstants.USER_NOT_FOUND,
     })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneById(@Param('id', ParseIntPipe) id: number): Promise<SafeUserDto> {
@@ -76,11 +71,10 @@ export class UsersController {
      */
     @Get('email/:email')
     @ApiOkResponse({
-        description: 'The found user',
         type: SafeUserDto,
     })
     @ApiNoContentResponse({
-        description: 'User not found',
+        description: ExceptionConstants.USER_NOT_FOUND,
     })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneByEmail(@Param('email') email: string, @Res() res: Response): Promise<SafeUserDto | null> {
@@ -102,7 +96,7 @@ export class UsersController {
         type: SafeUserDto,
     })
     @ApiNotFoundResponse({
-        description: 'User with ID ${id} not found',
+        description: ExceptionConstants.USER_NOT_FOUND,
     })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<SafeUserDto> {
@@ -114,11 +108,10 @@ export class UsersController {
      */
     @Delete(':id')
     @ApiOkResponse({
-        description: 'The number of deleted users',
         type: Number,
     })
     @ApiNotFoundResponse({
-        description: 'User with ID ${id} not found',
+        description: ExceptionConstants.USER_NOT_FOUND,
     })
     remove(@Param('id', ParseIntPipe) id: number): Promise<number> {
         return this.usersService.remove(id);

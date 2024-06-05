@@ -7,6 +7,7 @@ import { JwtGuard } from './guards/jwt.guard';
 import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
+import { ExceptionConstants } from 'src/constants/exception.constants';
 
 export interface AuthTokenRequest extends Request {
     user?: AuthTokenDto;
@@ -24,16 +25,15 @@ export class AuthController {
      */
     @Post('login')
     @ApiCreatedResponse({
-        description: 'User session created successfully',
         type: AuthTokenDto,
     })
     @ApiForbiddenResponse({
-        description: 'Invalid email or password',
+        description: ExceptionConstants.INVALID_CREDENTIALS,
     })
     @UseGuards(LocalGuard)
     async login(@Req() req: AuthTokenRequest, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
         if (!req.user) {
-            throw new ForbiddenException('Access denied. Invalid email or password');
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         return req.user;
@@ -54,11 +54,10 @@ export class AuthController {
      */
     @Post('register')
     @ApiCreatedResponse({
-        description: 'User registered successfully',
         type: AuthTokenDto,
     })
     @ApiConflictResponse({
-        description: 'User with email ${email} already exists',
+        description: ExceptionConstants.USER_ALREADY_EXISTS,
     })
     async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);

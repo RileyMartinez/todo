@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ExceptionConstants } from 'src/constants/exception.constants';
 
 @Injectable()
 export class UsersRepository {
@@ -30,7 +31,7 @@ export class UsersRepository {
             .execute();
 
         if (!result.raw[0]) {
-            throw new InternalServerErrorException('Failed to create user');
+            throw new InternalServerErrorException(`Failed to create user: ${JSON.stringify(insertUserDto)}`);
         }
 
         return result.raw[0];
@@ -46,7 +47,7 @@ export class UsersRepository {
         const result = await this.repository.createQueryBuilder().where('id = :id', { id }).getOne();
 
         if (!result) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(ExceptionConstants.UserNotFound(id));
         }
 
         return result;
@@ -79,7 +80,7 @@ export class UsersRepository {
             .execute();
 
         if (!result.raw[0]) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(ExceptionConstants.UserNotFound(id));
         }
 
         return result.raw[0];
@@ -95,7 +96,7 @@ export class UsersRepository {
         const result = await this.repository.createQueryBuilder().delete().where('id = :id', { id }).execute();
 
         if (!result.affected) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(ExceptionConstants.UserNotFound(id));
         }
 
         return result.affected;

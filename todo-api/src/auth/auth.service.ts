@@ -11,6 +11,7 @@ import { SafeUserDto } from 'src/users/dto/safe-user.dto';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/users/entities/user.entity';
+import { ExceptionConstants } from 'src/constants/exception.constants';
 
 @Injectable()
 export class AuthService {
@@ -38,17 +39,16 @@ export class AuthService {
      */
     async login({ email, password }: AuthLoginDto): Promise<AuthTokenDto> {
         const user = await this.usersService.findOneByEmail(email);
-        const exceptionMessage = 'Access denied. Invalid email or password.';
 
         if (!user) {
             this.logger.warn(`User with email ${email} not found`, AuthService.name);
-            throw new ForbiddenException(exceptionMessage);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const passwordMatches = await bcrypt.compare(password, user.password);
 
         if (!passwordMatches) {
-            throw new ForbiddenException(exceptionMessage);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const safeUser = this.mapper.map(user, User, SafeUserDto);
@@ -68,7 +68,7 @@ export class AuthService {
         const user = await this.usersService.findOneByEmail(email);
 
         if (user) {
-            throw new ConflictException(`User with email ${email} already exists`);
+            throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
         const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
