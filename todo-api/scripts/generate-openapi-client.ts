@@ -1,4 +1,4 @@
-import { ExecOptionsWithStringEncoding, exec } from 'child_process';
+import { exec } from 'child_process';
 import { config } from 'dotenv';
 import * as os from 'os';
 import { writeFile } from 'fs';
@@ -43,7 +43,6 @@ async function fetchOpenApiSpec(fetchPath: string): Promise<string> {
 
 async function generateClient() {
     try {
-        const execOptions: ExecOptionsWithStringEncoding = { encoding: 'utf8' };
         const { stdout, stderr } = await execAsync(
             [
                 runCommand,
@@ -52,7 +51,7 @@ async function generateClient() {
                 `-o ${outputPath}`,
                 `--additional-properties=basePath=${basePath}:${port}`,
             ].join(' '),
-            execOptions,
+            { encoding: 'utf8' },
         );
 
         if (stdout) {
@@ -78,8 +77,7 @@ async function moveClientToUiProject() {
         }
     }
 
-    const moveOptions: fs.MoveOptions = { overwrite: true };
-    await fs.move(sourcePath, destinationPath, moveOptions);
+    await fs.move(sourcePath, destinationPath, { overwrite: true });
 }
 
 generateOpenAPIClient(fetchPath);
