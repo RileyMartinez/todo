@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { LocalGuard } from './guards/local.guard';
@@ -7,13 +7,14 @@ import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenRes
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { ExceptionConstants } from 'src/constants/exception.constants';
+import { Request } from 'express';
 
 interface ExpressRequest extends Express.Request {
     user?: ExpressUser;
 }
 
 interface ExpressUser extends Express.User {
-    id?: number;
+    sub?: number;
     accessToken?: string;
     refreshToken?: string;
 }
@@ -36,7 +37,8 @@ export class AuthController {
         description: ExceptionConstants.INVALID_CREDENTIALS,
     })
     @UseGuards(LocalGuard)
-    async login(@Req() req: ExpressRequest, @Body() _: AuthLoginDto): Promise<ExpressUser> {
+    @HttpCode(HttpStatus.OK)
+    async login(@Req() req: Request, @Body() _: AuthLoginDto): Promise<ExpressUser> {
         if (!req.user) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
@@ -50,12 +52,13 @@ export class AuthController {
     @Post('logout')
     @UseGuards(JwtAccessGuard)
     @ApiBearerAuth()
+    @HttpCode(HttpStatus.OK)
     async logout(@Req() req: ExpressRequest): Promise<void> {
-        if (!req.user || !req.user.id) {
+        if (!req.user || !req.user.sub) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        return await this.authService.logout(req.user.id);
+        return await this.authService.logout(req.user.sub);
     }
 
     /**
@@ -68,6 +71,7 @@ export class AuthController {
     @ApiConflictResponse({
         description: ExceptionConstants.USER_ALREADY_EXISTS,
     })
+    @HttpCode(HttpStatus.CREATED)
     async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);
     }

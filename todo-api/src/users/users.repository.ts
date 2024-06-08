@@ -101,10 +101,6 @@ export class UsersRepository {
             .returning('*')
             .execute();
 
-        if (!result.raw[0]) {
-            throw new NotFoundException(ExceptionConstants.UserNotFound(id));
-        }
-
         return result.raw[0];
     }
 

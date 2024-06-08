@@ -1,11 +1,4 @@
-import {
-    ConflictException,
-    ForbiddenException,
-    Inject,
-    Injectable,
-    LoggerService,
-    NotImplementedException,
-} from '@nestjs/common';
+import { ConflictException, ForbiddenException, Inject, Injectable, LoggerService } from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -158,7 +151,7 @@ export class AuthService {
         assert(userId > 0, 'userId must be greater than 0');
         assert(refreshToken, 'refreshToken must be provided');
 
-        const saltRounds = this.configService.getOrThrow<number>(ConfigConstants.BCRYPT_SALT_ROUNDS);
+        const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
         const hash = await bcrypt.hash(refreshToken, saltRounds);
 
         await this.usersService.update(userId, { refreshToken: hash });
