@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { ExecOptionsWithStringEncoding, exec } from 'child_process';
 import { config } from 'dotenv';
 import * as os from 'os';
 import { writeFile } from 'fs';
@@ -6,8 +6,10 @@ import { promisify } from 'util';
 import * as fs from 'fs-extra';
 import axios from 'axios';
 
+// Load environment variables
 config();
 
+// Constants
 const isWindows = os.platform() === 'win32';
 const currentDir = isWindows ? '%cd%' : '$(pwd)';
 const runCommand = `docker run --rm -v "${currentDir}:/local" openapitools/openapi-generator-cli:latest-release`;
@@ -18,14 +20,17 @@ const fileName = 'openapi.json';
 const inputPath = `local/${fileName}`;
 const outputPath = 'local/openapi-client';
 const destinationPath = '../todo-ui/src/app/openapi-client';
+
+// Promisify functions
 const writeFileAsync = promisify(writeFile);
+const execAsync = promisify(exec);
 
 const generateOpenAPIClient = async (fetchPath: string) => {
     try {
         const spec = await fetchOpenApiSpec(fetchPath);
         await writeFileAsync(`./${fileName}`, spec);
-        generateClient();
-        moveClientToUiProject();
+        await generateClient();
+        await moveClientToUiProject();
     } catch (error) {
         console.error('Error generating OpenAPI client:', error);
     }
@@ -36,22 +41,29 @@ async function fetchOpenApiSpec(fetchPath: string): Promise<string> {
     return response.data;
 }
 
-function generateClient() {
-    const output = execSync(
-        [
-            runCommand,
-            'generate -g typescript-angular',
-            `-i ${inputPath}`,
-            `-o ${outputPath}`,
-            `--additional-properties=basePath=${basePath}:${port}`,
-        ].join(' '),
-        {
-            encoding: 'utf-8',
-        },
-    );
+async function generateClient() {
+    try {
+        const execOptions: ExecOptionsWithStringEncoding = { encoding: 'utf8' };
+        const { stdout, stderr } = await execAsync(
+            [
+                runCommand,
+                'generate -g typescript-angular',
+                `-i ${inputPath}`,
+                `-o ${outputPath}`,
+                `--additional-properties=basePath=${basePath}:${port}`,
+            ].join(' '),
+            execOptions,
+        );
 
-    if (output) {
-        console.log('Generate OpenAPI client:', output);
+        if (stdout) {
+            console.log('Generate OpenAPI client:', stdout);
+        }
+
+        if (stderr) {
+            console.error('Error generating OpenAPI client:', stderr);
+        }
+    } catch (error) {
+        console.error('Error generating OpenAPI client:', error);
     }
 }
 
@@ -59,14 +71,15 @@ async function moveClientToUiProject() {
     const sourcePath = './openapi-client';
 
     if (!isWindows) {
-        execSync(`sudo chmod 777 ${sourcePath}`);
+        await execAsync(`sudo chmod 777 ${sourcePath}`);
 
         if (await fs.exists(destinationPath)) {
-            execSync(`sudo rm -rf ${destinationPath}`);
+            await execAsync(`sudo rm -rf ${destinationPath}`);
         }
     }
 
-    await fs.move(sourcePath, destinationPath, { overwrite: true });
+    const moveOptions: fs.MoveOptions = { overwrite: true };
+    await fs.move(sourcePath, destinationPath, moveOptions);
 }
 
 generateOpenAPIClient(fetchPath);
