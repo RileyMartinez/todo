@@ -4,12 +4,12 @@ import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { Todo } from './entities/todo.entity';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
 
 @Controller('todo')
-@UseGuards(JwtGuard)
+@UseGuards(JwtAccessGuard)
 @ApiTags('todo')
 @ApiBearerAuth()
 @SkipThrottle()

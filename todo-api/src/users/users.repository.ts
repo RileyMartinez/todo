@@ -87,6 +87,28 @@ export class UsersRepository {
     }
 
     /**
+     * Nullifies the refresh token of a user with the specified ID.
+     * @param id - The ID of the user.
+     * @returns A Promise that resolves to the updated User object.
+     * @throws {NotFoundException} If the user with the specified ID is not found.
+     */
+    async nullifyUserRefreshToken(id: number): Promise<User> {
+        const result = await this.repository
+            .createQueryBuilder()
+            .update()
+            .set({ refreshToken: null })
+            .where('id = :id AND refreshToken IS NOT NULL', { id })
+            .returning('*')
+            .execute();
+
+        if (!result.raw[0]) {
+            throw new NotFoundException(ExceptionConstants.UserNotFound(id));
+        }
+
+        return result.raw[0];
+    }
+
+    /**
      * Deletes a user by their ID.
      * @param id - The ID of the user to delete.
      * @returns A promise that resolves to the number of deleted rows.

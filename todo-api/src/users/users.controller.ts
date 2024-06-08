@@ -15,7 +15,6 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import {
     ApiBearerAuth,
     ApiCreatedResponse,
@@ -29,10 +28,11 @@ import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
 import { Response } from 'express';
 import { ExceptionConstants } from 'src/constants/exception.constants';
+import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
 
 @Controller('users')
 @ApiTags('users')
-@UseGuards(JwtGuard)
+@UseGuards(JwtAccessGuard)
 @ApiBearerAuth()
 export class UsersController {
     constructor(private readonly usersService: UsersService) {

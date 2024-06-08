@@ -2,15 +2,20 @@ import { Body, Controller, ForbiddenException, Post, Req, UseGuards } from '@nes
 import { AuthService } from './auth.service';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { LocalGuard } from './guards/local.guard';
-import { Request } from 'express';
-import { JwtGuard } from './guards/jwt.guard';
+import { JwtAccessGuard } from './guards/jwt-access.guard';
 import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { ExceptionConstants } from 'src/constants/exception.constants';
 
-export interface AuthTokenRequest extends Request {
-    user?: AuthTokenDto;
+interface ExpressRequest extends Express.Request {
+    user?: ExpressUser;
+}
+
+interface ExpressUser extends Express.User {
+    id?: number;
+    accessToken?: string;
+    refreshToken?: string;
 }
 
 @Controller('auth')
@@ -31,7 +36,7 @@ export class AuthController {
         description: ExceptionConstants.INVALID_CREDENTIALS,
     })
     @UseGuards(LocalGuard)
-    async login(@Req() req: AuthTokenRequest, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
+    async login(@Req() req: ExpressRequest, @Body() _: AuthLoginDto): Promise<ExpressUser> {
         if (!req.user) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
@@ -43,10 +48,14 @@ export class AuthController {
      * Handles the logout request.
      */
     @Post('logout')
-    @UseGuards(JwtGuard)
+    @UseGuards(JwtAccessGuard)
     @ApiBearerAuth()
-    async logout() {
-        return await this.authService.logout();
+    async logout(@Req() req: ExpressRequest): Promise<void> {
+        if (!req.user || !req.user.id) {
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        return await this.authService.logout(req.user.id);
     }
 
     /**

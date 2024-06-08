@@ -65,6 +65,17 @@ export class UsersService {
     }
 
     /**
+     * Nullifies the refresh token of a user.
+     * @param id - The ID of the user.
+     * @returns A Promise that resolves to the updated User object.
+     * @throws {AssertionError} Iff the user ID is not greater than 0.
+     */
+    async nullifyUserRefreshToken(id: number): Promise<User> {
+        assert(id > 0, 'User ID must be greater than 0');
+        return await this.usersRepository.nullifyUserRefreshToken(id);
+    }
+
+    /**
      * Removes a user.
      * @param id - The ID of the user to remove.
      * @returns A promise that resolves to the number of deleted rows.

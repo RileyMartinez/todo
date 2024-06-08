@@ -31,6 +31,9 @@ export class User {
      * User jwt refresh token
      * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkZvbyBCYXIiLCJpYXQiOjE1MTYyMzkwMjJ9.1Jf8
      */
-    @Column({ nullable: true })
-    refreshToken: string;
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
+    refreshToken: string | null;
 }

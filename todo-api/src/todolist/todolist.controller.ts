@@ -4,13 +4,13 @@ import { CreateTodolistDto } from './dto/create-todolist.dto';
 import { UpdateTodolistDto } from './dto/update-todolist.dto';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
 
 @Controller('todolist')
 @ApiTags('todolist')
-@UseGuards(JwtGuard)
+@UseGuards(JwtAccessGuard)
 @ApiBearerAuth()
 @SkipThrottle()
 export class TodolistController {

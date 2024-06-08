@@ -103,8 +103,9 @@ export class AuthService {
         return tokens;
     }
 
-    async logout() {
-        throw new NotImplementedException();
+    async logout(userId: number): Promise<void> {
+        assert(userId > 0, 'userId must be greater than 0');
+        await this.usersService.nullifyUserRefreshToken(userId);
     }
 
     /**
@@ -124,7 +125,7 @@ export class AuthService {
         const [accessToken, refreshToken] = await Promise.all([
             await this.jwtService.signAsync(
                 {
-                    userId: safeUser.id,
+                    sub: safeUser.id,
                     email: safeUser.email,
                 },
                 {
@@ -134,7 +135,7 @@ export class AuthService {
             ),
             await this.jwtService.signAsync(
                 {
-                    userId: safeUser.id,
+                    sub: safeUser.id,
                     email: safeUser.email,
                 },
                 {
