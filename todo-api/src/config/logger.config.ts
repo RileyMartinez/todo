@@ -7,14 +7,19 @@ import { ConfigConstants } from 'src/constants/config.constants';
 export const loggerConfig: WinstonModuleAsyncOptions = {
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService): Promise<LoggerOptions> => {
-        const isProd = configService.get(ConfigConstants.ENV) === 'prod';
+        const isProd = configService.getOrThrow(ConfigConstants.ENV) === 'prod';
+        const loggerLevel = configService.getOrThrow(ConfigConstants.LOGGER_LEVEL);
+        const loggerDirectory = configService.getOrThrow(ConfigConstants.LOGGER_DIRECTORY);
+        const loggerMaxSize = configService.getOrThrow(ConfigConstants.LOGGER_MAX_SIZE);
+        const loggerFileLifetime = configService.getOrThrow(ConfigConstants.LOGGER_FILE_LIFETIME);
+
         return {
-            level: isProd ? 'info' : 'debug',
+            level: loggerLevel,
             format: isProd
                 ? format.combine(format.timestamp(), format.json())
                 : format.combine(
                       format.colorize(),
-                      format.timestamp(),
+                      format.timestamp({ format: 'MM/DD/YYYY, hh:mm:ss A' }),
                       format.ms(),
                       format.align(),
                       format.splat(),
@@ -29,18 +34,18 @@ export const loggerConfig: WinstonModuleAsyncOptions = {
             transports: [
                 new transports.Console(),
                 new DailyRotateFile({
-                    filename: 'logs/combined-%DATE%.log',
+                    filename: `${loggerDirectory}/combined-%DATE%.log`,
                     datePattern: 'YYYY-MM-DD',
                     zippedArchive: true,
-                    maxSize: '20m',
-                    maxFiles: '14d',
+                    maxSize: loggerMaxSize,
+                    maxFiles: loggerFileLifetime,
                 }),
                 new DailyRotateFile({
-                    filename: 'logs/error-%DATE%.log',
+                    filename: `${loggerDirectory}/error-%DATE%.log`,
                     datePattern: 'YYYY-MM-DD',
                     zippedArchive: true,
-                    maxSize: '20m',
-                    maxFiles: '14d',
+                    maxSize: loggerMaxSize,
+                    maxFiles: loggerFileLifetime,
                     level: 'error',
                 }),
             ],

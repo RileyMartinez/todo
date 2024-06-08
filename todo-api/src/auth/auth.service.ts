@@ -20,6 +20,7 @@ import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/users/entities/user.entity';
 import { ExceptionConstants } from 'src/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { strict as assert } from 'assert';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +46,8 @@ export class AuthService {
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
     async login({ email, password }: AuthLoginDto): Promise<AuthTokenDto> {
+        assert(email && password, 'Email and password must be provided');
+
         const user = await this.usersService.findOneByEmail(email);
 
         if (!user) {
@@ -55,6 +58,7 @@ export class AuthService {
         const passwordMatches = await bcrypt.compare(password, user.password);
 
         if (!passwordMatches) {
+            this.logger.warn(`Password for user with email ${email} does not match`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -69,9 +73,12 @@ export class AuthService {
      * Registers a new user with the provided email and password.
      * @param {AuthRegisterDto} data - The registration data containing email and password.
      * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
+     * @throws {AssertionError} - If the email or password is not provided, or if the user creation fails.
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
     async register({ email, password }: AuthRegisterDto): Promise<AuthTokenDto> {
+        assert(email && password, 'Email and password must be provided');
+
         const user = await this.usersService.findOneByEmail(email);
 
         if (user) {
@@ -87,8 +94,11 @@ export class AuthService {
             password: hash,
         });
 
-        const tokens = await this.getTokens(newUser);
-        await this.updateUserRefreshToken(newUser.id, tokens.refreshToken);
+        assert(newUser, 'Failed to create user');
+
+        const safeNewUser = this.mapper.map(newUser, User, SafeUserDto);
+        const tokens = await this.getTokens(safeNewUser);
+        await this.updateUserRefreshToken(safeNewUser.id, tokens.refreshToken);
 
         return tokens;
     }
@@ -104,6 +114,8 @@ export class AuthService {
      * @returns An object containing the access and refresh tokens.
      */
     private async getTokens(safeUser: SafeUserDto): Promise<AuthTokenDto> {
+        assert(safeUser, 'User must be provided');
+
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
         const accessTokenExpiration = this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION);
@@ -142,7 +154,10 @@ export class AuthService {
      * @returns A Promise that resolves when the refresh token is updated.
      */
     private async updateUserRefreshToken(userId: number, refreshToken: string): Promise<void> {
-        const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
+        assert(userId > 0, 'userId must be greater than 0');
+        assert(refreshToken, 'refreshToken must be provided');
+
+        const saltRounds = this.configService.getOrThrow<number>(ConfigConstants.BCRYPT_SALT_ROUNDS);
         const hash = await bcrypt.hash(refreshToken, saltRounds);
 
         await this.usersService.update(userId, { refreshToken: hash });

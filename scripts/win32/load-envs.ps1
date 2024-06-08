@@ -29,16 +29,16 @@ if (-not $env:APP_ENV) {
 
 $paths = @(
     @{
-        input = "../.env.op"
-        output = "../.env"
+        input = "../../.env.op"
+        output = "../../.env"
     },
     @{
-        input = "../todo-api/.env.op"
+        input = "../../todo-api/.env.op"
         output = "../todo-api/.env"
     },
     @{
-        input = "../todo-ui/.env.op"
-        output = "../todo-ui/.env"
+        input = "../../todo-ui/.env.op"
+        output = "../../todo-ui/.env"
     }
 )
 

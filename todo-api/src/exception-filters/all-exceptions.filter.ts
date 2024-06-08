@@ -28,7 +28,6 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
             this.logger.error(JSON.stringify(exception), AllExceptionsFilter.name);
         }
 
-        //
         super.catch(exception, host);
     }
 }

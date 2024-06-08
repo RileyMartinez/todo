@@ -23,9 +23,9 @@ if [ -z "$APP_ENV" ]; then
 fi
 
 declare -A paths=(
-    ["../.env.op"]="../.env"
-    ["../todo-api/.env.op"]="../todo-api/.env"
-    ["../todo-ui/.env.op"]="../todo-ui/.env"
+    ["../../.env.op"]="../../.env"
+    ["../../todo-api/.env.op"]="../../todo-api/.env"
+    ["../../todo-ui/.env.op"]="../../todo-ui/.env"
 )
 
 for input_file in "${!paths[@]}"; do

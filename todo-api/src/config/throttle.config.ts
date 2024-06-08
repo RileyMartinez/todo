@@ -7,8 +7,8 @@ export const throttlerConfig: ThrottlerAsyncOptions = {
     useFactory: async (configService: ConfigService): Promise<ThrottlerModuleOptions> => ({
         throttlers: [
             {
-                limit: configService.get<number>(ConfigConstants.THROTTLE_LIMIT) || 60000,
-                ttl: configService.get<number>(ConfigConstants.THROTTLE_TTL) || 10,
+                limit: configService.getOrThrow<number>(ConfigConstants.THROTTLE_LIMIT),
+                ttl: configService.getOrThrow<number>(ConfigConstants.THROTTLE_TTL),
             },
         ],
     }),
