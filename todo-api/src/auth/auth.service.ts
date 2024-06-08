@@ -1,4 +1,11 @@
-import { ConflictException, ForbiddenException, Injectable, Logger, NotImplementedException } from '@nestjs/common';
+import {
+    ConflictException,
+    ForbiddenException,
+    Inject,
+    Injectable,
+    LoggerService,
+    NotImplementedException,
+} from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -12,22 +19,22 @@ import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/users/entities/user.entity';
 import { ExceptionConstants } from 'src/constants/exception.constants';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectMapper()
-        private readonly mapper: Mapper,
+        @InjectMapper() private readonly mapper: Mapper,
+        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
-        private readonly logger: Logger,
     ) {
         this.mapper = mapper;
+        this.logger = logger;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
-        this.logger = logger;
     }
 
     /**
