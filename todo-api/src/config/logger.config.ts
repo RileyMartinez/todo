@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { LoggerOptions, format, transports } from 'winston';
+import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import DailyRotateFile = require('winston-daily-rotate-file');
 
 config();
@@ -24,7 +25,17 @@ export const loggerConfig: LoggerOptions = {
     handleExceptions: true,
     handleRejections: true,
     transports: [
-        new transports.Console(),
+        new transports.Console({
+            format: format.combine(
+                format.timestamp(),
+                format.ms(),
+                nestWinstonModuleUtilities.format.nestLike('todo-api', {
+                    colors: true,
+                    prettyPrint: true,
+                    processId: true,
+                }),
+            ),
+        }),
         new DailyRotateFile({
             filename: 'logs/combined-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
