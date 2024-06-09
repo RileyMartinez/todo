@@ -3,20 +3,34 @@ import { AuthService } from './auth.service';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { LocalGuard } from './guards/local.guard';
 import { JwtAccessGuard } from './guards/jwt-access.guard';
-import { ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiConflictResponse,
+    ApiCreatedResponse,
+    ApiForbiddenResponse,
+    ApiOkResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { ExceptionConstants } from 'src/constants/exception.constants';
-import { Request } from 'express';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
-interface ExpressRequest extends Express.Request {
-    user?: ExpressUser;
+interface LoginRequest extends Express.Request {
+    user?: AuthTokenDto;
 }
 
-interface ExpressUser extends Express.User {
-    sub?: number;
-    accessToken?: string;
-    refreshToken?: string;
+interface LogOutRequest extends Express.Request {
+    user?: {
+        sub: number;
+    };
+}
+
+interface RefreshRequest extends Express.Request {
+    user?: {
+        sub: number;
+        refreshToken: string;
+    };
 }
 
 @Controller('auth')
@@ -30,7 +44,7 @@ export class AuthController {
      * Handles the login request.
      */
     @Post('login')
-    @ApiCreatedResponse({
+    @ApiOkResponse({
         type: AuthTokenDto,
     })
     @ApiForbiddenResponse({
@@ -38,7 +52,7 @@ export class AuthController {
     })
     @UseGuards(LocalGuard)
     @HttpCode(HttpStatus.OK)
-    async login(@Req() req: Request, @Body() _: AuthLoginDto): Promise<ExpressUser> {
+    async login(@Req() req: LoginRequest, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
         if (!req.user) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
@@ -50,10 +64,16 @@ export class AuthController {
      * Handles the logout request.
      */
     @Post('logout')
-    @UseGuards(JwtAccessGuard)
     @ApiBearerAuth()
+    @ApiOkResponse({
+        description: 'User logged out successfully.',
+    })
+    @ApiForbiddenResponse({
+        description: ExceptionConstants.INVALID_CREDENTIALS,
+    })
+    @UseGuards(JwtAccessGuard)
     @HttpCode(HttpStatus.OK)
-    async logout(@Req() req: ExpressRequest): Promise<void> {
+    async logout(@Req() req: LogOutRequest): Promise<void> {
         if (!req.user || !req.user.sub) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
@@ -74,5 +94,26 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);
+    }
+
+    /**
+     * Handles the refresh request.
+     */
+    @Post('refresh')
+    @ApiBearerAuth()
+    @ApiOkResponse({
+        type: AuthTokenDto,
+    })
+    @ApiForbiddenResponse({
+        description: ExceptionConstants.INVALID_CREDENTIALS,
+    })
+    @UseGuards(JwtRefreshGuard)
+    @HttpCode(HttpStatus.OK)
+    async refresh(@Req() req: RefreshRequest): Promise<AuthTokenDto> {
+        if (!req.user || !req.user.sub || !req.user.refreshToken) {
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        return await this.authService.refresh(req.user.sub, req.user.refreshToken);
     }
 }

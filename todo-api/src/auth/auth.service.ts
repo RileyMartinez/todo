@@ -96,9 +96,53 @@ export class AuthService {
         return tokens;
     }
 
+    /**
+     * Logs out a user by nullifying their refresh token.
+     * @param userId - The ID of the user to log out.
+     * @throws {AssertionError} If the userId is not greater than 0.
+     */
     async logout(userId: number): Promise<void> {
         assert(userId > 0, 'userId must be greater than 0');
         await this.usersService.nullifyUserRefreshToken(userId);
+    }
+
+    /**
+     * Refreshes the authentication tokens for a user.
+     *
+     * @param userId - The ID of the user.
+     * @param refreshToken - The refresh token provided by the user.
+     * @returns A promise that resolves to an AuthTokenDto object containing the new authentication tokens.
+     * @throws {AssertionError} If the userId or refreshToken is not provided.
+     * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
+     */
+    async refresh(userId: number, refreshToken: string): Promise<AuthTokenDto> {
+        assert(userId > 0, 'userId must be greater than 0');
+        assert(refreshToken, 'refreshToken must be provided');
+
+        const user = await this.usersService.findOneById(userId);
+
+        if (!user) {
+            this.logger.warn(`User with ID ${userId} not found`, AuthService.name);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        if (!user.refreshToken) {
+            this.logger.warn(`User with ID ${userId} does not have a refresh token`, AuthService.name);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+
+        if (!refreshTokenMatches) {
+            this.logger.warn(`Refresh token for user with ID ${userId} does not match`, AuthService.name);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        const safeUser = this.mapper.map(user, User, SafeUserDto);
+        const tokens = await this.getTokens(safeUser);
+        await this.updateUserRefreshToken(user.id, tokens.refreshToken);
+
+        return tokens;
     }
 
     /**
