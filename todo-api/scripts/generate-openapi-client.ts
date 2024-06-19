@@ -5,12 +5,9 @@ import { writeFile } from 'fs';
 import { promisify } from 'util';
 import * as fs from 'fs-extra';
 import axios from 'axios';
-import { strict as assert } from 'assert';
 
-// Load environment variables
 config();
 
-// Constants
 const isWindows = os.platform() === 'win32';
 const currentDir = isWindows ? '%cd%' : '$(pwd)';
 const runCommand = `docker run --rm -v "${currentDir}:/local" openapitools/openapi-generator-cli:latest-release`;
@@ -22,15 +19,20 @@ const inputPath = `local/${fileName}`;
 const outputPath = 'local/openapi-client';
 const destinationPath = '../todo-ui/src/app/openapi-client';
 
-// Promisify functions
 const writeFileAsync = promisify(writeFile);
 const execAsync = promisify(exec);
 
 const generateOpenAPIClient = async (fetchPath: string) => {
     try {
-        assert(fetchPath, 'fetchPath is required');
-        assert(basePath, 'basePath is required');
-        assert(port, 'port is required');
+        if (!fetchPath) {
+            throw new Error('fetchPath is required');
+        }
+        if (!basePath) {
+            throw new Error('basePath is required');
+        }
+        if (!port) {
+            throw new Error('port is required');
+        }
 
         const spec = await fetchOpenApiSpec(fetchPath);
         await writeFileAsync(`./${fileName}`, spec);

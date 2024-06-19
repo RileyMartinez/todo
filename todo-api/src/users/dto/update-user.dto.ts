@@ -9,7 +9,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
      */
     @IsString()
     @IsOptional()
-    password?: string | undefined;
+    password?: string;
 
     /**
      * User jwt refresh token
@@ -17,5 +17,5 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
      */
     @IsString()
     @IsOptional()
-    refreshToken?: string | undefined;
+    refreshToken?: string;
 }

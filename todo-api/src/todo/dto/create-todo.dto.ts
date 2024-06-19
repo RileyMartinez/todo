@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateTodoDto {
     @IsNumber()
@@ -7,7 +7,7 @@ export class CreateTodoDto {
 
     @IsString()
     @IsNotEmpty()
-    title: string;
+    title: string = '';
 
     @IsString()
     @IsOptional()
@@ -15,7 +15,7 @@ export class CreateTodoDto {
 
     @IsBoolean()
     @IsNotEmpty()
-    completed: boolean;
+    completed: boolean = false;
 
     @IsDate()
     @IsOptional()
@@ -23,9 +23,11 @@ export class CreateTodoDto {
 
     @IsNumber()
     @IsNotEmpty()
-    order: number;
+    @Min(1)
+    order: number = 0;
 
     @IsNumber()
     @IsNotEmpty()
-    todoListId: number;
+    @Min(1)
+    todoListId: number = 0;
 }

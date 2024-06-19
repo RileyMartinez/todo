@@ -7,7 +7,7 @@ export class CreateUserDto {
      */
     @IsString()
     @IsNotEmpty()
-    email: string;
+    email: string = '';
 
     /**
      * User password
@@ -15,5 +15,5 @@ export class CreateUserDto {
      */
     @IsString()
     @IsNotEmpty()
-    password: string;
+    password: string = '';
 }

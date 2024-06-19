@@ -1,4 +1,11 @@
-import { ConflictException, ForbiddenException, Inject, Injectable, LoggerService } from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    ForbiddenException,
+    Inject,
+    Injectable,
+    LoggerService,
+} from '@nestjs/common';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -13,7 +20,8 @@ import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/users/entities/user.entity';
 import { ExceptionConstants } from 'src/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { strict as assert } from 'assert';
+import { ClassValidatorUtil } from 'src/utils/class-validator.util';
+import { AuthRefreshDto } from './dto/auth-refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,28 +44,30 @@ export class AuthService {
      * If the user is authenticated, a JWT token is generated and returned.
      * @param {AuthLoginDto} credentials - The email and password of the user.
      * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the authenticated user.
+     * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
-    async login({ email, password }: AuthLoginDto): Promise<AuthTokenDto> {
-        assert(email && password, 'Email and password must be provided');
+    async login(authLoginDto: AuthLoginDto): Promise<AuthTokenDto> {
+        await ClassValidatorUtil.validate(authLoginDto);
 
-        const user = await this.usersService.findOneByEmail(email);
+        const user = await this.usersService.findOneByEmail(authLoginDto.email);
 
         if (!user) {
-            this.logger.warn(`User with email ${email} not found`, AuthService.name);
+            this.logger.warn(`User with email ${authLoginDto.email} not found`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const passwordMatches = await bcrypt.compare(password, user.password);
+        const passwordMatches = await bcrypt.compare(authLoginDto.password, user.password);
 
         if (!passwordMatches) {
-            this.logger.warn(`Password for user with email ${email} does not match`, AuthService.name);
+            this.logger.warn(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const safeUser = this.mapper.map(user, User, SafeUserDto);
         const tokens = await this.getTokens(safeUser);
-        await this.updateUserRefreshToken(user.id, tokens.refreshToken);
+
+        await this.updateUserRefreshToken(new AuthRefreshDto(safeUser.id, tokens.refreshToken));
 
         return tokens;
     }
@@ -66,32 +76,30 @@ export class AuthService {
      * Registers a new user with the provided email and password.
      * @param {AuthRegisterDto} data - The registration data containing email and password.
      * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
-     * @throws {AssertionError} - If the email or password is not provided, or if the user creation fails.
+     * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
-    async register({ email, password }: AuthRegisterDto): Promise<AuthTokenDto> {
-        assert(email && password, 'Email and password must be provided');
+    async register(authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
+        await ClassValidatorUtil.validate(authRegisterDto);
 
-        const user = await this.usersService.findOneByEmail(email);
+        const user = await this.usersService.findOneByEmail(authRegisterDto.email);
 
         if (user) {
-            this.logger.warn(`User with email ${email} already exists`, AuthService.name);
+            this.logger.warn(`User with email ${authRegisterDto.email} already exists`, AuthService.name);
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
         const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
-        const hash = await bcrypt.hash(password, saltRounds);
+        const hash = await bcrypt.hash(authRegisterDto.password, saltRounds);
 
         const newUser = await this.usersService.create({
-            email,
+            email: authRegisterDto.email,
             password: hash,
         });
 
-        assert(newUser, 'Failed to create user');
-
         const safeNewUser = this.mapper.map(newUser, User, SafeUserDto);
         const tokens = await this.getTokens(safeNewUser);
-        await this.updateUserRefreshToken(safeNewUser.id, tokens.refreshToken);
+        await this.updateUserRefreshToken(new AuthRefreshDto(safeNewUser.id, tokens.refreshToken));
 
         return tokens;
     }
@@ -99,10 +107,13 @@ export class AuthService {
     /**
      * Logs out a user by nullifying their refresh token.
      * @param userId - The ID of the user to log out.
-     * @throws {AssertionError} If the userId is not greater than 0.
+     * @throws {BadRequestException} If user ID is less than 1.
      */
     async logout(userId: number): Promise<void> {
-        assert(userId > 0, 'userId must be greater than 0');
+        if (userId < 1) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
         await this.usersService.nullifyUserRefreshToken(userId);
     }
 
@@ -112,35 +123,38 @@ export class AuthService {
      * @param userId - The ID of the user.
      * @param refreshToken - The refresh token provided by the user.
      * @returns A promise that resolves to an AuthTokenDto object containing the new authentication tokens.
-     * @throws {AssertionError} If the userId or refreshToken is not provided.
+     * @throws {ValidationException} if the user ID or refresh token is invalid.
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
      */
-    async refresh(userId: number, refreshToken: string): Promise<AuthTokenDto> {
-        assert(userId > 0, 'userId must be greater than 0');
-        assert(refreshToken, 'refreshToken must be provided');
+    async refresh(authRefreshDto: AuthRefreshDto): Promise<AuthTokenDto> {
+        await ClassValidatorUtil.validate(authRefreshDto);
 
-        const user = await this.usersService.findOneById(userId);
+        const user = await this.usersService.findOneById(authRefreshDto.userId);
 
         if (!user) {
-            this.logger.warn(`User with ID ${userId} not found`, AuthService.name);
+            this.logger.warn(`User with ID ${authRefreshDto.userId} not found`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.refreshToken) {
-            this.logger.warn(`User with ID ${userId} does not have a refresh token`, AuthService.name);
+            this.logger.warn(`User with ID ${authRefreshDto.userId} does not have a refresh token`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+        const refreshTokenMatches = await bcrypt.compare(authRefreshDto.refreshToken, user.refreshToken);
 
         if (!refreshTokenMatches) {
-            this.logger.warn(`Refresh token for user with ID ${userId} does not match`, AuthService.name);
+            this.logger.warn(
+                `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const safeUser = this.mapper.map(user, User, SafeUserDto);
         const tokens = await this.getTokens(safeUser);
-        await this.updateUserRefreshToken(user.id, tokens.refreshToken);
+
+        await this.updateUserRefreshToken(new AuthRefreshDto(safeUser.id, tokens.refreshToken));
 
         return tokens;
     }
@@ -150,9 +164,10 @@ export class AuthService {
      * @param userId - The ID of the user.
      * @param email - The email of the user.
      * @returns An object containing the access and refresh tokens.
+     * @throws {ValidationException} If the user ID or email is invalid.
      */
     private async getTokens(safeUser: SafeUserDto): Promise<AuthTokenDto> {
-        assert(safeUser, 'User must be provided');
+        await ClassValidatorUtil.validate(safeUser);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
@@ -182,7 +197,10 @@ export class AuthService {
             ),
         ]);
 
-        return { accessToken, refreshToken };
+        const tokens = new AuthTokenDto(accessToken, refreshToken);
+        await ClassValidatorUtil.validate(tokens);
+
+        return tokens;
     }
 
     /**
@@ -190,14 +208,14 @@ export class AuthService {
      * @param userId - The ID of the user.
      * @param refreshToken - The new refresh token.
      * @returns A Promise that resolves when the refresh token is updated.
+     * @throws {ValidationException} If the user ID or refresh token is invalid.
      */
-    private async updateUserRefreshToken(userId: number, refreshToken: string): Promise<void> {
-        assert(userId > 0, 'userId must be greater than 0');
-        assert(refreshToken, 'refreshToken must be provided');
+    private async updateUserRefreshToken(authRefreshDto: AuthRefreshDto): Promise<void> {
+        await ClassValidatorUtil.validate(authRefreshDto);
 
         const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
-        const hash = await bcrypt.hash(refreshToken, saltRounds);
+        const hash = await bcrypt.hash(authRefreshDto.refreshToken, saltRounds);
 
-        await this.usersService.update(userId, { refreshToken: hash });
+        await this.usersService.update(authRefreshDto.userId, { refreshToken: hash });
     }
 }

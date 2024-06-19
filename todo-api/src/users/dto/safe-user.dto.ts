@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 export class SafeUserDto {
     /**
@@ -9,7 +9,8 @@ export class SafeUserDto {
     @AutoMap()
     @IsNumber()
     @IsNotEmpty()
-    id: number;
+    @Min(1)
+    id: number = 0;
 
     /**
      * User email address
@@ -18,5 +19,5 @@ export class SafeUserDto {
     @AutoMap()
     @IsString()
     @IsNotEmpty()
-    email: string;
+    email: string = '';
 }

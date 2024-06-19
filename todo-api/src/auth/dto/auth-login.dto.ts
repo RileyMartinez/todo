@@ -7,7 +7,7 @@ export class AuthLoginDto {
      */
     @IsString()
     @IsNotEmpty()
-    email: string;
+    email: string = '';
 
     /**
      * Login password
@@ -15,5 +15,5 @@ export class AuthLoginDto {
      */
     @IsString()
     @IsNotEmpty()
-    password: string;
+    password: string = '';
 }

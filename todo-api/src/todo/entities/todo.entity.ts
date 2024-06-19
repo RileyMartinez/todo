@@ -4,28 +4,28 @@ import { TodoList } from '../../todolist/entities/todolist.entity';
 @Entity()
 export class Todo {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    title: string;
+    title!: string;
 
-    @Column({ nullable: true })
-    description: string;
+    @Column({ type: 'text', nullable: true })
+    description: string | null = null;
 
     @Column({ default: false })
-    completed: boolean;
+    completed: boolean = false;
 
     @Column({ type: 'timestamp', nullable: true })
-    dueDate: Date;
+    dueDate: Date | null = null;
 
     @Column()
-    order: number;
+    order!: number;
 
     @Column()
-    todoListId: number;
+    todoListId!: number;
 
     @ManyToOne(() => TodoList, (todoList) => todoList.todos, {
         onDelete: 'CASCADE',
     })
-    todoList: TodoList;
+    todoList!: TodoList;
 }

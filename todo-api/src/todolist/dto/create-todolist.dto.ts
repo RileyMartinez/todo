@@ -7,5 +7,5 @@ export class CreateTodolistDto {
 
     @IsString()
     @IsNotEmpty()
-    title: string;
+    title: string = '';
 }

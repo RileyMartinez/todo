@@ -7,7 +7,7 @@ export class AuthRegisterDto {
      */
     @IsString()
     @IsNotEmpty()
-    email: string;
+    email: string = '';
 
     /**
      * Registration password
@@ -15,5 +15,5 @@ export class AuthRegisterDto {
      */
     @IsString()
     @IsNotEmpty()
-    password: string;
+    password: string = '';
 }

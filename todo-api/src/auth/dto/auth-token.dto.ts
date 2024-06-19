@@ -7,7 +7,7 @@ export class AuthTokenDto {
      */
     @IsString()
     @IsNotEmpty()
-    accessToken: string;
+    accessToken: string = '';
 
     /**
      * Refresh token
@@ -15,5 +15,10 @@ export class AuthTokenDto {
      */
     @IsString()
     @IsNotEmpty()
-    refreshToken: string;
+    refreshToken: string = '';
+
+    constructor(accessToken: string, refreshToken: string) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 }

@@ -15,6 +15,7 @@ import { AuthTokenDto } from './dto/auth-token.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { ExceptionConstants } from 'src/constants/exception.constants';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { AuthRefreshDto } from './dto/auth-refresh.dto';
 
 interface LoginRequest extends Express.Request {
     user?: AuthTokenDto;
@@ -114,6 +115,6 @@ export class AuthController {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        return await this.authService.refresh(req.user.sub, req.user.refreshToken);
+        return await this.authService.refresh(new AuthRefreshDto(req.user.sub, req.user.refreshToken));
     }
 }

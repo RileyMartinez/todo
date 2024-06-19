@@ -10,7 +10,7 @@ export class User {
      */
     @AutoMap()
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     /**
      * User email address
@@ -18,14 +18,14 @@ export class User {
      */
     @AutoMap()
     @Column()
-    email: string;
+    email!: string;
 
     /**
      * User password
      * @example fooBar123!
      */
     @Column()
-    password: string;
+    password!: string;
 
     /**
      * User jwt refresh token
@@ -35,5 +35,5 @@ export class User {
         type: 'text',
         nullable: true,
     })
-    refreshToken: string | null;
+    refreshToken: string | null = null;
 }
