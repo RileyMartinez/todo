@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
-import { OpenAPIUtil } from './utils/openapi.util';
+import { OpenAPIGenerator } from './utils/openapi-generator.util';
 import { ConfigConstants } from './constants/config.constants';
 import { AllExceptionsFilter } from './exception-filters/all-exceptions.filter';
 import { HttpExceptionsFilter } from './exception-filters/http-exceptions.filter';
@@ -26,7 +26,7 @@ async function bootstrap() {
     const configService = app.get(ConfigService);
     const port = configService.getOrThrow(ConfigConstants.PORT);
 
-    await OpenAPIUtil.generateOpenAPIClient(document);
+    await OpenAPIGenerator.generateClient(document);
 
     app.enableCors(corsConfig);
 

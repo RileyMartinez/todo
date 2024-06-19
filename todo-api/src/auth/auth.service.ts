@@ -20,7 +20,7 @@ import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/users/entities/user.entity';
 import { ExceptionConstants } from 'src/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ClassValidatorUtil } from 'src/utils/class-validator.util';
+import { ClassValidator } from 'src/utils/class-validator.util';
 import { AuthRefreshDto } from './dto/auth-refresh.dto';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class AuthService {
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
     async login(authLoginDto: AuthLoginDto): Promise<AuthTokenDto> {
-        await ClassValidatorUtil.validate(authLoginDto);
+        await ClassValidator.validate(authLoginDto);
 
         const user = await this.usersService.findOneByEmail(authLoginDto.email);
 
@@ -80,7 +80,7 @@ export class AuthService {
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
     async register(authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
-        await ClassValidatorUtil.validate(authRegisterDto);
+        await ClassValidator.validate(authRegisterDto);
 
         const user = await this.usersService.findOneByEmail(authRegisterDto.email);
 
@@ -127,7 +127,7 @@ export class AuthService {
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
      */
     async refresh(authRefreshDto: AuthRefreshDto): Promise<AuthTokenDto> {
-        await ClassValidatorUtil.validate(authRefreshDto);
+        await ClassValidator.validate(authRefreshDto);
 
         const user = await this.usersService.findOneById(authRefreshDto.userId);
 
@@ -167,7 +167,7 @@ export class AuthService {
      * @throws {ValidationException} If the user ID or email is invalid.
      */
     private async getTokens(safeUser: SafeUserDto): Promise<AuthTokenDto> {
-        await ClassValidatorUtil.validate(safeUser);
+        await ClassValidator.validate(safeUser);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
@@ -198,7 +198,7 @@ export class AuthService {
         ]);
 
         const tokens = new AuthTokenDto(accessToken, refreshToken);
-        await ClassValidatorUtil.validate(tokens);
+        await ClassValidator.validate(tokens);
 
         return tokens;
     }
@@ -211,7 +211,7 @@ export class AuthService {
      * @throws {ValidationException} If the user ID or refresh token is invalid.
      */
     private async updateUserRefreshToken(authRefreshDto: AuthRefreshDto): Promise<void> {
-        await ClassValidatorUtil.validate(authRefreshDto);
+        await ClassValidator.validate(authRefreshDto);
 
         const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
         const hash = await bcrypt.hash(authRefreshDto.refreshToken, saltRounds);

@@ -5,8 +5,8 @@ import { promisify } from 'util';
 import { config } from 'dotenv';
 import { PathLike } from 'fs';
 
-export class OpenAPIUtil {
-    static async generateOpenAPIClient(swaggerDocument: OpenAPIObject) {
+export class OpenAPIGenerator {
+    static async generateClient(swaggerDocument: OpenAPIObject) {
         try {
             config();
             const execAsync = promisify(exec);
