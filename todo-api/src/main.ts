@@ -18,7 +18,7 @@ async function bootstrap() {
     app.useLogger(logger);
 
     const { httpAdapter } = app.get(HttpAdapterHost);
-    app.useGlobalFilters(new AllExceptionsFilter(logger, httpAdapter), new HttpExceptionsFilter(logger));
+    app.useGlobalFilters(new AllExceptionsFilter(httpAdapter), new HttpExceptionsFilter(logger));
     app.useGlobalPipes(new ValidationPipe());
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);

@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, LoggerService } from '@nestjs/common';
+import { ArgumentsHost, Catch } from '@nestjs/common';
 import { AbstractHttpAdapter, BaseExceptionFilter } from '@nestjs/core';
 
 /**
@@ -6,27 +6,24 @@ import { AbstractHttpAdapter, BaseExceptionFilter } from '@nestjs/core';
  */
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
-    constructor(
-        private readonly logger: LoggerService,
-        httpAdapter: AbstractHttpAdapter,
-    ) {
+    constructor(httpAdapter: AbstractHttpAdapter) {
         super(httpAdapter);
-        this.logger = logger;
     }
 
     /**
-     * Catches the exception and logs it using the logger service.
+     * Catches and logs the exception using Nest's underlying ExceptionHandler.
      * @param exception - The exception to be caught.
      * @param host - The arguments host object containing the request and response objects.
      * @todo Implement an injestion service to send the exception to a monitoring service.
      */
     catch(exception: unknown, host: ArgumentsHost) {
+        /*
         if (exception instanceof Error) {
-            this.logger.error(exception.message, exception.stack, AllExceptionsFilter.name);
+            Do something with exceptiion.message and exception.stack
         } else if (exception) {
-            this.logger.error(JSON.stringify(exception), AllExceptionsFilter.name);
+            Do something with exception as a string (e.g. JSON.stringify(exception))
         }
-
+        */
         super.catch(exception, host);
     }
 }
