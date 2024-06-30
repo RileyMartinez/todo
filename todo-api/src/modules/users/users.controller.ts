@@ -28,7 +28,7 @@ import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
 import { Response } from 'express';
 import { ExceptionConstants } from 'src/constants/exception.constants';
-import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
+import { JwtAccessGuard } from 'src/modules/auth/guards/jwt-access.guard';
 
 @Controller('users')
 @ApiTags('users')

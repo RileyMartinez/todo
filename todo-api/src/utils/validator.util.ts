@@ -1,7 +1,7 @@
 import { validate } from 'class-validator';
 import { ValidationException } from 'src/exceptions/validation.exception';
 
-export class ClassValidator {
+export class ValidatorUtil {
     /**
      * Validates an object using class-validator library.
      * Throws a ValidationException if there are any validation errors.

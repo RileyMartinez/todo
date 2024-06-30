@@ -6,7 +6,7 @@ import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { Todo } from './entities/todo.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
+import { JwtAccessGuard } from 'src/modules/auth/guards/jwt-access.guard';
 
 @Controller('todo')
 @UseGuards(JwtAccessGuard)

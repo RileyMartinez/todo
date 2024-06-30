@@ -3,8 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
-import { ClassValidator } from 'src/utils/class-validator.util';
 import { ExceptionConstants } from 'src/constants/exception.constants';
+import { ValidatorUtil } from 'src/utils/validator.util';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +20,7 @@ export class UsersService {
      * @throws {InternalServerErrorException} If the user creation fails.
      */
     async create(createUserDto: CreateUserDto): Promise<User> {
-        await ClassValidator.validate(createUserDto);
+        await ValidatorUtil.validate(createUserDto);
         return await this.usersRepository.insert(createUserDto);
     }
 
