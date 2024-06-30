@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodoModule } from '../todo/todo.module';
 import { ConfigModule } from '@nestjs/config';
@@ -32,7 +31,6 @@ import { OpenAPIService } from './providers/openapi.service';
     ],
     controllers: [AppController],
     providers: [
-        AppService,
         {
             provide: AppConstants.APP_GUARD,
             useClass: ThrottlerGuard,

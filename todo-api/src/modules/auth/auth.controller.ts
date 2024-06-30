@@ -45,12 +45,8 @@ export class AuthController {
      * Handles the login request.
      */
     @Post('login')
-    @ApiOkResponse({
-        type: AuthTokenDto,
-    })
-    @ApiForbiddenResponse({
-        description: ExceptionConstants.INVALID_CREDENTIALS,
-    })
+    @ApiOkResponse({ type: AuthTokenDto })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(LocalGuard)
     @HttpCode(HttpStatus.OK)
     async login(@Req() req: LoginRequest, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
@@ -66,12 +62,8 @@ export class AuthController {
      */
     @Post('logout')
     @ApiBearerAuth()
-    @ApiOkResponse({
-        description: 'User logged out successfully.',
-    })
-    @ApiForbiddenResponse({
-        description: ExceptionConstants.INVALID_CREDENTIALS,
-    })
+    @ApiOkResponse({ description: 'User logged out successfully.' })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(JwtAccessGuard)
     @HttpCode(HttpStatus.OK)
     async logout(@Req() req: LogOutRequest): Promise<void> {
@@ -86,12 +78,8 @@ export class AuthController {
      * Handles the registration request.
      */
     @Post('register')
-    @ApiCreatedResponse({
-        type: AuthTokenDto,
-    })
-    @ApiConflictResponse({
-        description: ExceptionConstants.USER_ALREADY_EXISTS,
-    })
+    @ApiCreatedResponse({ type: AuthTokenDto })
+    @ApiConflictResponse({ description: ExceptionConstants.USER_ALREADY_EXISTS })
     @HttpCode(HttpStatus.CREATED)
     async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
         return await this.authService.register(authRegisterDto);
@@ -102,12 +90,8 @@ export class AuthController {
      */
     @Post('refresh')
     @ApiBearerAuth()
-    @ApiOkResponse({
-        type: AuthTokenDto,
-    })
-    @ApiForbiddenResponse({
-        description: ExceptionConstants.INVALID_CREDENTIALS,
-    })
+    @ApiOkResponse({ type: AuthTokenDto })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(JwtRefreshGuard)
     @HttpCode(HttpStatus.OK)
     async refresh(@Req() req: RefreshRequest): Promise<AuthTokenDto> {

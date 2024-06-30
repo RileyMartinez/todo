@@ -1,16 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Redirect } from '@nestjs/common';
+import { ApiFoundResponse } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
-    constructor(private readonly appService: AppService) {}
+    constructor() {}
 
     /**
-     * Retrieves a greeting message.
-     * @returns The greeting message.
+     * Redirects to the Open API documentation.
      */
     @Get()
-    getHello(): string {
-        return this.appService.getHello();
-    }
+    @Redirect('api')
+    @ApiFoundResponse({ description: 'Redirects to /api' })
+    redirectToApiDocumentation(): void {}
 }
