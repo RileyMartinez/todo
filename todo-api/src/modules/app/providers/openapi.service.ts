@@ -26,6 +26,10 @@ export class OpenAPIService {
         this.execAsync = promisify(exec);
     }
 
+    /**
+     * Generates an OpenAPI client based on the provided OpenAPI document.
+     * @param document The OpenAPI document.
+     */
     async generateClient(document: OpenAPIObject) {
         const basePath = this.configService.getOrThrow(ConfigConstants.BASE_PATH);
         const port = this.configService.getOrThrow(ConfigConstants.PORT);
