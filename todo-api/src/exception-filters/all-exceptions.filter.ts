@@ -1,14 +1,13 @@
-import { ArgumentsHost, Catch, Inject, LoggerService } from '@nestjs/common';
+import { ArgumentsHost, Catch, LoggerService } from '@nestjs/common';
 import { AbstractHttpAdapter, BaseExceptionFilter } from '@nestjs/core';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 /**
- * Global exception filter that catches all exceptions and logs them using a logger service.
+ * Global exception filter that catches all exceptions.
  */
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
     constructor(
-        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
+        private readonly logger: LoggerService,
         httpAdapter: AbstractHttpAdapter,
     ) {
         super(httpAdapter);

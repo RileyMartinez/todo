@@ -1,12 +1,11 @@
-import { Catch, ArgumentsHost, HttpException, Inject, ExceptionFilter, LoggerService } from '@nestjs/common';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Catch, ArgumentsHost, HttpException, ExceptionFilter, LoggerService } from '@nestjs/common';
 
 /**
  * Custom exception filter for handling HTTP exceptions.
  */
 @Catch(HttpException)
 export class HttpExceptionsFilter implements ExceptionFilter {
-    constructor(@Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService) {
+    constructor(private readonly logger: LoggerService) {
         this.logger = logger;
     }
 
