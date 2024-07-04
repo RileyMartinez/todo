@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ExceptionConstants } from 'src/constants/exception.constants';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
 
 @Injectable()
 export class UsersRepository {

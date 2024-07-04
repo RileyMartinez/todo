@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { AppConstants } from 'src/constants/app.constants';
+import { AppConstants } from 'src/common/constants/app.constants';
 
 /**
  * Utility class for working with file paths.

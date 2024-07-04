@@ -27,7 +27,7 @@ import { SafeUserDto } from './dto/safe-user.dto';
 import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
 import { Response } from 'express';
-import { ExceptionConstants } from 'src/constants/exception.constants';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { JwtAccessGuard } from 'src/modules/auth/guards/jwt-access.guard';
 
 @Controller('users')

@@ -8,7 +8,7 @@ import {
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { ExceptionConstants } from 'src/constants/exception.constants';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { LocalGuard, JwtAccessGuard, JwtRefreshGuard } from './guards';
 import { AuthLoginDto, AuthRefreshDto, AuthTokenDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';

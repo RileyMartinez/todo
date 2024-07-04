@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { ValidationException } from 'src/exceptions/validation.exception';
+import { ValidationException } from 'src/common/exceptions/validation.exception';
 
 export class ValidatorUtil {
     /**

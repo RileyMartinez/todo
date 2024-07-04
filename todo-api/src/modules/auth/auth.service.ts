@@ -9,13 +9,13 @@ import {
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ConfigConstants } from 'src/constants/config.constants';
+import { ConfigConstants } from 'src/common/constants/config.constants';
 import { ConfigService } from '@nestjs/config';
 import { SafeUserDto } from 'src/modules/users/dto/safe-user.dto';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/modules/users/entities/user.entity';
-import { ExceptionConstants } from 'src/constants/exception.constants';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ValidatorUtil } from 'src/utils/validator.util';
 import { AuthLoginDto, AuthTokenDto, AuthRefreshDto } from './dto';

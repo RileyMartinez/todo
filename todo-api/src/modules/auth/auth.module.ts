@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/modules/users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtConfig } from '../../configs/jwt.config';
+import { JwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
 import { LocalStrategy, JwtAccessStrategy, JwtRefreshStrategy } from './strategies';
 

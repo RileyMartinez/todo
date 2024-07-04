@@ -4,15 +4,15 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
-import { AppConstants } from 'src/constants';
-import { UserMappingProfile } from 'src/mappers';
+import { AppConstants } from 'src/common/constants';
+import { UserMappingProfile } from 'src/common/mappers';
 import { AuthModule } from '../auth/auth.module';
 import { TodoModule } from '../todo/todo.module';
 import { TodolistModule } from '../todolist/todolist.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
 import { OpenAPIService } from './providers';
-import { TypeOrmConfig, ThrottlerConfig, AutomapperConfig, LoggerConfig } from 'src/configs';
+import { TypeOrmConfig, ThrottlerConfig, AutomapperConfig, LoggerConfig } from 'src/common/configs';
 
 @Module({
     imports: [

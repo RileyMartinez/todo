@@ -1,6 +1,6 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModuleAsyncOptions, JwtModuleOptions } from '@nestjs/jwt';
-import { ConfigConstants } from 'src/constants/config.constants';
+import { ConfigConstants } from 'src/common/constants/config.constants';
 
 export const JwtConfig: JwtModuleAsyncOptions = {
     imports: [ConfigModule],

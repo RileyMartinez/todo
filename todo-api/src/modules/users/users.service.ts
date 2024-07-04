@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
-import { ExceptionConstants } from 'src/constants/exception.constants';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { ValidatorUtil } from 'src/utils/validator.util';
 
 @Injectable()

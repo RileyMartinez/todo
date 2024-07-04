@@ -5,8 +5,8 @@ import { ExecOptionsWithStringEncoding, exec } from 'child_process';
 import { writeFile } from 'fs/promises';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { join } from 'path';
-import { AppConstants } from 'src/constants/app.constants';
-import { ConfigConstants } from 'src/constants/config.constants';
+import { AppConstants } from 'src/common/constants/app.constants';
+import { ConfigConstants } from 'src/common/constants/config.constants';
 import { PathUtil } from 'src/utils/path.util';
 import { promisify } from 'util';
 

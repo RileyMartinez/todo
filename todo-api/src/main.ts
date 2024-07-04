@@ -6,9 +6,9 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { OpenAPIService } from './modules/app/providers';
-import { AllExceptionsFilter, HttpExceptionsFilter } from './exception-filters';
-import { SwaggerConfig, CorsConfig } from './configs';
-import { ConfigConstants } from './constants';
+import { SwaggerConfig, CorsConfig } from './common/configs';
+import { ConfigConstants } from './common/constants';
+import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-filters';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
