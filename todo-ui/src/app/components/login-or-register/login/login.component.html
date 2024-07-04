@@ -9,20 +9,9 @@
                 <div class="mb-4">
                     <mat-form-field appearance="fill" class="w-3/4">
                         <mat-label>Email</mat-label>
-                        <input
-                            matInput
-                            type="email"
-                            [formControl]="emailFormControl"
-                            autocomplete="email"
-                            required
-                        />
-                        @if (
-                            emailFormControl.hasError('email') &&
-                            !emailFormControl.hasError('required')
-                        ) {
-                            <mat-error>
-                                Please enter a valid email address
-                            </mat-error>
+                        <input matInput type="email" [formControl]="emailFormControl" autocomplete="email" required />
+                        @if (emailFormControl.hasError('email') && emailFormControl.hasError('required')) {
+                            <mat-error> Please enter a valid email address </mat-error>
                         }
                         @if (emailFormControl.hasError('required')) {
                             <mat-error> Email is required </mat-error>
@@ -48,14 +37,7 @@
             </mat-card-content>
 
             <mat-card-actions>
-                <button
-                    mat-raised-button
-                    color="primary"
-                    type="submit"
-                    [disabled]="loginForm.invalid"
-                >
-                    Submit
-                </button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Submit</button>
             </mat-card-actions>
         </mat-card>
     </div>
