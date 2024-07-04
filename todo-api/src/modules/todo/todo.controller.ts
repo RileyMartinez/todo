@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -6,10 +6,8 @@ import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { Todo } from './entities/todo.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAccessGuard } from 'src/modules/auth/guards/jwt-access.guard';
 
 @Controller('todo')
-@UseGuards(JwtAccessGuard)
 @ApiTags('todo')
 @ApiBearerAuth()
 @SkipThrottle()

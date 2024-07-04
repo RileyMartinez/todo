@@ -4,7 +4,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
-import { AppConstants } from 'src/common/constants';
 import { UserMappingProfile } from 'src/common/mappers';
 import { AuthModule } from '../auth/auth.module';
 import { TodoModule } from '../todo/todo.module';
@@ -13,6 +12,8 @@ import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
 import { OpenAPIService } from './providers';
 import { TypeOrmConfig, ThrottlerConfig, AutomapperConfig, LoggerConfig } from 'src/common/configs';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/guards';
 
 @Module({
     imports: [
@@ -29,7 +30,11 @@ import { TypeOrmConfig, ThrottlerConfig, AutomapperConfig, LoggerConfig } from '
     controllers: [AppController],
     providers: [
         {
-            provide: AppConstants.APP_GUARD,
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        },
+        {
+            provide: APP_GUARD,
             useClass: ThrottlerGuard,
         },
         UserMappingProfile,

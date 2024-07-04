@@ -15,7 +15,8 @@
     "/todo-api/src/modules/todolist/dto",
     "/todo-api/src/modules/todolist/entities",
     "/todo-api/src/modules/users/dto",
-    "/todo-api/src/modules/users/entities"
+    "/todo-api/src/modules/users/entities",
+    "/todo-api/src/common/decorators"
   ]
 }
 

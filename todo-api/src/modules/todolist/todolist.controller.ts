@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { TodolistService } from './todolist.service';
 import { CreateTodolistDto } from './dto/create-todolist.dto';
 import { UpdateTodolistDto } from './dto/update-todolist.dto';
@@ -6,11 +6,9 @@ import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAccessGuard } from 'src/modules/auth/guards/jwt-access.guard';
 
 @Controller('todolist')
 @ApiTags('todolist')
-@UseGuards(JwtAccessGuard)
 @ApiBearerAuth()
 @SkipThrottle()
 export class TodolistController {
