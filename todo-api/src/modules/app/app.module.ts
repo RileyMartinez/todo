@@ -1,29 +1,26 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TodoModule } from '../todo/todo.module';
-import { ConfigModule } from '@nestjs/config';
-import { typeOrmConfig } from '../../configs/typeorm.config';
-import { AuthModule } from '../auth/auth.module';
-import { UsersModule } from '../users/users.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { throttlerConfig } from '../../configs/throttle.config';
-import { AppConstants } from '../../constants/app.constants';
 import { AutomapperModule } from '@automapper/nestjs';
-import { automapperConfig } from '../../configs/automapper.config';
-import { UserMappingProfile } from '../../mappers/user-mapping.profile';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
-import { loggerConfig } from '../../configs/logger.config';
-import { AppController } from './app.controller';
+import { AppConstants } from 'src/constants';
+import { UserMappingProfile } from 'src/mappers';
+import { AuthModule } from '../auth/auth.module';
+import { TodoModule } from '../todo/todo.module';
 import { TodolistModule } from '../todolist/todolist.module';
-import { OpenAPIService } from './providers/openapi.service';
+import { UsersModule } from '../users/users.module';
+import { AppController } from './app.controller';
+import { OpenAPIService } from './providers';
+import { TypeOrmConfig, ThrottlerConfig, AutomapperConfig, LoggerConfig } from 'src/configs';
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        TypeOrmModule.forRootAsync(typeOrmConfig),
-        ThrottlerModule.forRootAsync(throttlerConfig),
-        AutomapperModule.forRootAsync(automapperConfig),
-        WinstonModule.forRootAsync(loggerConfig),
+        TypeOrmModule.forRootAsync(TypeOrmConfig),
+        ThrottlerModule.forRootAsync(ThrottlerConfig),
+        AutomapperModule.forRootAsync(AutomapperConfig),
+        WinstonModule.forRootAsync(LoggerConfig),
         TodoModule,
         TodolistModule,
         AuthModule,

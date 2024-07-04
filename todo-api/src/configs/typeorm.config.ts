@@ -3,7 +3,7 @@ import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm
 import { AppConstants } from 'src/constants/app.constants';
 import { ConfigConstants } from 'src/constants/config.constants';
 
-export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
+export const TypeOrmConfig: TypeOrmModuleAsyncOptions = {
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => ({
         type: 'postgres',

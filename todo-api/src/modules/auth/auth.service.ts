@@ -6,22 +6,20 @@ import {
     Injectable,
     LoggerService,
 } from '@nestjs/common';
-import { AuthLoginDto } from './dto/auth-login.dto';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { AuthRegisterDto } from './dto/auth-register.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigConstants } from 'src/constants/config.constants';
 import { ConfigService } from '@nestjs/config';
-import { AuthTokenDto } from './dto/auth-token.dto';
 import { SafeUserDto } from 'src/modules/users/dto/safe-user.dto';
 import { Mapper } from '@automapper/core';
 import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ExceptionConstants } from 'src/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { AuthRefreshDto } from './dto/auth-refresh.dto';
 import { ValidatorUtil } from 'src/utils/validator.util';
+import { AuthLoginDto, AuthTokenDto, AuthRefreshDto } from './dto';
+import { AuthRegisterDto } from './dto/auth-register.dto';
 
 @Injectable()
 export class AuthService {

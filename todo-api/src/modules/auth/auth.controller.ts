@@ -1,8 +1,5 @@
 import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthRegisterDto } from './dto/auth-register.dto';
-import { LocalGuard } from './guards/local.guard';
-import { JwtAccessGuard } from './guards/jwt-access.guard';
 import {
     ApiBearerAuth,
     ApiConflictResponse,
@@ -11,11 +8,10 @@ import {
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { AuthTokenDto } from './dto/auth-token.dto';
-import { AuthLoginDto } from './dto/auth-login.dto';
 import { ExceptionConstants } from 'src/constants/exception.constants';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { AuthRefreshDto } from './dto/auth-refresh.dto';
+import { LocalGuard, JwtAccessGuard, JwtRefreshGuard } from './guards';
+import { AuthLoginDto, AuthRefreshDto, AuthTokenDto } from './dto';
+import { AuthRegisterDto } from './dto/auth-register.dto';
 
 interface LoginRequest extends Express.Request {
     user?: AuthTokenDto;

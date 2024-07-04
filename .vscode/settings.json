@@ -1,0 +1,21 @@
+{
+  "exportall.config.folderListener": [
+    "/todo-api/src/configs",
+    "/todo-api/src/constants",
+    "/todo-api/src/exception-filters",
+    "/todo-api/src/exceptions",
+    "/todo-api/src/mappers",
+    "/todo-api/src/utils",
+    "/todo-api/src/modules/app/providers",
+    "/todo-api/src/modules/auth/dto",
+    "/todo-api/src/modules/auth/guards",
+    "/todo-api/src/modules/auth/strategies",
+    "/todo-api/src/modules/todo/dto",
+    "/todo-api/src/modules/todo/entities",
+    "/todo-api/src/modules/todolist/dto",
+    "/todo-api/src/modules/todolist/entities",
+    "/todo-api/src/modules/users/dto",
+    "/todo-api/src/modules/users/entities"
+  ]
+}
+
