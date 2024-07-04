@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { LoadingService } from '../../../services/loading.service';
 import { AuthService } from '../../../openapi-client';
-import { firstValueFrom } from 'rxjs';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-register',
@@ -28,8 +28,7 @@ export class RegisterComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.loadingService.triggerLoading();
-
+        this.loadingService.setLoading(true);
         this.emailFormControl = new FormControl('', [Validators.email, Validators.required]);
         this.passwordFormControl = new FormControl('', [Validators.minLength(8), Validators.required]);
 
@@ -37,21 +36,34 @@ export class RegisterComponent implements OnInit {
             email: this.emailFormControl,
             password: this.passwordFormControl,
         });
+        this.loadingService.setLoading(false);
     }
 
-    async onSubmit(): Promise<void> {
+    onSubmit(): void {
         this.loadingService.setLoading(true);
+
         if (this.registerForm.invalid) {
             return;
         }
 
-        await firstValueFrom(
-            this.authService.authControllerRegister({
+        this.authService
+            .authControllerRegister({
                 email: this.emailFormControl.value,
                 password: this.passwordFormControl.value,
-            }),
-        );
+            })
+            .pipe(finalize(() => this.loadingService.setLoading(false)))
+            .subscribe({
+                next: (tokens) => {
+                    if (!tokens) {
+                        throw new Error('No tokens returned');
+                    }
 
-        this.loadingService.setLoading(false);
+                    localStorage.setItem('accessToken', tokens.accessToken);
+                    localStorage.setItem('refreshToken', tokens.refreshToken);
+                },
+                error: (error) => {
+                    console.error(error);
+                },
+            });
     }
 }

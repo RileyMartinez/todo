@@ -4,19 +4,11 @@
     </button>
     <span>Todo App</span>
 </mat-toolbar>
-<mat-progress-bar
-    mode="indeterminate"
-    *ngIf="loadingService.loading$ | async"
-></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" *ngIf="loadingService.loading$ | async"></mat-progress-bar>
 <mat-sidenav-container>
     <mat-sidenav #sidenav mode="push">
         <mat-nav-list>
-            <a
-                mat-list-item
-                (click)="sidenav.close()"
-                [routerLink]="['/loginOrRegister']"
-                >Login</a
-            >
+            <a mat-list-item (click)="sidenav.close()" [routerLink]="['/loginOrRegister']">Login</a>
         </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content>

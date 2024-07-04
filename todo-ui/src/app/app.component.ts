@@ -29,9 +29,7 @@ import { MatListModule } from '@angular/material/list';
     styleUrl: './app.component.scss',
 })
 export class AppComponent {
-    constructor(public loadingService: LoadingService) {
-        this.loadingService.triggerLoading();
-    }
+    constructor(public loadingService: LoadingService) {}
 
     title = 'todo-ui';
 }
