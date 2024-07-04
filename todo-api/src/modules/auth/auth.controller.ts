@@ -12,7 +12,7 @@ import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { LocalGuard, JwtRefreshGuard } from './guards';
 import { AuthLoginDto, AuthRefreshDto, AuthTokenDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
-import { GetCurrentUser, GetSessionTokens, Public } from 'src/common/decorators';
+import { GetCurrentUser, Public } from 'src/common/decorators';
 import { DecoratorConstants } from 'src/common/constants';
 
 @Controller('auth')
@@ -31,7 +31,7 @@ export class AuthController {
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(LocalGuard)
     @HttpCode(HttpStatus.OK)
-    async login(@GetSessionTokens() tokens: AuthTokenDto, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
+    async login(@GetCurrentUser() tokens: AuthTokenDto, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
         if (!tokens) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
