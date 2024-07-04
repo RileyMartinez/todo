@@ -50,7 +50,6 @@ export class LoginComponent implements OnInit {
             }),
         );
 
-        console.log(this.loginForm?.value);
         this.loadingService.setLoading(false);
     }
 }
