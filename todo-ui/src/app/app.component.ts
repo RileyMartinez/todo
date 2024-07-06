@@ -9,6 +9,7 @@ import { LoadingService } from './services/loading.service';
 import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { RouteConstants } from './constants/route.constants';
 
 @Component({
     selector: 'app-root',
@@ -30,6 +31,6 @@ import { MatListModule } from '@angular/material/list';
 })
 export class AppComponent {
     constructor(public loadingService: LoadingService) {}
-
+    loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
 }

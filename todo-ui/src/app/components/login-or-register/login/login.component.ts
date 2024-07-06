@@ -5,10 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { LoadingService } from '../../../services/loading.service';
-import { AuthService } from '../../../openapi-client';
-import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { AuthenticationService } from '../../../services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -24,13 +21,10 @@ export class LoginComponent implements OnInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private loadingService: LoadingService,
-        private authService: AuthService,
-        private router: Router,
+        private authenticationService: AuthenticationService,
     ) {}
 
     ngOnInit(): void {
-        this.loadingService.setLoading(true);
         this.emailFormControl = new FormControl('', [Validators.email, Validators.required]);
         this.passwordFormControl = new FormControl('', Validators.required);
 
@@ -38,35 +32,13 @@ export class LoginComponent implements OnInit {
             email: this.emailFormControl,
             password: this.passwordFormControl,
         });
-        this.loadingService.setLoading(false);
     }
 
     onSubmit(): void {
-        this.loadingService.setLoading(true);
-
         if (this.loginForm?.invalid) {
             return;
         }
 
-        this.authService
-            .authControllerLogin({
-                email: this.emailFormControl.value,
-                password: this.passwordFormControl.value,
-            })
-            .pipe(finalize(() => this.loadingService.setLoading(false)))
-            .subscribe({
-                next: (tokens) => {
-                    if (!tokens) {
-                        throw new Error('No tokens returned');
-                    }
-
-                    localStorage.setItem('accessToken', tokens.accessToken);
-                    localStorage.setItem('refreshToken', tokens.refreshToken);
-                    this.router.navigate(['/todoList']);
-                },
-                error: (error) => {
-                    console.error(error);
-                },
-            });
+        this.authenticationService.login(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
     }
 }

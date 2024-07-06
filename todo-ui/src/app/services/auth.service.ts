@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { AuthService, AuthTokenDto } from '../openapi-client';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { AccessTokenDto, AuthService } from '../openapi-client';
+import { catchError, finalize, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { LoadingService } from './loading.service';
+import { RouteConstants } from '../constants/route.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +14,7 @@ export class AuthenticationService {
     constructor(
         private authService: AuthService,
         private router: Router,
+        private loadingService: LoadingService,
     ) {}
 
     private setToken(token: string): void {
@@ -26,49 +29,59 @@ export class AuthenticationService {
         this.accessToken = null;
     }
 
-    login(email: string, password: string): Observable<AuthTokenDto | null> {
+    login(email: string, password: string): Observable<AccessTokenDto | null> {
+        this.loadingService.setLoading(true);
         return this.authService.authControllerLogin({ email, password }).pipe(
             tap((tokens) => {
                 if (!tokens) {
                     throw new Error('No tokens returned');
                 }
                 this.setToken(tokens.accessToken);
-                this.router.navigate(['/todoList']);
+                this.router.navigate([RouteConstants.TODO_LIST]);
             }),
             catchError((error) => {
                 console.error(error);
                 return of(null);
             }),
+            finalize(() => this.loadingService.setLoading(false)),
         );
     }
 
     logout(): Observable<void> {
+        this.loadingService.setLoading(true);
         return this.authService.authControllerLogout().pipe(
             tap(() => this.clearToken()),
             catchError((error) => {
                 console.error(error);
                 return of();
             }),
+            finalize(() => {
+                this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
+                this.loadingService.setLoading(false);
+            }),
         );
     }
 
-    register(email: string, password: string): Observable<AuthTokenDto | null> {
+    register(email: string, password: string): Observable<AccessTokenDto | null> {
+        this.loadingService.setLoading(true);
         return this.authService.authControllerRegister({ email, password }).pipe(
             tap((tokens) => {
                 if (!tokens) {
                     throw new Error('No tokens returned');
                 }
                 this.setToken(tokens.accessToken);
-                this.router.navigate(['/todoList']);
+                this.router.navigate([RouteConstants.TODO_LIST]);
             }),
             catchError((error) => {
                 console.error(error);
                 return of(null);
             }),
+            finalize(() => this.loadingService.setLoading(false)),
         );
     }
 
-    refresh(): Observable<AuthTokenDto | null> {
+    refresh(): Observable<AccessTokenDto | null> {
+        this.loadingService.setLoading(true);
         return this.authService.authControllerRefresh().pipe(
             tap((tokens) => {
                 if (!tokens) {
@@ -80,6 +93,7 @@ export class AuthenticationService {
                 console.error(error);
                 return of(null);
             }),
+            finalize(() => this.loadingService.setLoading(false)),
         );
     }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
     ApiBearerAuth,
@@ -10,10 +10,12 @@ import {
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { LocalGuard, JwtRefreshGuard } from './guards';
-import { AuthLoginDto, AuthRefreshDto, AuthTokenDto } from './dto';
+import { AccessTokenDto, AuthLoginDto, AuthRefreshDto, AuthTokenDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
-import { DecoratorConstants } from 'src/common/constants';
+import { ConfigConstants, DecoratorConstants } from 'src/common/constants';
+import { Response } from 'express';
+import { RefreshTokenCookieConfig } from 'src/common/configs';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -27,16 +29,22 @@ export class AuthController {
      */
     @Public()
     @Post('login')
-    @ApiOkResponse({ type: AuthTokenDto })
+    @ApiOkResponse({ type: AccessTokenDto })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(LocalGuard)
     @HttpCode(HttpStatus.OK)
-    async login(@GetCurrentUser() tokens: AuthTokenDto, @Body() _: AuthLoginDto): Promise<AuthTokenDto> {
+    async login(
+        @GetCurrentUser() tokens: AuthTokenDto,
+        @Body() _: AuthLoginDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<AccessTokenDto> {
         if (!tokens) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        return tokens;
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, RefreshTokenCookieConfig);
+
+        return new AccessTokenDto(tokens.accessToken);
     }
 
     /**
@@ -60,11 +68,17 @@ export class AuthController {
      */
     @Public()
     @Post('register')
-    @ApiCreatedResponse({ type: AuthTokenDto })
+    @ApiCreatedResponse({ type: AccessTokenDto })
     @ApiConflictResponse({ description: ExceptionConstants.USER_ALREADY_EXISTS })
     @HttpCode(HttpStatus.CREATED)
-    async register(@Body() authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
-        return await this.authService.register(authRegisterDto);
+    async register(
+        @Body() authRegisterDto: AuthRegisterDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<AccessTokenDto> {
+        const tokens = await this.authService.register(authRegisterDto);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, RefreshTokenCookieConfig);
+
+        return new AccessTokenDto(tokens.accessToken);
     }
 
     /**
@@ -74,18 +88,22 @@ export class AuthController {
     @Public()
     @Post('refresh')
     @ApiBearerAuth()
-    @ApiOkResponse({ type: AuthTokenDto })
+    @ApiOkResponse({ type: AccessTokenDto })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(JwtRefreshGuard)
     @HttpCode(HttpStatus.OK)
     async refresh(
         @GetCurrentUser(DecoratorConstants.SUB) userId: number,
         @GetCurrentUser(DecoratorConstants.REFRESH_TOKEN) refreshToken: string,
-    ): Promise<AuthTokenDto> {
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<AccessTokenDto> {
         if (!userId || !refreshToken) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        return await this.authService.refresh(new AuthRefreshDto(userId, refreshToken));
+        const tokens = await this.authService.refresh(new AuthRefreshDto(userId, refreshToken));
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, RefreshTokenCookieConfig);
+
+        return new AccessTokenDto(tokens.accessToken);
     }
 }
