@@ -15,7 +15,7 @@ import { AuthRegisterDto } from './dto/auth-register.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
 import { ConfigConstants, DecoratorConstants } from 'src/common/constants';
 import { Response } from 'express';
-import { RefreshTokenCookieConfig } from 'src/common/configs';
+import { InvalidRefreshTokenCookieConfig, RefreshTokenCookieConfig } from 'src/common/configs';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -55,10 +55,15 @@ export class AuthController {
     @ApiOkResponse({ description: 'User logged out successfully.' })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @HttpCode(HttpStatus.OK)
-    async logout(@GetCurrentUser(DecoratorConstants.SUB) userId: number): Promise<void> {
+    async logout(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: number,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
         if (!userId) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
+
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, '', InvalidRefreshTokenCookieConfig);
 
         return await this.authService.logout(userId);
     }

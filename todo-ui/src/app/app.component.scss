@@ -1,0 +1,9 @@
+:host {
+    mat-sidenav {
+        width: 200px;
+    }
+
+    mat-nav-list button {
+        @apply w-full;
+    }
+}

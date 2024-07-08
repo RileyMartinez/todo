@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,8 @@ import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
+import { AuthenticationService } from './services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -29,8 +31,28 @@ import { RouteConstants } from './constants/route.constants';
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })
-export class AppComponent {
-    constructor(public loadingService: LoadingService) {}
+export class AppComponent implements OnInit {
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
+    isAuthenticated = false;
+    private authenticatedSubscription: Subscription = new Subscription();
+
+    constructor(
+        public loadingService: LoadingService,
+        private authenticationService: AuthenticationService,
+    ) {}
+
+    ngOnInit(): void {
+        this.authenticatedSubscription = this.authenticationService.isAuthenticated().subscribe((isAuthenticated) => {
+            this.isAuthenticated = isAuthenticated;
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.authenticatedSubscription.unsubscribe();
+    }
+
+    logout(): void {
+        this.authenticationService.logout().subscribe();
+    }
 }

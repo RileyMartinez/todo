@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AccessTokenDto, AuthService } from '../openapi-client';
-import { catchError, finalize, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
@@ -9,7 +9,8 @@ import { RouteConstants } from '../constants/route.constants';
     providedIn: 'root',
 })
 export class AuthenticationService {
-    private accessToken: string | null = null;
+    private accessTokenSubject = new BehaviorSubject<string | null>(null);
+    public readonly accessToken$ = this.accessTokenSubject.asObservable();
 
     constructor(
         private authService: AuthService,
@@ -17,16 +18,16 @@ export class AuthenticationService {
         private loadingService: LoadingService,
     ) {}
 
-    private setToken(token: string): void {
-        this.accessToken = token;
+    isAuthenticated(): Observable<boolean> {
+        return this.accessToken$.pipe(map((token) => !!token));
     }
 
-    getToken(): string | null {
-        return this.accessToken;
+    private setToken(token: string): void {
+        this.accessTokenSubject.next(token);
     }
 
     private clearToken(): void {
-        this.accessToken = null;
+        this.accessTokenSubject.next(null);
     }
 
     login(email: string, password: string): Observable<AccessTokenDto | null> {
@@ -50,12 +51,12 @@ export class AuthenticationService {
     logout(): Observable<void> {
         this.loadingService.setLoading(true);
         return this.authService.authControllerLogout().pipe(
-            tap(() => this.clearToken()),
             catchError((error) => {
                 console.error(error);
                 return of();
             }),
             finalize(() => {
+                this.clearToken();
                 this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
                 this.loadingService.setLoading(false);
             }),
@@ -91,6 +92,8 @@ export class AuthenticationService {
             }),
             catchError((error) => {
                 console.error(error);
+                this.clearToken();
+                this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
                 return of(null);
             }),
             finalize(() => this.loadingService.setLoading(false)),

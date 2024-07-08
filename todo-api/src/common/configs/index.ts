@@ -1,5 +1,6 @@
 export * from './automapper.config';
 export * from './cors.config';
+export * from './invalid-refresh-token-cookie.config';
 export * from './jwt.config';
 export * from './logger.config';
 export * from './refresh-token-cookie.config';
