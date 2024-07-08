@@ -1,1 +1,24 @@
-<p>todo-lists works!</p>
+<div class="flex justify-center p-14">
+    <mat-card class="min-w-96 mx-auto">
+        <mat-card-header class="mb-4">
+            <mat-card-title>Todo Lists</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-list>
+                <mat-list-item *ngFor="let todoList of todoLists">
+                    <h3 mat-line>{{ todoList.name }}</h3>
+                    <p mat-line>{{ todoList.description }}</p>
+                    <button mat-icon-button color="primary">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-raised-button color="primary">Create</button>
+        </mat-card-actions>
+    </mat-card>
+</div>

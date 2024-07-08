@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './services/loading.service';
 import { CommonModule } from '@angular/common';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
 import { AuthenticationService } from './services/auth.service';
@@ -32,6 +32,7 @@ import { Subscription } from 'rxjs';
     styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
+    @ViewChild('sidenav') sidenav: MatSidenav | undefined;
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
     isAuthenticated = false;
@@ -53,6 +54,7 @@ export class AppComponent implements OnInit {
     }
 
     logout(): void {
+        this.sidenav?.close();
         this.authenticationService.logout().subscribe();
     }
 }

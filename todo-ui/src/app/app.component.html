@@ -9,11 +9,16 @@
     <mat-sidenav-container class="flex-grow">
         <mat-sidenav #sidenav mode="push">
             <mat-nav-list>
-                <a *ngIf="!isAuthenticated" (click)="sidenav.close()" [routerLink]="[loginOrRegisterRoute]">
-                    <button mat-button>Login</button>
+                <a
+                    *ngIf="!isAuthenticated"
+                    mat-list-item
+                    (click)="sidenav.close()"
+                    [routerLink]="[loginOrRegisterRoute]"
+                >
+                    Login
                 </a>
-                <a *ngIf="isAuthenticated" (click)="sidenav.close()" [routerLink]="[loginOrRegisterRoute]">
-                    <button mat-button (click)="logout()">Logout</button>
+                <a *ngIf="isAuthenticated" mat-list-item (click)="logout()" [routerLink]="[loginOrRegisterRoute]">
+                    Logout
                 </a>
             </mat-nav-list>
         </mat-sidenav>

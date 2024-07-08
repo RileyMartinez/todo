@@ -38,7 +38,7 @@ export class AuthenticationService {
                     throw new Error('No tokens returned');
                 }
                 this.setToken(tokens.accessToken);
-                this.router.navigate([RouteConstants.TODO_LIST]);
+                this.router.navigate([RouteConstants.TODO_LISTS]);
             }),
             catchError((error) => {
                 console.error(error);
@@ -71,7 +71,7 @@ export class AuthenticationService {
                     throw new Error('No tokens returned');
                 }
                 this.setToken(tokens.accessToken);
-                this.router.navigate([RouteConstants.TODO_LIST]);
+                this.router.navigate([RouteConstants.TODO_LISTS]);
             }),
             catchError((error) => {
                 console.error(error);
