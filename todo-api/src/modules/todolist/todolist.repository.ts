@@ -24,10 +24,11 @@ export class TodolistRepository {
             .execute();
     }
 
-    async getMany(): Promise<TodoList[]> {
+    async getMany(userId: number): Promise<TodoList[]> {
         return await this.repository
             .createQueryBuilder('todoList')
             .leftJoinAndSelect('todoList.todos', 'todos')
+            .where('todoList.userId = :userId', { userId })
             .getMany();
     }
 

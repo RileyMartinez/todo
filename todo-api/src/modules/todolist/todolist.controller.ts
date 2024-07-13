@@ -26,11 +26,12 @@ export class TodolistController {
 
     /**
      * Get all todo lists.
+     * @param userId - The ID of the user to get todo lists for.
      * @returns A promise that resolves to an array of todo lists.
      */
-    @Get()
-    async findAll(): Promise<TodoList[]> {
-        return await this.todolistService.findAll();
+    @Get(':userId')
+    async findAll(@Param('userId', ParseIntPipe) userId: number): Promise<TodoList[]> {
+        return await this.todolistService.findAll(userId);
     }
 
     /**

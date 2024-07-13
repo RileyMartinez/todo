@@ -4,6 +4,8 @@ import { BehaviorSubject, catchError, finalize, map, Observable, of, tap } from 
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
+import { jwtDecode } from 'jwt-decode';
+import { User } from '../interfaces/user.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -11,6 +13,9 @@ import { RouteConstants } from '../constants/route.constants';
 export class AuthenticationService {
     private accessTokenSubject = new BehaviorSubject<string | null>(null);
     public readonly accessToken$ = this.accessTokenSubject.asObservable();
+
+    private userSubject = new BehaviorSubject<User | null>(null);
+    public readonly user$ = this.userSubject.asObservable();
 
     constructor(
         private authService: AuthService,
@@ -22,12 +27,14 @@ export class AuthenticationService {
         return this.accessToken$.pipe(map((token) => !!token));
     }
 
-    private setToken(token: string): void {
+    private setTokenAndUserIdentity(token: string): void {
         this.accessTokenSubject.next(token);
+        this.userSubject.next(jwtDecode<User>(token));
     }
 
-    private clearToken(): void {
+    private clearTokenAndUserIdentity(): void {
         this.accessTokenSubject.next(null);
+        this.userSubject.next(null);
     }
 
     login(email: string, password: string): Observable<AccessTokenDto | null> {
@@ -37,7 +44,7 @@ export class AuthenticationService {
                 if (!tokens) {
                     throw new Error('No tokens returned');
                 }
-                this.setToken(tokens.accessToken);
+                this.setTokenAndUserIdentity(tokens.accessToken);
                 this.router.navigate([RouteConstants.TODO_LISTS]);
             }),
             catchError((error) => {
@@ -56,7 +63,7 @@ export class AuthenticationService {
                 return of();
             }),
             finalize(() => {
-                this.clearToken();
+                this.clearTokenAndUserIdentity();
                 this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
                 this.loadingService.setLoading(false);
             }),
@@ -70,7 +77,7 @@ export class AuthenticationService {
                 if (!tokens) {
                     throw new Error('No tokens returned');
                 }
-                this.setToken(tokens.accessToken);
+                this.setTokenAndUserIdentity(tokens.accessToken);
                 this.router.navigate([RouteConstants.TODO_LISTS]);
             }),
             catchError((error) => {
@@ -88,11 +95,11 @@ export class AuthenticationService {
                 if (!tokens) {
                     throw new Error('No tokens returned');
                 }
-                this.setToken(tokens.accessToken);
+                this.setTokenAndUserIdentity(tokens.accessToken);
             }),
             catchError((error) => {
                 console.error(error);
-                this.clearToken();
+                this.clearTokenAndUserIdentity();
                 this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
                 return of(null);
             }),

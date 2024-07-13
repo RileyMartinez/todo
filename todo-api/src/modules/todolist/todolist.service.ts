@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTodolistDto } from './dto/create-todolist.dto';
 import { UpdateTodolistDto } from './dto/update-todolist.dto';
 import { TodolistRepository } from './todolist.repository';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
+import { ExceptionConstants } from 'src/common/constants';
 
 @Injectable()
 export class TodolistService {
@@ -13,8 +14,12 @@ export class TodolistService {
         return await this.todolistRepository.upsert(createTodolistDto);
     }
 
-    async findAll(): Promise<TodoList[]> {
-        const todoLists = await this.todolistRepository.getMany();
+    async findAll(userId: number): Promise<TodoList[]> {
+        if (userId < 1) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        const todoLists = await this.todolistRepository.getMany(userId);
 
         if (!todoLists || todoLists.length === 0) {
             throw new NotFoundException('No todo lists found');

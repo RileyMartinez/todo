@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateTodolistDto {
     @IsNumber()
@@ -8,4 +8,8 @@ export class CreateTodolistDto {
     @IsString()
     @IsNotEmpty()
     title: string = '';
+
+    @IsNumber()
+    @Min(1)
+    userId: number = 0;
 }

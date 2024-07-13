@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, first, takeUntil, timer } from 'rxjs';
+import { BehaviorSubject, Subject, catchError, first, of, takeUntil, timer } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -16,6 +16,9 @@ export class LoadingService {
                 .pipe(
                     first(() => this.loading.value === true),
                     takeUntil(this.unsubscribe$),
+                    catchError(() => {
+                        return of(false);
+                    }),
                 )
                 .subscribe(() => {
                     this.loading.next(isLoading);

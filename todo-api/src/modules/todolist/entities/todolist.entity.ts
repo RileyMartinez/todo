@@ -9,6 +9,9 @@ export class TodoList {
     @Column()
     title!: string;
 
+    @Column()
+    userId!: number;
+
     @OneToMany(() => Todo, (todo) => todo.todoList)
     todos: Todo[] | undefined;
 }
