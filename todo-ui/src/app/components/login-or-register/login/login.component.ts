@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { AuthenticationService } from '../../../services/auth.service';
+import { IdentityService } from '../../../services/identity.service';
 
 @Component({
     selector: 'app-login',
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private authenticationService: AuthenticationService,
+        private identityService: IdentityService,
     ) {}
 
     ngOnInit(): void {
@@ -39,6 +39,6 @@ export class LoginComponent implements OnInit {
             return;
         }
 
-        this.authenticationService.login(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
+        this.identityService.login(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
     }
 }

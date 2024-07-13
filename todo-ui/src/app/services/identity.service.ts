@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AccessTokenDto, AuthService } from '../openapi-client';
 import { BehaviorSubject, catchError, finalize, map, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -10,18 +10,16 @@ import { User } from '../interfaces/user.interface';
 @Injectable({
     providedIn: 'root',
 })
-export class AuthenticationService {
+export class IdentityService {
     private accessTokenSubject = new BehaviorSubject<string | null>(null);
     public readonly accessToken$ = this.accessTokenSubject.asObservable();
 
     private userSubject = new BehaviorSubject<User | null>(null);
     public readonly user$ = this.userSubject.asObservable();
 
-    constructor(
-        private authService: AuthService,
-        private router: Router,
-        private loadingService: LoadingService,
-    ) {}
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly loadingService = inject(LoadingService);
 
     isAuthenticated(): Observable<boolean> {
         return this.accessToken$.pipe(map((token) => !!token));

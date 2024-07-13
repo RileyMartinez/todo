@@ -7,15 +7,15 @@ import {
     HttpStatusCode,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthenticationService } from '../services/auth.service';
+import { IdentityService } from '../services/identity.service';
 import { catchError, Observable, switchMap, take, throwError } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(private readonly authenticationService: AuthenticationService) {}
+    constructor(private readonly identityService: IdentityService) {}
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return this.authenticationService.accessToken$.pipe(
+        return this.identityService.accessToken$.pipe(
             take(1), // Take the current value and complete
             switchMap((accessToken) => {
                 if (!accessToken) {
@@ -26,7 +26,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 return next.handle(authReq).pipe(
                     catchError((error: HttpErrorResponse): Observable<HttpEvent<any>> => {
                         if (error.status === HttpStatusCode.Unauthorized) {
-                            return this.authenticationService.refresh().pipe(
+                            return this.identityService.refresh().pipe(
                                 switchMap((newToken) => {
                                     const updatedReq = this.setAuthorizationHeader(req, newToken?.accessToken);
                                     return next.handle(updatedReq);

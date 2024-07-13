@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { TodoService } from '../../services/todo.service';
 import { TodoList } from '../../openapi-client';
 import { USER_OBSERVABLE_TOKEN } from '../../injection-tokens/user.token';
-import { AuthenticationService } from '../../services/auth.service';
+import { IdentityService } from '../../services/identity.service';
 import { User } from '../../interfaces/user.interface';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,8 +21,8 @@ import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
         {
             provide: USER_OBSERVABLE_TOKEN,
             useFactory: () => {
-                const authService = inject(AuthenticationService);
-                return authService.user$;
+                const identityService = inject(IdentityService);
+                return identityService.user$;
             },
         },
     ],

@@ -52,7 +52,7 @@ services:
     volumes:
       - ./todo-api/src:/app/src
       - openapi:/share/openapi-client
-    command: npm run start:debug
+    command: yarn start:debug
 
   ui:
     build:
@@ -73,3 +73,4 @@ volumes:
   pgdata:
   pgadmin:
   openapi:
+

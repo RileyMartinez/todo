@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
-import { AuthenticationService } from './services/auth.service';
+import { IdentityService } from './services/identity.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -40,11 +40,11 @@ export class AppComponent implements OnInit {
 
     constructor(
         public loadingService: LoadingService,
-        private authenticationService: AuthenticationService,
+        private identityService: IdentityService,
     ) {}
 
     ngOnInit(): void {
-        this.authenticatedSubscription = this.authenticationService.isAuthenticated().subscribe((isAuthenticated) => {
+        this.authenticatedSubscription = this.identityService.isAuthenticated().subscribe((isAuthenticated) => {
             this.isAuthenticated = isAuthenticated;
         });
     }
@@ -55,6 +55,6 @@ export class AppComponent implements OnInit {
 
     logout(): void {
         this.sidenav?.close();
-        this.authenticationService.logout().subscribe();
+        this.identityService.logout().subscribe();
     }
 }
