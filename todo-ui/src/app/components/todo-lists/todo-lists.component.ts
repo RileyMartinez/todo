@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatActionList, MatListModule } from '@angular/material/list';
-import { TodoService } from '../../services/todo.service';
+import { NgTodoListService } from '../../services/ng-todolist.service';
 import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
@@ -31,7 +31,7 @@ import { RouteConstants } from '../../constants/route.constants';
     styleUrl: './todo-lists.component.scss',
 })
 export class TodoListsComponent implements OnInit {
-    private readonly todoService = inject(TodoService);
+    private readonly ngTodoListService = inject(NgTodoListService);
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
@@ -57,7 +57,7 @@ export class TodoListsComponent implements OnInit {
                     return;
                 }
 
-                this.todoService
+                this.ngTodoListService
                     .createTodoList(title)
                     .pipe(first())
                     .subscribe(() => this.getTodoLists());
@@ -81,7 +81,7 @@ export class TodoListsComponent implements OnInit {
                     return;
                 }
 
-                this.todoService
+                this.ngTodoListService
                     .deleteTodoList(todoList.id)
                     .pipe(first())
                     .subscribe(() => this.getTodoLists());
@@ -89,6 +89,6 @@ export class TodoListsComponent implements OnInit {
     }
 
     private getTodoLists(): void {
-        this.todoLists$ = this.todoService.getTodoLists();
+        this.todoLists$ = this.ngTodoListService.getTodoLists();
     }
 }

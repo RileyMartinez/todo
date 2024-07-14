@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
-import { IdentityService } from './services/identity.service';
+import { NgAuthService } from './services/ng-auth.service';
 import { User } from './interfaces/user.interface';
 import { LoadingService } from './services/loading.service';
 
@@ -33,7 +33,7 @@ import { LoadingService } from './services/loading.service';
 })
 export class AppComponent implements OnInit {
     loadingService = inject(LoadingService);
-    identityService = inject(IdentityService);
+    ngAuthService = inject(NgAuthService);
 
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
@@ -42,13 +42,13 @@ export class AppComponent implements OnInit {
     user: User | null = null;
 
     ngOnInit(): void {
-        this.identityService.user$.subscribe((user) => {
+        this.ngAuthService.user$.subscribe((user) => {
             this.user = user;
         });
     }
 
     logout(): void {
         this.sidenav?.close();
-        this.identityService.logout().subscribe();
+        this.ngAuthService.logout().subscribe();
     }
 }

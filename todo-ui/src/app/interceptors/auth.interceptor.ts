@@ -7,17 +7,17 @@ import {
     HttpStatusCode,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { IdentityService } from '../services/identity.service';
+import { NgAuthService } from '../services/ng-auth.service';
 import { catchError, Observable, switchMap, take, throwError } from 'rxjs';
 
 let refreshAttempted = false;
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
-    const identityService = inject(IdentityService);
+    const ngAuthService = inject(NgAuthService);
 
     req = req.clone({ withCredentials: true });
 
-    return identityService.accessToken$.pipe(
+    return ngAuthService.accessToken$.pipe(
         take(1),
         switchMap((accessToken) => {
             if (!accessToken) {
@@ -54,7 +54,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     function refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
         refreshAttempted = true;
 
-        return identityService.refresh().pipe(
+        return ngAuthService.refresh().pipe(
             switchMap((newToken) => {
                 if (!newToken?.accessToken) {
                     return throwError(() => new HttpErrorResponse({ status: HttpStatusCode.Unauthorized }));

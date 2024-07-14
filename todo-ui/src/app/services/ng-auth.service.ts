@@ -10,7 +10,7 @@ import { User } from '../interfaces/user.interface';
 @Injectable({
     providedIn: 'root',
 })
-export class IdentityService {
+export class NgAuthService {
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
