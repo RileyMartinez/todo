@@ -10,18 +10,19 @@ import { AppConstants } from 'src/common/constants';
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, AppConstants.JWT_REFRESH_STRATEGY_NAME) {
     constructor(readonly configService: ConfigService) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (req: Request) => req.cookies?.[ConfigConstants.REFRESH_TOKEN_COOKIE_NAME],
+            ]),
             secretOrKey: configService.get(ConfigConstants.JWT_REFRESH_SECRET),
             passReqToCallback: true,
+            ignoreExpiration: false,
         } as StrategyOptions);
     }
 
     async validate(req: Request, payload: any) {
-        const refreshToken = req.cookies?.[ConfigConstants.REFRESH_TOKEN_COOKIE_NAME];
-
         return {
-            ...payload,
-            refreshToken,
+            sub: payload.sub,
+            refreshToken: req.cookies?.[ConfigConstants.REFRESH_TOKEN_COOKIE_NAME],
         };
     }
 }

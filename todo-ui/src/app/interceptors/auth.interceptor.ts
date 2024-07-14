@@ -13,6 +13,8 @@ import { catchError, Observable, switchMap, take, throwError } from 'rxjs';
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
     const identityService = inject(IdentityService);
 
+    req = req.clone({ withCredentials: true });
+
     return identityService.accessToken$.pipe(
         take(1),
         switchMap((accessToken) => {
@@ -56,10 +58,6 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     }
 
     function setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | undefined): HttpRequest<any> {
-        if (!accessToken) {
-            return req;
-        }
-
         return req.clone({
             headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
         });

@@ -1,4 +1,14 @@
-import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    ForbiddenException,
+    HttpCode,
+    HttpStatus,
+    ParseIntPipe,
+    Post,
+    Res,
+    UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
     ApiBearerAuth,
@@ -15,7 +25,7 @@ import { AuthRegisterDto } from './dto/auth-register.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
 import { ConfigConstants, DecoratorConstants } from 'src/common/constants';
 import { Response } from 'express';
-import { InvalidRefreshTokenCookieConfig, RefreshTokenCookieConfig } from 'src/common/configs';
+import { InvalidTokenCookieConfig, RefreshTokenCookieConfig } from 'src/common/configs';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -56,14 +66,14 @@ export class AuthController {
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @HttpCode(HttpStatus.OK)
     async logout(
-        @GetCurrentUser(DecoratorConstants.SUB) userId: number,
+        @GetCurrentUser(DecoratorConstants.SUB, ParseIntPipe) userId: number,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {
         if (!userId) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, '', InvalidRefreshTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, '', InvalidTokenCookieConfig);
 
         return await this.authService.logout(userId);
     }
@@ -98,7 +108,7 @@ export class AuthController {
     @UseGuards(JwtRefreshGuard)
     @HttpCode(HttpStatus.OK)
     async refresh(
-        @GetCurrentUser(DecoratorConstants.SUB) userId: number,
+        @GetCurrentUser(DecoratorConstants.SUB, ParseIntPipe) userId: number,
         @GetCurrentUser(DecoratorConstants.REFRESH_TOKEN) refreshToken: string,
         @Res({ passthrough: true }) response: Response,
     ): Promise<AccessTokenDto> {

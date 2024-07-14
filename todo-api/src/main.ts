@@ -9,6 +9,7 @@ import { OpenAPIService } from './modules/app/providers';
 import { SwaggerConfig, CorsConfig } from './common/configs';
 import { ConfigConstants } from './common/constants';
 import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-filters';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,6 +19,7 @@ async function bootstrap() {
     const { httpAdapter } = app.get(HttpAdapterHost);
     app.useGlobalFilters(new AllExceptionsFilter(httpAdapter), new HttpExceptionsFilter(logger));
     app.useGlobalPipes(new ValidationPipe());
+    app.use(cookieParser());
 
     const document = SwaggerModule.createDocument(app, SwaggerConfig);
     SwaggerModule.setup('api', app, document);

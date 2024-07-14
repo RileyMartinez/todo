@@ -48,4 +48,13 @@ export class TodoService {
             finalize(() => this.loadingService.setLoading(false)),
         );
     }
+
+    public deleteTodoList(todoListId: number): Observable<void> {
+        this.loadingService.setLoading(true);
+
+        return this.todoListService.todolistControllerRemove(todoListId).pipe(
+            catchError(() => of(null)),
+            finalize(() => this.loadingService.setLoading(false)),
+        );
+    }
 }

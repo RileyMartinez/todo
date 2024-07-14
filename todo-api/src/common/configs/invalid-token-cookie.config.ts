@@ -10,7 +10,7 @@ if (!process.env.ENV) {
 
 const isProduction = process.env.ENV === AppConstants.PROD;
 
-export const InvalidRefreshTokenCookieConfig: CookieOptions = {
+export const InvalidTokenCookieConfig: CookieOptions = {
     httpOnly: true,
     secure: isProduction,
     sameSite: 'strict',
