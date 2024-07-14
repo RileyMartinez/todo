@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { TodoList } from '../../../openapi-client';
 
 @Component({
     selector: 'app-todo-list',
@@ -7,4 +8,10 @@ import { Component } from '@angular/core';
     templateUrl: './todo-list.component.html',
     styleUrl: './todo-list.component.scss',
 })
-export class TodoListComponent {}
+export class TodoListComponent implements OnInit {
+    todoList: TodoList | null = null;
+
+    ngOnInit(): void {
+        this.todoList = history.state.todoList;
+    }
+}

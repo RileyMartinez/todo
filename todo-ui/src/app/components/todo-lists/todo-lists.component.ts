@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
+import { MatActionList, MatListModule } from '@angular/material/list';
 import { TodoService } from '../../services/todo.service';
 import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,22 +11,39 @@ import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 import { first, Observable } from 'rxjs';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { MatLineModule } from '@angular/material/core';
+import { Router } from '@angular/router';
+import { RouteConstants } from '../../constants/route.constants';
 
 @Component({
     selector: 'app-todo-lists',
     standalone: true,
-    imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatIconModule, MatLineModule],
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatButtonModule,
+        MatListModule,
+        MatIconModule,
+        MatLineModule,
+        MatActionList,
+        MatListModule,
+    ],
     templateUrl: './todo-lists.component.html',
     styleUrl: './todo-lists.component.scss',
 })
 export class TodoListsComponent implements OnInit {
     private readonly todoService = inject(TodoService);
+    private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
     todoLists$: Observable<TodoList[]> = new Observable<TodoList[]>();
 
     ngOnInit(): void {
         this.getTodoLists();
+    }
+
+    onSelectedChange($event: any) {
+        const event = $event;
+        return event;
     }
 
     openCreateDialog(): void {
@@ -47,7 +64,13 @@ export class TodoListsComponent implements OnInit {
             });
     }
 
-    openDeleteDialog(todoListId: number): void {
+    openEditPage(todoList: TodoList): void {
+        this.router.navigate([RouteConstants.TODO_LIST], {
+            state: { todoList },
+        });
+    }
+
+    openDeleteDialog(todoList: TodoList): void {
         const dialogRef = this.dialog.open(TodoListDeleteDialog);
 
         dialogRef
@@ -59,7 +82,7 @@ export class TodoListsComponent implements OnInit {
                 }
 
                 this.todoService
-                    .deleteTodoList(todoListId)
+                    .deleteTodoList(todoList.id)
                     .pipe(first())
                     .subscribe(() => this.getTodoLists());
             });
