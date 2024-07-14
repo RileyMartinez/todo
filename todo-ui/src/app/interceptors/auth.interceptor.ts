@@ -10,6 +10,8 @@ import { inject } from '@angular/core';
 import { IdentityService } from '../services/identity.service';
 import { catchError, Observable, switchMap, take, throwError } from 'rxjs';
 
+let refreshAttempted = false;
+
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
     const identityService = inject(IdentityService);
 
@@ -36,6 +38,11 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
         return next(authReq).pipe(
             catchError((error: HttpErrorResponse): Observable<HttpEvent<any>> => {
                 if (error.status === HttpStatusCode.Unauthorized) {
+                    if (refreshAttempted) {
+                        refreshAttempted = false;
+                        return throwError(() => new HttpErrorResponse({ status: HttpStatusCode.Unauthorized }));
+                    }
+
                     return refreshTokenAndRetry(req, next);
                 }
 
@@ -45,6 +52,8 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     }
 
     function refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
+        refreshAttempted = true;
+
         return identityService.refresh().pipe(
             switchMap((newToken) => {
                 if (!newToken?.accessToken) {
