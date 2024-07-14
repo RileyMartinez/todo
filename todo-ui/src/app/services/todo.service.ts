@@ -1,50 +1,50 @@
-import { Injectable } from '@angular/core';
-import { catchError, finalize, Observable, of } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { catchError, finalize, Observable, of, switchMap } from 'rxjs';
 import { CreateTodolistDto, TodoList, TodolistService } from '../openapi-client';
 import { LoadingService } from './loading.service';
-import { User } from '../interfaces/user.interface';
+import { IdentityService } from './identity.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TodoService {
-    constructor(
-        private loadingService: LoadingService,
-        private todoListService: TodolistService,
-    ) {}
+    private readonly loadingService = inject(LoadingService);
+    private readonly todoListService = inject(TodolistService);
+    private readonly identityService = inject(IdentityService);
 
-    public getTodoLists(user: User | null): Observable<TodoList[]> {
-        if (!user) {
-            return of([]);
-        }
-
+    public getTodoLists(): Observable<TodoList[]> {
         this.loadingService.setLoading(true);
 
-        return this.todoListService.todolistControllerFindAll(user.sub).pipe(
-            catchError((error) => {
-                console.error(error);
-                return of([]);
+        return this.identityService.user$.pipe(
+            switchMap((user) => {
+                if (!user) {
+                    return of([]);
+                }
+
+                return this.todoListService.todolistControllerFindAll(user.sub);
             }),
+            catchError(() => of([])),
             finalize(() => this.loadingService.setLoading(false)),
         );
     }
 
-    public createTodoList(user: User | null, title: string): Observable<TodoList | null> {
-        if (!user) {
-            return of(null);
-        }
-
+    public createTodoList(title: string): Observable<TodoList | null> {
         this.loadingService.setLoading(true);
-        const createTodolistDto: CreateTodolistDto = {
-            title,
-            userId: user.sub,
-        };
 
-        return this.todoListService.todolistControllerCreate(createTodolistDto).pipe(
-            catchError((error) => {
-                console.error(error);
-                return of(null);
+        return this.identityService.user$.pipe(
+            switchMap((user) => {
+                if (!user) {
+                    return of(null);
+                }
+
+                const createTodolistDto: CreateTodolistDto = {
+                    title,
+                    userId: user.sub,
+                };
+
+                return this.todoListService.todolistControllerCreate(createTodolistDto);
             }),
+            catchError(() => of(null)),
             finalize(() => this.loadingService.setLoading(false)),
         );
     }

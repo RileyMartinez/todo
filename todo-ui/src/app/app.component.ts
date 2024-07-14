@@ -10,8 +10,6 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
 import { IdentityService } from './services/identity.service';
-import { Observable } from 'rxjs';
-import { USER_OBSERVABLE_TOKEN } from './injection-tokens/user.token';
 import { User } from './interfaces/user.interface';
 import { LoadingService } from './services/loading.service';
 
@@ -30,19 +28,12 @@ import { LoadingService } from './services/loading.service';
         MatSidenavModule,
         MatListModule,
     ],
-    providers: [
-        {
-            provide: USER_OBSERVABLE_TOKEN,
-            useFactory: () => inject(IdentityService).user$,
-        },
-    ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
     loadingService = inject(LoadingService);
     identityService = inject(IdentityService);
-    user$: Observable<User | null> = inject(USER_OBSERVABLE_TOKEN);
 
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
@@ -51,7 +42,7 @@ export class AppComponent implements OnInit {
     user: User | null = null;
 
     ngOnInit(): void {
-        this.user$.subscribe((user) => {
+        this.identityService.user$.subscribe((user) => {
             this.user = user;
         });
     }

@@ -10,5 +10,5 @@ export const routes: Routes = [
     { path: RouteConstants.LOGIN_OR_REGISTER, component: LoginOrRegisterComponent },
     { path: RouteConstants.TODO_LISTS, component: TodoListsComponent, canActivate: [authGuard] },
     { path: RouteConstants.TODO_LIST, component: TodoListComponent, canActivate: [authGuard] },
-    { path: '**', redirectTo: RouteConstants.LOGIN_OR_REGISTER },
+    { path: RouteConstants.WILDCARD, redirectTo: RouteConstants.LOGIN_OR_REGISTER },
 ];

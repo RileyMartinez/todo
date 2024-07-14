@@ -23,8 +23,7 @@ export class IdentityService {
 
     private setTokenAndUserIdentity(token: string): void {
         this.accessTokenSubject.next(token);
-        const user = this.getUserFromToken(token);
-        this.userSubject.next(user);
+        this.userSubject.next(this.getUserFromToken(token));
     }
 
     private clearTokenAndUserIdentity(): void {
@@ -50,10 +49,7 @@ export class IdentityService {
                 this.setTokenAndUserIdentity(tokens.accessToken);
                 this.router.navigate([RouteConstants.TODO_LISTS]);
             }),
-            catchError((error) => {
-                console.error(error);
-                return of(null);
-            }),
+            catchError(() => of(null)),
             finalize(() => this.loadingService.setLoading(false)),
         );
     }
@@ -61,10 +57,7 @@ export class IdentityService {
     logout(): Observable<void> {
         this.loadingService.setLoading(true);
         return this.authService.authControllerLogout().pipe(
-            catchError((error) => {
-                console.error(error);
-                return of();
-            }),
+            catchError(() => of(null)),
             finalize(() => {
                 this.clearTokenAndUserIdentity();
                 this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
@@ -83,10 +76,7 @@ export class IdentityService {
                 this.setTokenAndUserIdentity(tokens.accessToken);
                 this.router.navigate([RouteConstants.TODO_LISTS]);
             }),
-            catchError((error) => {
-                console.error(error);
-                return of(null);
-            }),
+            catchError(() => of(null)),
             finalize(() => this.loadingService.setLoading(false)),
         );
     }

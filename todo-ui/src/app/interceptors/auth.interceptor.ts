@@ -1,42 +1,40 @@
 import {
     HttpErrorResponse,
     HttpEvent,
-    HttpHandler,
-    HttpInterceptor,
+    HttpHandlerFn,
+    HttpInterceptorFn,
     HttpRequest,
     HttpStatusCode,
 } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { IdentityService } from '../services/identity.service';
 import { catchError, Observable, switchMap, take, throwError } from 'rxjs';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-    private readonly identityService = inject(IdentityService);
+export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+    const identityService = inject(IdentityService);
 
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return this.identityService.accessToken$.pipe(
-            take(1),
-            switchMap((accessToken) => {
-                if (!accessToken) {
-                    return next.handle(req);
-                }
+    return identityService.accessToken$.pipe(
+        take(1),
+        switchMap((accessToken) => {
+            if (!accessToken) {
+                return next(req);
+            }
 
-                return this.handleRequestWithToken(req, next, accessToken);
-            }),
-        );
-    }
+            return handleRequestWithToken(req, next, accessToken);
+        }),
+    );
 
-    private handleRequestWithToken(
+    function handleRequestWithToken(
         req: HttpRequest<any>,
-        next: HttpHandler,
+        next: HttpHandlerFn,
         accessToken: string,
     ): Observable<HttpEvent<any>> {
-        const authReq = this.setAuthorizationHeader(req, accessToken);
-        return next.handle(authReq).pipe(
+        const authReq = setAuthorizationHeader(req, accessToken);
+
+        return next(authReq).pipe(
             catchError((error: HttpErrorResponse): Observable<HttpEvent<any>> => {
                 if (error.status === HttpStatusCode.Unauthorized) {
-                    return this.refreshTokenAndRetry(req, next);
+                    return refreshTokenAndRetry(req, next);
                 }
 
                 return throwError(() => error);
@@ -44,20 +42,20 @@ export class AuthInterceptor implements HttpInterceptor {
         );
     }
 
-    private refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return this.identityService.refresh().pipe(
+    function refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
+        return identityService.refresh().pipe(
             switchMap((newToken) => {
                 if (!newToken?.accessToken) {
                     return throwError(() => new HttpErrorResponse({ status: HttpStatusCode.Unauthorized }));
                 }
 
-                const updatedReq = this.setAuthorizationHeader(req, newToken?.accessToken);
-                return next.handle(updatedReq);
+                const updatedReq = setAuthorizationHeader(req, newToken?.accessToken);
+                return next(updatedReq);
             }),
         );
     }
 
-    private setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | undefined): HttpRequest<any> {
+    function setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | undefined): HttpRequest<any> {
         if (!accessToken) {
             return req;
         }
@@ -66,4 +64,4 @@ export class AuthInterceptor implements HttpInterceptor {
             headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
         });
     }
-}
+};

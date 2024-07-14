@@ -6,10 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { TodoService } from '../../services/todo.service';
 import { TodoList } from '../../openapi-client';
-import { USER_OBSERVABLE_TOKEN } from '../../injection-tokens/user.token';
-import { IdentityService } from '../../services/identity.service';
-import { User } from '../../interfaces/user.interface';
-import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 
@@ -17,35 +13,21 @@ import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
     selector: 'app-todo-lists',
     standalone: true,
     imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatIconModule],
-    providers: [
-        {
-            provide: USER_OBSERVABLE_TOKEN,
-            useFactory: () => {
-                const identityService = inject(IdentityService);
-                return identityService.user$;
-            },
-        },
-    ],
     templateUrl: './todo-lists.component.html',
     styleUrl: './todo-lists.component.scss',
 })
 export class TodoListsComponent implements OnInit {
-    private todoService = inject(TodoService);
-    private createListDialog = inject(MatDialog);
-    private user$: Observable<User | null> = inject(USER_OBSERVABLE_TOKEN);
-    private user: User | null = null;
+    private readonly todoService = inject(TodoService);
+    private readonly createListDialog = inject(MatDialog);
 
     todoLists: TodoList[] = [];
 
     ngOnInit(): void {
-        this.user$.subscribe((user) => {
-            this.user = user;
-            this.loadTodoLists();
-        });
+        this.loadTodoLists();
     }
 
     loadTodoLists(): void {
-        this.todoService.getTodoLists(this.user).subscribe((todoLists) => {
+        this.todoService.getTodoLists().subscribe((todoLists) => {
             this.todoLists = todoLists;
         });
     }
@@ -58,7 +40,7 @@ export class TodoListsComponent implements OnInit {
                 return;
             }
 
-            this.todoService.createTodoList(this.user, title).subscribe((todoList) => {
+            this.todoService.createTodoList(title).subscribe((todoList) => {
                 if (todoList) {
                     this.todoLists.push(todoList);
                 }
