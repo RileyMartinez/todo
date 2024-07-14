@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AccessTokenDto, AuthService } from '../openapi-client';
-import { BehaviorSubject, catchError, finalize, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
@@ -21,13 +21,10 @@ export class IdentityService {
     private userSubject = new BehaviorSubject<User | null>(null);
     public readonly user$ = this.userSubject.asObservable();
 
-    isAuthenticated(): Observable<boolean> {
-        return this.accessToken$.pipe(map((token) => !!token));
-    }
-
     private setTokenAndUserIdentity(token: string): void {
         this.accessTokenSubject.next(token);
-        this.userSubject.next(this.getUserFromToken(token));
+        const user = this.getUserFromToken(token);
+        this.userSubject.next(user);
     }
 
     private clearTokenAndUserIdentity(): void {
