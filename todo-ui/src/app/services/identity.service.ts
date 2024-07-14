@@ -11,15 +11,15 @@ import { User } from '../interfaces/user.interface';
     providedIn: 'root',
 })
 export class IdentityService {
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly loadingService = inject(LoadingService);
+
     private accessTokenSubject = new BehaviorSubject<string | null>(null);
     public readonly accessToken$ = this.accessTokenSubject.asObservable();
 
     private userSubject = new BehaviorSubject<User | null>(null);
     public readonly user$ = this.userSubject.asObservable();
-
-    private readonly authService = inject(AuthService);
-    private readonly router = inject(Router);
-    private readonly loadingService = inject(LoadingService);
 
     isAuthenticated(): Observable<boolean> {
         return this.accessToken$.pipe(map((token) => !!token));
@@ -27,12 +27,20 @@ export class IdentityService {
 
     private setTokenAndUserIdentity(token: string): void {
         this.accessTokenSubject.next(token);
-        this.userSubject.next(jwtDecode<User>(token));
+        this.userSubject.next(this.getUserFromToken(token));
     }
 
     private clearTokenAndUserIdentity(): void {
         this.accessTokenSubject.next(null);
         this.userSubject.next(null);
+    }
+
+    private getUserFromToken(token: string): User | null {
+        try {
+            return jwtDecode<User>(token);
+        } catch {
+            return null;
+        }
     }
 
     login(email: string, password: string): Observable<AccessTokenDto | null> {
