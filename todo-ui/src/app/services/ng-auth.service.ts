@@ -21,14 +21,27 @@ export class NgAuthService {
     private userSubject = new BehaviorSubject<User | null>(null);
     public readonly user$ = this.userSubject.asObservable();
 
+    constructor() {
+        this.refreshSession();
+    }
+
+    private refreshSession(): void {
+        const userId = parseInt(sessionStorage.getItem('todo.sub') || '0');
+        if (userId) {
+            this.userSubject.next({ sub: userId });
+        }
+    }
+
     private setTokenAndUserIdentity(token: string): void {
         this.accessTokenSubject.next(token);
         this.userSubject.next(this.getUserFromToken(token));
+        sessionStorage.setItem('todo.sub', this.userSubject.value?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
         this.accessTokenSubject.next(null);
         this.userSubject.next(null);
+        sessionStorage.removeItem('todo.sub');
     }
 
     private getUserFromToken(token: string): User | null {

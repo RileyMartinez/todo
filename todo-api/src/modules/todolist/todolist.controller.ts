@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from 
 import { TodolistService } from './todolist.service';
 import { CreateTodolistDto } from './dto/create-todolist.dto';
 import { UpdateTodolistDto } from './dto/update-todolist.dto';
-import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -20,7 +20,7 @@ export class TodolistController {
      * @returns A promise that resolves to the result of the insert operation.
      */
     @Post()
-    async create(@Body() createTodolistDto: CreateTodolistDto): Promise<InsertResult> {
+    async create(@Body() createTodolistDto: CreateTodolistDto): Promise<TodoList> {
         return await this.todolistService.create(createTodolistDto);
     }
 

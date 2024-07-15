@@ -1,4 +1,4 @@
-import { DeleteResult, InsertResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,16 +12,8 @@ export class TodolistRepository {
         private readonly repository: Repository<TodoList>,
     ) {}
 
-    async upsert(createTodolistDto: CreateTodolistDto): Promise<InsertResult> {
-        return await this.repository
-            .createQueryBuilder()
-            .insert()
-            .into(TodoList)
-            .values(createTodolistDto)
-            .orUpdate(['title'], ['id'], {
-                skipUpdateIfNoValuesChanged: true,
-            })
-            .execute();
+    async upsert(createTodolistDto: CreateTodolistDto): Promise<TodoList> {
+        return await this.repository.save(createTodolistDto);
     }
 
     async getMany(userId: number): Promise<TodoList[]> {

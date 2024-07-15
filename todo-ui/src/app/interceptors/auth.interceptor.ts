@@ -20,7 +20,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     return ngAuthService.accessToken$.pipe(
         take(1),
         switchMap((accessToken) => {
-            if (!accessToken) {
+            if (req.url.endsWith('login') || req.url.endsWith('register')) {
                 return next(req);
             }
 
@@ -31,7 +31,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     function handleRequestWithToken(
         req: HttpRequest<any>,
         next: HttpHandlerFn,
-        accessToken: string,
+        accessToken: string | null,
     ): Observable<HttpEvent<any>> {
         const authReq = setAuthorizationHeader(req, accessToken);
 
@@ -66,7 +66,11 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
         );
     }
 
-    function setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | undefined): HttpRequest<any> {
+    function setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | null): HttpRequest<any> {
+        if (!accessToken) {
+            return req;
+        }
+
         return req.clone({
             headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
         });

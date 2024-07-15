@@ -5,11 +5,9 @@
         </mat-card-header>
         <mat-card-content>
             <mat-selection-list #todoLists [multiple]="false">
-                <mat-list-option *ngFor="let list of todoLists$ | async" [value]="list">{{
-                    list.title
-                }}</mat-list-option>
+                <mat-list-option *ngFor="let list of lists" [value]="list">{{ list.title }}</mat-list-option>
             </mat-selection-list>
-            <p *ngIf="((todoLists$ | async)?.length || 0) === 0">No lists found. Create a new list to get started.</p>
+            <p *ngIf="lists.length === 0">No lists found. Create a new list to get started.</p>
         </mat-card-content>
         <mat-card-actions>
             <button mat-icon-button color="primary" aria-label="Create new list" (click)="openCreateDialog()">

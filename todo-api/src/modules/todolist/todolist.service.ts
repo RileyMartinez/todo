@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateTodolistDto } from './dto/create-todolist.dto';
 import { UpdateTodolistDto } from './dto/update-todolist.dto';
 import { TodolistRepository } from './todolist.repository';
-import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
 import { ExceptionConstants } from 'src/common/constants';
 
@@ -10,7 +10,7 @@ import { ExceptionConstants } from 'src/common/constants';
 export class TodolistService {
     constructor(private readonly todolistRepository: TodolistRepository) {}
 
-    async create(createTodolistDto: CreateTodolistDto): Promise<InsertResult> {
+    async create(createTodolistDto: CreateTodolistDto): Promise<TodoList> {
         return await this.todolistRepository.upsert(createTodolistDto);
     }
 

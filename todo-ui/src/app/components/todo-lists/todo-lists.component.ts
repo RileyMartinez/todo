@@ -8,7 +8,7 @@ import { NgTodoListService } from '../../services/ng-todolist.service';
 import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
-import { first, Observable } from 'rxjs';
+import { first } from 'rxjs';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { MatLineModule } from '@angular/material/core';
 import { Router } from '@angular/router';
@@ -35,10 +35,15 @@ export class TodoListsComponent implements OnInit {
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
-    todoLists$: Observable<TodoList[]> = new Observable<TodoList[]>();
+    lists: TodoList[] = [];
 
     ngOnInit(): void {
-        this.getTodoLists();
+        this.ngTodoListService
+            .getTodoLists()
+            .pipe(first())
+            .subscribe((todoLists) => {
+                this.lists = todoLists;
+            });
     }
 
     onSelectedChange($event: any) {
@@ -60,7 +65,11 @@ export class TodoListsComponent implements OnInit {
                 this.ngTodoListService
                     .createTodoList(title)
                     .pipe(first())
-                    .subscribe(() => this.getTodoLists());
+                    .subscribe((todoList) => {
+                        if (todoList) {
+                            this.lists.push(todoList);
+                        }
+                    });
             });
     }
 
@@ -84,11 +93,9 @@ export class TodoListsComponent implements OnInit {
                 this.ngTodoListService
                     .deleteTodoList(todoList.id)
                     .pipe(first())
-                    .subscribe(() => this.getTodoLists());
+                    .subscribe(() => {
+                        this.lists = this.lists.filter((list) => list.id !== todoList.id);
+                    });
             });
-    }
-
-    private getTodoLists(): void {
-        this.todoLists$ = this.ngTodoListService.getTodoLists();
     }
 }

@@ -8,10 +8,10 @@ export const authGuard: CanActivateFn = () => {
     const ngAuthService = inject(NgAuthService);
     const router = inject(Router);
 
-    return ngAuthService.accessToken$.pipe(
+    return ngAuthService.user$.pipe(
         take(1),
-        map((accessToken) => {
-            if (!accessToken) {
+        map((user) => {
+            if (!user) {
                 router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
                 return false;
             }
