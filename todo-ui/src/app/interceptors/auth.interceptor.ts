@@ -8,9 +8,9 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { NgAuthService } from '../services/ng-auth.service';
-import { catchError, Observable, switchMap, take, throwError } from 'rxjs';
+import { catchError, finalize, Observable, switchMap, take, throwError } from 'rxjs';
 
-let refreshAttempted = false;
+let isRefreshing = false;
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
     const ngAuthService = inject(NgAuthService);
@@ -20,10 +20,6 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     return ngAuthService.accessToken$.pipe(
         take(1),
         switchMap((accessToken) => {
-            if (req.url.endsWith('login') || req.url.endsWith('register')) {
-                return next(req);
-            }
-
             return handleRequestWithToken(req, next, accessToken);
         }),
     );
@@ -37,12 +33,11 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
         return next(authReq).pipe(
             catchError((error: HttpErrorResponse): Observable<HttpEvent<any>> => {
-                if (error.status === HttpStatusCode.Unauthorized) {
-                    if (refreshAttempted) {
-                        refreshAttempted = false;
-                        return throwError(() => new HttpErrorResponse({ status: HttpStatusCode.Unauthorized }));
-                    }
-
+                if (
+                    error.status === HttpStatusCode.Unauthorized &&
+                    !req.url.endsWith('login') &&
+                    !req.url.endsWith('register')
+                ) {
                     return refreshTokenAndRetry(req, next);
                 }
 
@@ -52,21 +47,26 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     }
 
     function refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
-        refreshAttempted = true;
+        if (isRefreshing) {
+            return next(req);
+        }
+
+        isRefreshing = true;
 
         return ngAuthService.refresh().pipe(
             switchMap((newToken) => {
-                if (!newToken?.accessToken) {
-                    return throwError(() => new HttpErrorResponse({ status: HttpStatusCode.Unauthorized }));
-                }
+                isRefreshing = false;
 
                 const updatedReq = setAuthorizationHeader(req, newToken?.accessToken);
                 return next(updatedReq);
             }),
+            finalize(() => {
+                isRefreshing = false;
+            }),
         );
     }
 
-    function setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | null): HttpRequest<any> {
+    function setAuthorizationHeader(req: HttpRequest<any>, accessToken: string | null | undefined): HttpRequest<any> {
         if (!accessToken) {
             return req;
         }

@@ -95,7 +95,6 @@ export class NgAuthService {
     }
 
     refresh(): Observable<AccessTokenDto | null> {
-        this.loadingService.setLoading(true);
         return this.authService.authControllerRefresh().pipe(
             tap((tokens) => {
                 if (!tokens) {
@@ -103,13 +102,11 @@ export class NgAuthService {
                 }
                 this.setTokenAndUserIdentity(tokens.accessToken);
             }),
-            catchError((error) => {
-                console.error(error);
+            catchError(() => {
                 this.clearTokenAndUserIdentity();
                 this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
                 return of(null);
             }),
-            finalize(() => this.loadingService.setLoading(false)),
         );
     }
 }
