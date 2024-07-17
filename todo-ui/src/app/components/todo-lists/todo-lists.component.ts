@@ -8,7 +8,7 @@ import { NgTodoListService } from '../../services/ng-todolist.service';
 import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
-import { first } from 'rxjs';
+import { BehaviorSubject, first, map } from 'rxjs';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { MatLineModule } from '@angular/material/core';
 import { Router } from '@angular/router';
@@ -35,14 +35,18 @@ export class TodoListsComponent implements OnInit {
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
-    lists: TodoList[] = [];
+    private listsSubject = new BehaviorSubject<TodoList[]>([]);
+    lists$ = this.listsSubject.asObservable();
 
     ngOnInit(): void {
         this.ngTodoListService
             .getTodoLists()
-            .pipe(first())
+            .pipe(
+                first(),
+                map((todoLists) => todoLists.sort((a, b) => a.id - b.id)),
+            )
             .subscribe((todoLists) => {
-                this.lists = todoLists;
+                this.listsSubject.next(todoLists);
             });
     }
 
@@ -67,7 +71,7 @@ export class TodoListsComponent implements OnInit {
                     .pipe(first())
                     .subscribe((todoList) => {
                         if (todoList) {
-                            this.lists.push(todoList);
+                            this.listsSubject.next([...this.listsSubject.value, todoList]);
                         }
                     });
             });
@@ -94,7 +98,7 @@ export class TodoListsComponent implements OnInit {
                     .deleteTodoList(todoList.id)
                     .pipe(first())
                     .subscribe(() => {
-                        this.lists = this.lists.filter((list) => list.id !== todoList.id);
+                        this.listsSubject.next(this.listsSubject.value.filter((list) => list.id !== todoList.id));
                     });
             });
     }
