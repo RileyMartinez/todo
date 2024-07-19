@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,16 +29,14 @@ import { LoadingService } from './services/loading.service';
     ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
     private readonly loadingService = inject(LoadingService);
     private readonly authProvider = inject(AuthProvider);
-
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
-
     loading$ = this.loadingService.loading$;
     user$ = this.authProvider.user$;
-
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
     isAuthenticated = false;

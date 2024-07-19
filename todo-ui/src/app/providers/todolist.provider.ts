@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, finalize, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, first, of, switchMap, take } from 'rxjs';
 import { CreateTodolistDto, TodoList, TodolistService } from '../openapi-client';
 import { AuthProvider } from '../providers/auth.provider';
 import { LoadingService } from '../services/loading.service';
@@ -10,51 +10,74 @@ import { LoadingService } from '../services/loading.service';
 export class TodoListProvider {
     private readonly loadingService = inject(LoadingService);
     private readonly todoListService = inject(TodolistService);
-    private readonly ngAuthService = inject(AuthProvider);
+    private readonly authProvider = inject(AuthProvider);
 
-    public getTodoLists(): Observable<TodoList[]> {
+    private todoListsSubject = new BehaviorSubject<TodoList[]>([]);
+    public readonly todoLists$ = this.todoListsSubject.asObservable();
+
+    public getTodoLists(): void {
         this.loadingService.setLoading(true);
 
-        return this.ngAuthService.user$.pipe(
-            switchMap((user) => {
-                if (!user) {
-                    return of([]);
-                }
+        this.authProvider.user$
+            .pipe(
+                take(1),
+                switchMap((user) => {
+                    if (!user) {
+                        return of([]);
+                    }
 
-                return this.todoListService.todolistControllerFindAll(user.sub);
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingService.setLoading(false)),
-        );
+                    return this.todoListService.todolistControllerFindAll(user.sub).pipe(take(1));
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
+            .subscribe((todoLists) => {
+                this.todoListsSubject.next(todoLists.sort((a, b) => a.id - b.id));
+            });
     }
 
-    public createTodoList(title: string): Observable<TodoList | null> {
+    public createTodoList(title: string): void {
         this.loadingService.setLoading(true);
 
-        return this.ngAuthService.user$.pipe(
-            switchMap((user) => {
-                if (!user) {
-                    return of(null);
+        this.authProvider.user$
+            .pipe(
+                take(1),
+                switchMap((user) => {
+                    if (!user) {
+                        return of(null);
+                    }
+
+                    const createTodolistDto: CreateTodolistDto = {
+                        title,
+                        userId: user.sub,
+                    };
+
+                    return this.todoListService.todolistControllerCreate(createTodolistDto).pipe(first());
+                }),
+                catchError(() => of(null)),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
+            .subscribe((todoList) => {
+                if (todoList) {
+                    this.todoListsSubject.next([...this.todoListsSubject.value, todoList]);
                 }
-
-                const createTodolistDto: CreateTodolistDto = {
-                    title,
-                    userId: user.sub,
-                };
-
-                return this.todoListService.todolistControllerCreate(createTodolistDto);
-            }),
-            catchError(() => of(null)),
-            finalize(() => this.loadingService.setLoading(false)),
-        );
+            });
     }
 
-    public deleteTodoList(todoListId: number): Observable<void> {
+    public deleteTodoList(todoListId: number): void {
         this.loadingService.setLoading(true);
 
-        return this.todoListService.todolistControllerRemove(todoListId).pipe(
-            catchError(() => of(null)),
-            finalize(() => this.loadingService.setLoading(false)),
-        );
+        this.todoListService
+            .todolistControllerRemove(todoListId)
+            .pipe(
+                take(1),
+                catchError(() => of(null)),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
+            .subscribe(() => {
+                this.todoListsSubject.next(
+                    this.todoListsSubject.value.filter((todoList) => todoList.id !== todoListId),
+                );
+            });
     }
 }

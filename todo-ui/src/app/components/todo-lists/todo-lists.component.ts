@@ -7,7 +7,7 @@ import { MatActionList, MatListModule } from '@angular/material/list';
 import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
-import { BehaviorSubject, first, map } from 'rxjs';
+import { first } from 'rxjs';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { MatLineModule } from '@angular/material/core';
 import { Router } from '@angular/router';
@@ -35,19 +35,10 @@ export class TodoListsComponent implements OnInit {
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
-    private listsSubject = new BehaviorSubject<TodoList[]>([]);
-    lists$ = this.listsSubject.asObservable();
+    todoLists$ = this.todoListProvider.todoLists$;
 
     ngOnInit(): void {
-        this.todoListProvider
-            .getTodoLists()
-            .pipe(
-                first(),
-                map((todoLists) => todoLists.sort((a, b) => a.id - b.id)),
-            )
-            .subscribe((todoLists) => {
-                this.listsSubject.next(todoLists);
-            });
+        this.todoListProvider.getTodoLists();
     }
 
     onSelectedChange($event: any) {
@@ -66,14 +57,7 @@ export class TodoListsComponent implements OnInit {
                     return;
                 }
 
-                this.todoListProvider
-                    .createTodoList(title)
-                    .pipe(first())
-                    .subscribe((todoList) => {
-                        if (todoList) {
-                            this.listsSubject.next([...this.listsSubject.value, todoList]);
-                        }
-                    });
+                this.todoListProvider.createTodoList(title);
             });
     }
 
@@ -94,12 +78,7 @@ export class TodoListsComponent implements OnInit {
                     return;
                 }
 
-                this.todoListProvider
-                    .deleteTodoList(todoList.id)
-                    .pipe(first())
-                    .subscribe(() => {
-                        this.listsSubject.next(this.listsSubject.value.filter((list) => list.id !== todoList.id));
-                    });
+                this.todoListProvider.deleteTodoList(todoList.id);
             });
     }
 }

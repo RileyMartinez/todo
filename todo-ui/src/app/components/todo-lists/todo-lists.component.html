@@ -5,9 +5,11 @@
         </mat-card-header>
         <mat-card-content>
             <mat-selection-list #todoLists [multiple]="false">
-                <mat-list-option *ngFor="let list of lists$ | async" [value]="list">{{ list.title }}</mat-list-option>
+                <mat-list-option *ngFor="let list of todoLists$ | async" [value]="list">{{
+                    list.title
+                }}</mat-list-option>
             </mat-selection-list>
-            <p *ngIf="(lists$ | async)?.length === 0">No lists found. Create a new list to get started.</p>
+            <p *ngIf="(todoLists$ | async)?.length === 0">No lists found. Create a new list to get started.</p>
         </mat-card-content>
         <div class="flex justify-between items-center">
             <mat-card-actions [align]="'start'">
