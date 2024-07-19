@@ -7,13 +7,13 @@ import {
     HttpStatusCode,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { NgAuthService } from '../services/ng-auth.service';
+import { AuthProvider } from '../providers/auth.provider';
 import { catchError, finalize, Observable, switchMap, take, throwError } from 'rxjs';
 
 let isRefreshing = false;
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
-    const ngAuthService = inject(NgAuthService);
+    const ngAuthService = inject(AuthProvider);
 
     req = req.clone({ withCredentials: true });
 

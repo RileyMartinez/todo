@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { NgAuthService } from '../../../services/ng-auth.service';
+import { AuthProvider } from '../../../providers/auth.provider';
 
 @Component({
     selector: 'app-register',
@@ -15,14 +15,12 @@ import { NgAuthService } from '../../../services/ng-auth.service';
     styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
+    private readonly formBuilder = inject(FormBuilder);
+    private readonly authProvider = inject(AuthProvider);
+
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
     registerForm!: FormGroup;
-
-    constructor(
-        private formBuilder: FormBuilder,
-        private ngAuthService: NgAuthService,
-    ) {}
 
     ngOnInit(): void {
         this.emailFormControl = new FormControl('', [Validators.email, Validators.required]);
@@ -39,6 +37,6 @@ export class RegisterComponent implements OnInit {
             return;
         }
 
-        this.ngAuthService.register(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
+        this.authProvider.register(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
     }
 }

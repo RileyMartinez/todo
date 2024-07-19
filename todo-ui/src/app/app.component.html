@@ -5,11 +5,15 @@
         </button>
         <span>Todo App</span>
     </mat-toolbar>
-    <mat-progress-bar mode="indeterminate" *ngIf="loadingService.loading$ | async"></mat-progress-bar>
+    @if (loading$ | async) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else {
+        <mat-progress-bar mode="determinate" [value]="0"></mat-progress-bar>
+    }
     <mat-sidenav-container class="flex-grow">
         <mat-sidenav #sidenav mode="push">
             <mat-nav-list>
-                @if (user) {
+                @if (user$ | async) {
                     <a mat-list-item (click)="logout()" [routerLink]="[loginOrRegisterRoute]"> Logout </a>
                 } @else {
                     <a mat-list-item (click)="sidenav.close()" [routerLink]="[loginOrRegisterRoute]"> Login </a>

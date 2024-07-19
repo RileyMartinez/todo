@@ -1,16 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, finalize, Observable, of, switchMap } from 'rxjs';
 import { CreateTodolistDto, TodoList, TodolistService } from '../openapi-client';
-import { LoadingService } from './loading.service';
-import { NgAuthService } from './ng-auth.service';
+import { AuthProvider } from '../providers/auth.provider';
+import { LoadingService } from '../services/loading.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class NgTodoListService {
+export class TodoListProvider {
     private readonly loadingService = inject(LoadingService);
     private readonly todoListService = inject(TodolistService);
-    private readonly ngAuthService = inject(NgAuthService);
+    private readonly ngAuthService = inject(AuthProvider);
 
     public getTodoLists(): Observable<TodoList[]> {
         this.loadingService.setLoading(true);

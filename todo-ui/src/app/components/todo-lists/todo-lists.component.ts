@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatActionList, MatListModule } from '@angular/material/list';
-import { NgTodoListService } from '../../services/ng-todolist.service';
 import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
@@ -13,6 +12,7 @@ import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { MatLineModule } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { RouteConstants } from '../../constants/route.constants';
+import { TodoListProvider } from '../../providers/todolist.provider';
 
 @Component({
     selector: 'app-todo-lists',
@@ -31,7 +31,7 @@ import { RouteConstants } from '../../constants/route.constants';
     styleUrl: './todo-lists.component.scss',
 })
 export class TodoListsComponent implements OnInit {
-    private readonly ngTodoListService = inject(NgTodoListService);
+    private readonly todoListProvider = inject(TodoListProvider);
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
@@ -39,7 +39,7 @@ export class TodoListsComponent implements OnInit {
     lists$ = this.listsSubject.asObservable();
 
     ngOnInit(): void {
-        this.ngTodoListService
+        this.todoListProvider
             .getTodoLists()
             .pipe(
                 first(),
@@ -66,7 +66,7 @@ export class TodoListsComponent implements OnInit {
                     return;
                 }
 
-                this.ngTodoListService
+                this.todoListProvider
                     .createTodoList(title)
                     .pipe(first())
                     .subscribe((todoList) => {
@@ -94,7 +94,7 @@ export class TodoListsComponent implements OnInit {
                     return;
                 }
 
-                this.ngTodoListService
+                this.todoListProvider
                     .deleteTodoList(todoList.id)
                     .pipe(first())
                     .subscribe(() => {

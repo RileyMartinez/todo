@@ -9,8 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
-import { NgAuthService } from './services/ng-auth.service';
-import { User } from './interfaces/user.interface';
+import { AuthProvider } from './providers/auth.provider';
 import { LoadingService } from './services/loading.service';
 
 @Component({
@@ -32,23 +31,26 @@ import { LoadingService } from './services/loading.service';
     styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-    loadingService = inject(LoadingService);
-    ngAuthService = inject(NgAuthService);
+    private readonly loadingService = inject(LoadingService);
+    private readonly authProvider = inject(AuthProvider);
 
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
+
+    loading$ = this.loadingService.loading$;
+    user$ = this.authProvider.user$;
+
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
     isAuthenticated = false;
-    user: User | null = null;
 
-    ngOnInit(): void {
-        this.ngAuthService.user$.subscribe((user) => {
-            this.user = user;
-        });
+    ngOnInit(): void {}
+
+    ngOnDestroy(): void {
+        this.loadingService.destroy();
     }
 
     logout(): void {
         this.sidenav?.close();
-        this.ngAuthService.logout().subscribe();
+        this.authProvider.logout().subscribe();
     }
 }

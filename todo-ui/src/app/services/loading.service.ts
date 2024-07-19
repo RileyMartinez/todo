@@ -1,35 +1,31 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, catchError, first, of, takeUntil, timer } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil, tap, timer } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LoadingService {
-    private minimumDelay = 500;
     private loading = new BehaviorSubject<boolean>(false);
-    private unsubscribe$ = new Subject<void>();
-    loading$ = this.loading.asObservable();
+    public readonly loading$ = this.loading.asObservable();
+    private readonly destroy$ = new Subject<void>();
+
+    private minimumDelay = 500;
 
     setLoading(isLoading: boolean): void {
-        if (!isLoading) {
+        if (!isLoading && this.loading.value) {
             timer(this.minimumDelay)
                 .pipe(
-                    first(() => this.loading.value === true),
-                    takeUntil(this.unsubscribe$),
-                    catchError(() => {
-                        return of(false);
-                    }),
+                    takeUntil(this.destroy$),
+                    tap(() => this.loading.next(isLoading)),
                 )
-                .subscribe(() => {
-                    this.loading.next(isLoading);
-                });
+                .subscribe();
         } else {
             this.loading.next(isLoading);
         }
     }
 
-    ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
+    destroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
