@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AccessTokenDto, AuthService } from '../openapi-client';
-import { BehaviorSubject, catchError, finalize, first, Observable, of, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
 import { RouteConstants } from '../constants/route.constants';
@@ -25,11 +25,62 @@ export class AuthProvider {
         this.refreshSession();
     }
 
-    private refreshSession(): void {
-        const userId = parseInt(localStorage.getItem('todo.sub') || '0');
-        if (userId) {
-            this.userSubject.next({ sub: userId });
-        }
+    login(email: string, password: string): void {
+        this.loadingService.setLoading(true);
+
+        this.authService
+            .authControllerLogin({ email, password })
+            .pipe(finalize(() => this.loadingService.setLoading(false)))
+            .subscribe({
+                next: (tokens) => {
+                    this.setSessonAndRedirect(tokens.accessToken);
+                },
+                error: () => {
+                    this.clearTokenAndUserIdentity();
+                },
+            });
+    }
+
+    logout(): void {
+        this.loadingService.setLoading(true);
+
+        this.authService
+            .authControllerLogout()
+            .pipe(
+                finalize(() => {
+                    this.clearSessionAndRedirect();
+                    this.loadingService.setLoading(false);
+                }),
+            )
+            .subscribe();
+    }
+
+    register(email: string, password: string): void {
+        this.loadingService.setLoading(true);
+
+        this.authService
+            .authControllerRegister({ email, password })
+            .pipe(finalize(() => this.loadingService.setLoading(false)))
+            .subscribe({
+                next: (tokens) => {
+                    this.setSessonAndRedirect(tokens.accessToken);
+                },
+                error: () => {
+                    this.clearTokenAndUserIdentity();
+                },
+            });
+    }
+
+    refresh(): Observable<AccessTokenDto | null> {
+        return this.authService.authControllerRefresh().pipe(
+            tap((tokens) => {
+                this.setTokenAndUserIdentity(tokens.accessToken);
+            }),
+            catchError(() => {
+                this.clearSessionAndRedirect();
+                return of(null);
+            }),
+        );
     }
 
     private setTokenAndUserIdentity(token: string): void {
@@ -52,65 +103,20 @@ export class AuthProvider {
         }
     }
 
-    login(email: string, password: string): Observable<AccessTokenDto | null> {
-        this.loadingService.setLoading(true);
-        return this.authService.authControllerLogin({ email, password }).pipe(
-            first(),
-            tap((tokens) => {
-                if (!tokens) {
-                    throw new Error('No tokens returned');
-                }
-                this.setTokenAndUserIdentity(tokens.accessToken);
-                this.router.navigate([RouteConstants.TODO_LISTS]);
-            }),
-            catchError(() => of(null)),
-            finalize(() => this.loadingService.setLoading(false)),
-        );
+    private refreshSession(): void {
+        const userId = parseInt(localStorage.getItem('todo.sub') || '0');
+        if (userId) {
+            this.userSubject.next({ sub: userId });
+        }
     }
 
-    logout(): Observable<void> {
-        this.loadingService.setLoading(true);
-        return this.authService.authControllerLogout().pipe(
-            take(1),
-            catchError(() => of(null)),
-            finalize(() => {
-                this.clearTokenAndUserIdentity();
-                this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
-                this.loadingService.setLoading(false);
-            }),
-        );
+    private setSessonAndRedirect(token: string): void {
+        this.setTokenAndUserIdentity(token);
+        this.router.navigate([RouteConstants.TODO_LISTS]);
     }
 
-    register(email: string, password: string): Observable<AccessTokenDto | null> {
-        this.loadingService.setLoading(true);
-        return this.authService.authControllerRegister({ email, password }).pipe(
-            first(),
-            tap((tokens) => {
-                if (!tokens) {
-                    throw new Error('No tokens returned');
-                }
-                this.setTokenAndUserIdentity(tokens.accessToken);
-                this.router.navigate([RouteConstants.TODO_LISTS]);
-            }),
-            catchError(() => of(null)),
-            finalize(() => this.loadingService.setLoading(false)),
-        );
-    }
-
-    refresh(): Observable<AccessTokenDto | null> {
-        return this.authService.authControllerRefresh().pipe(
-            first(),
-            tap((tokens) => {
-                if (!tokens) {
-                    throw new Error('No tokens returned');
-                }
-                this.setTokenAndUserIdentity(tokens.accessToken);
-            }),
-            catchError(() => {
-                this.clearTokenAndUserIdentity();
-                this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
-                return of(null);
-            }),
-        );
+    private clearSessionAndRedirect(): void {
+        this.clearTokenAndUserIdentity();
+        this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
     }
 }

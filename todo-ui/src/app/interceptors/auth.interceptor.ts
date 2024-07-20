@@ -13,11 +13,11 @@ import { catchError, finalize, Observable, switchMap, take, throwError } from 'r
 let isRefreshing = false;
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
-    const ngAuthService = inject(AuthProvider);
+    const authProvider = inject(AuthProvider);
 
     req = req.clone({ withCredentials: true });
 
-    return ngAuthService.accessToken$.pipe(
+    return authProvider.accessToken$.pipe(
         take(1),
         switchMap((accessToken) => {
             return handleRequestWithToken(req, next, accessToken);
@@ -53,7 +53,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
         isRefreshing = true;
 
-        return ngAuthService.refresh().pipe(
+        return authProvider.refresh().pipe(
             switchMap((newToken) => {
                 isRefreshing = false;
 

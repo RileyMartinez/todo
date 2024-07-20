@@ -37,6 +37,6 @@ export class RegisterComponent implements OnInit {
             return;
         }
 
-        this.authProvider.register(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
+        this.authProvider.register(this.emailFormControl.value, this.passwordFormControl.value);
     }
 }

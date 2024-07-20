@@ -37,6 +37,6 @@ export class LoginComponent implements OnInit {
             return;
         }
 
-        this.authProvider.login(this.emailFormControl.value, this.passwordFormControl.value).subscribe();
+        this.authProvider.login(this.emailFormControl.value, this.passwordFormControl.value);
     }
 }

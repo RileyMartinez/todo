@@ -34,9 +34,12 @@ import { LoadingService } from './services/loading.service';
 export class AppComponent implements OnInit {
     private readonly loadingService = inject(LoadingService);
     private readonly authProvider = inject(AuthProvider);
+
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
+
     loading$ = this.loadingService.loading$;
     user$ = this.authProvider.user$;
+
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
     isAuthenticated = false;
@@ -49,6 +52,6 @@ export class AppComponent implements OnInit {
 
     logout(): void {
         this.sidenav?.close();
-        this.authProvider.logout().subscribe();
+        this.authProvider.logout();
     }
 }
