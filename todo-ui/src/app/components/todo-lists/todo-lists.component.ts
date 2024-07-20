@@ -62,9 +62,7 @@ export class TodoListsComponent implements OnInit {
     }
 
     openEditPage(todoList: TodoList): void {
-        this.router.navigate([RouteConstants.TODO_LIST], {
-            state: { todoList },
-        });
+        this.router.navigate([RouteConstants.TODO_LIST, todoList.id]);
     }
 
     openDeleteDialog(todoList: TodoList): void {

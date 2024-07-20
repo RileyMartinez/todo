@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { TodoList } from '../../../openapi-client';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,8 @@ import { MatLineModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatActionList } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ActivatedRoute } from '@angular/router';
+import { TodoListProvider } from '../../../providers/todolist.provider';
 
 @Component({
     selector: 'app-todo-list',
@@ -26,10 +28,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     styleUrl: './todo-list.component.scss',
 })
 export class TodoListComponent implements OnInit {
-    todoList: TodoList | null = null;
+    private readonly route = inject(ActivatedRoute);
+    private readonly todoListProvider = inject(TodoListProvider);
+
+    todoListId: number = 0;
+    todoList: TodoList | undefined;
 
     ngOnInit(): void {
-        this.todoList = history.state.todoList;
+        this.todoListId = parseInt(this.route.snapshot.params['id']);
+        this.todoList = this.todoListProvider.getTodoList(this.todoListId);
     }
 
     addTodoItem(todo: string): string {

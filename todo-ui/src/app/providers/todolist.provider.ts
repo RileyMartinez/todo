@@ -36,6 +36,10 @@ export class TodoListProvider {
             });
     }
 
+    public getTodoList(todoListId: number): TodoList | undefined {
+        return this.todoListsSubject.value.find((todoList) => todoList.id === todoListId);
+    }
+
     public createTodoList(title: string): void {
         this.loadingService.setLoading(true);
 
