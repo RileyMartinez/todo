@@ -32,11 +32,11 @@ export class TodoListComponent implements OnInit {
     private readonly todoListProvider = inject(TodoListProvider);
 
     todoListId: number = 0;
-    todoList: TodoList | undefined;
+    todoList$ = this.todoListProvider.todoList$;
 
     ngOnInit(): void {
         this.todoListId = parseInt(this.route.snapshot.params['id']);
-        this.todoList = this.todoListProvider.getTodoList(this.todoListId);
+        this.todoListProvider.getTodoList(this.todoListId);
     }
 
     addTodoItem(todo: string): string {

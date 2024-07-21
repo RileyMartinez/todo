@@ -7,6 +7,7 @@ export class ExceptionConstants {
     static readonly USER_NOT_FOUND = 'User not found';
     static readonly INVALID_USER_ID = 'User ID must be greater than 0';
     static readonly INVALID_EMAIL = 'Email must be provided';
+    static readonly INVALID_TODO_LIST_ID = 'Todo list ID must be greater than 0';
 
     // functions
     static readonly UserNotFound = (id: string | number) => `User with ID ${id} not found`;

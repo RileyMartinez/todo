@@ -29,13 +29,11 @@ export class TodolistService {
     }
 
     async findOne(id: number): Promise<TodoList | null> {
-        const todoList = await this.todolistRepository.getOne(id);
-
-        if (!todoList) {
-            throw new NotFoundException(`Todo list with id ${id} not found`);
+        if (id < 1) {
+            throw new BadRequestException(ExceptionConstants.INVALID_TODO_LIST_ID);
         }
 
-        return todoList;
+        return await this.todolistRepository.fineOne(id);
     }
 
     async update(id: number, updateTodolistDto: UpdateTodolistDto): Promise<UpdateResult> {

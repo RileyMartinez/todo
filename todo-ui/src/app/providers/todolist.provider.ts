@@ -13,7 +13,9 @@ export class TodoListProvider {
     private readonly authProvider = inject(AuthProvider);
 
     private todoListsSubject = new BehaviorSubject<TodoList[]>([]);
+    private todoListSubject = new BehaviorSubject<TodoList | null | undefined>(null);
     public readonly todoLists$ = this.todoListsSubject.asObservable();
+    public readonly todoList$ = this.todoListSubject.asObservable();
 
     public getTodoLists(): void {
         this.loadingService.setLoading(true);
@@ -36,8 +38,19 @@ export class TodoListProvider {
             });
     }
 
-    public getTodoList(todoListId: number): TodoList | undefined {
-        return this.todoListsSubject.value.find((todoList) => todoList.id === todoListId);
+    public getTodoList(todoListId: number): void {
+        if (this.todoListsSubject.value.length > 0) {
+            this.todoListSubject.next(this.todoListsSubject.value.find((todoList) => todoList.id === todoListId));
+        } else {
+            this.loadingService.setLoading(true);
+
+            this.todoListService
+                .todolistControllerFindOne(todoListId)
+                .pipe(finalize(() => this.loadingService.setLoading(false)))
+                .subscribe((todoList) => {
+                    this.todoListSubject.next(todoList);
+                });
+        }
     }
 
     public createTodoList(title: string): void {

@@ -24,12 +24,11 @@ export class TodolistRepository {
             .getMany();
     }
 
-    async getOne(id: number): Promise<TodoList | null> {
-        return await this.repository
-            .createQueryBuilder('todoList')
-            .leftJoinAndSelect('todoList.todos', 'todos')
-            .where('todoList.id = :id', { id })
-            .getOne();
+    async fineOne(id: number): Promise<TodoList | null> {
+        return await this.repository.findOneOrFail({
+            where: { id },
+            relations: ['todos'],
+        });
     }
 
     async update(id: number, updateTodolistDto: UpdateTodolistDto): Promise<UpdateResult> {

@@ -5,7 +5,8 @@ import { UpdateTodolistDto } from './dto/update-todolist.dto';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { TodoList } from './entities/todolist.entity';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ExceptionConstants } from 'src/common/constants';
 
 @Controller('todolist')
 @ApiTags('todolist')
@@ -36,10 +37,11 @@ export class TodolistController {
 
     /**
      * Get a todo list by its ID.
-     * @param id - The ID of the todo list.
-     * @returns A promise that resolves to the found todo list or null if not found.
      */
     @Get(':id')
+    @ApiBearerAuth()
+    @ApiOkResponse({ type: TodoList })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_TODO_LIST_ID })
     async findOne(@Param('id', ParseIntPipe) id: number): Promise<TodoList | null> {
         return await this.todolistService.findOne(id);
     }
