@@ -7,7 +7,7 @@ import { WinstonModule } from 'nest-winston';
 import { UserMappingProfile } from 'src/common/mappers';
 import { AuthModule } from '../auth/auth.module';
 import { TodoModule } from '../todo/todo.module';
-import { TodolistModule } from '../todolist/todolist.module';
+import { TodoListModule } from '../todolist/todo-list.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
 import { OpenAPIService } from './providers';
@@ -23,7 +23,7 @@ import { JwtAuthGuard } from '../auth/guards';
         AutomapperModule.forRootAsync(AutomapperConfig),
         WinstonModule.forRootAsync(LoggerConfig),
         TodoModule,
-        TodolistModule,
+        TodoListModule,
         AuthModule,
         UsersModule,
     ],

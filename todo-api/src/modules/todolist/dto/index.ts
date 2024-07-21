@@ -1,2 +1,1 @@
-export * from './create-todolist.dto';
-export * from './update-todolist.dto';
+export * from './todo-list.dto';

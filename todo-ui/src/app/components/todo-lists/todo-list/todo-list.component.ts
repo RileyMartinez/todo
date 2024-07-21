@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { TodoList } from '../../../openapi-client';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';

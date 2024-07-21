@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
-export class CreateTodolistDto {
+export class TodoListDto {
     @IsNumber()
     @IsOptional()
     id?: number;
