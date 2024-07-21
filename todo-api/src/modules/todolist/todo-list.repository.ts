@@ -3,33 +3,46 @@ import { TodoList } from './entities/todolist.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TodoListDto } from './dto/todo-list.dto';
+import { Todo } from './entities';
+import { TodoDto } from './dto';
 
 @Injectable()
 export class TodoListRepository {
     constructor(
         @InjectRepository(TodoList)
-        private readonly repository: Repository<TodoList>,
+        private readonly todoListRepository: Repository<TodoList>,
+        @InjectRepository(Todo)
+        private readonly todoRepository: Repository<Todo>,
     ) {}
 
-    async save(createTodolistDto: TodoListDto): Promise<TodoList> {
-        return await this.repository.save(createTodolistDto);
+    async saveTodoList(userId: number, todoListDto: TodoListDto): Promise<TodoList> {
+        const todoList = { userId, ...todoListDto };
+        return await this.todoListRepository.save(todoList);
     }
 
-    async find(userId: number): Promise<TodoList[]> {
-        return await this.repository.find({
+    async saveTodoListItem(todoDto: TodoDto): Promise<Todo> {
+        return await this.todoRepository.save(todoDto);
+    }
+
+    async findTodoLists(userId: number): Promise<TodoList[]> {
+        return await this.todoListRepository.find({
             where: { userId },
             relations: ['todos'],
         });
     }
 
-    async findOne(id: number): Promise<TodoList | null> {
-        return await this.repository.findOneOrFail({
+    async findTodoList(id: number): Promise<TodoList | null> {
+        return await this.todoListRepository.findOneOrFail({
             where: { id },
             relations: ['todos'],
         });
     }
 
-    async delete(id: number): Promise<DeleteResult> {
-        return await this.repository.delete(id);
+    async deleteTodoList(id: number): Promise<DeleteResult> {
+        return await this.todoListRepository.delete(id);
+    }
+
+    async deleteTodoListItem(id: number): Promise<DeleteResult> {
+        return await this.todoRepository.delete(id);
     }
 }

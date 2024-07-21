@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
 import { UserMappingProfile } from 'src/common/mappers';
 import { AuthModule } from '../auth/auth.module';
-import { TodoModule } from '../todo/todo.module';
 import { TodoListModule } from '../todolist/todo-list.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
@@ -22,7 +21,6 @@ import { JwtAuthGuard } from '../auth/guards';
         ThrottlerModule.forRootAsync(ThrottlerConfig),
         AutomapperModule.forRootAsync(AutomapperConfig),
         WinstonModule.forRootAsync(LoggerConfig),
-        TodoModule,
         TodoListModule,
         AuthModule,
         UsersModule,

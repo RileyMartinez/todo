@@ -1,6 +1,6 @@
 import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
-export class CreateTodoDto {
+export class TodoDto {
     @IsNumber()
     @IsOptional()
     id?: number;

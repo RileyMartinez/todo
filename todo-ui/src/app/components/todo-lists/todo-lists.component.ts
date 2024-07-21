@@ -9,7 +9,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 import { first } from 'rxjs';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
-import { MatLineModule } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { RouteConstants } from '../../constants/route.constants';
 import { TodoListProvider } from '../../providers/todolist.provider';
@@ -17,16 +16,7 @@ import { TodoListProvider } from '../../providers/todolist.provider';
 @Component({
     selector: 'app-todo-lists',
     standalone: true,
-    imports: [
-        CommonModule,
-        MatCardModule,
-        MatButtonModule,
-        MatListModule,
-        MatIconModule,
-        MatLineModule,
-        MatActionList,
-        MatListModule,
-    ],
+    imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatIconModule, MatActionList, MatListModule],
     templateUrl: './todo-lists.component.html',
     styleUrl: './todo-lists.component.scss',
 })

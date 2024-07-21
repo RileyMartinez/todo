@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { TodoListService } from './todo-list.service';
-import { TodoListDto } from './dto/todo-list.dto';
 import { DeleteResult } from 'typeorm';
-import { TodoList } from './entities/todolist.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { ExceptionConstants } from 'src/common/constants';
+import { DecoratorConstants, ExceptionConstants } from 'src/common/constants';
+import { GetCurrentUser } from 'src/common/decorators';
+import { Todo, TodoList } from './entities';
+import { TodoDto, TodoListDto } from './dto';
 
 @Controller('todo-list')
 @ApiTags('todo-list')
@@ -19,19 +20,31 @@ export class TodoListController {
      */
     @Post()
     @ApiOkResponse({ type: TodoList })
-    async createOrUpdate(@Body() createTodolistDto: TodoListDto): Promise<TodoList> {
-        return await this.todolistService.createOrUpdate(createTodolistDto);
+    async saveTodoList(
+        @GetCurrentUser(DecoratorConstants.SUB, ParseIntPipe) userId: number,
+        @Body() todoListDto: TodoListDto,
+    ): Promise<TodoList> {
+        return await this.todolistService.saveTodoList(userId, todoListDto);
+    }
+
+    /**
+     * Create a new todo list item, or update an existing one.
+     */
+    @Post('item')
+    @ApiOkResponse({ type: Todo })
+    async saveTodoListItem(@Body() todoDto: TodoDto): Promise<Todo> {
+        return await this.todolistService.saveTodoListItem(todoDto);
     }
 
     /**
      * Get all todo lists for a given user.
      */
-    @Get('user/:id')
+    @Get()
     @ApiOkResponse({ type: [TodoList] })
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
     @ApiNotFoundResponse({ description: 'No Todo lists found' })
-    async findAll(@Param('id', ParseIntPipe) userId: number): Promise<TodoList[]> {
-        return await this.todolistService.find(userId);
+    async findTodoLists(@GetCurrentUser(DecoratorConstants.SUB, ParseIntPipe) userId: number): Promise<TodoList[]> {
+        return await this.todolistService.findTodoLists(userId);
     }
 
     /**
@@ -40,8 +53,8 @@ export class TodoListController {
     @Get(':id')
     @ApiOkResponse({ type: TodoList })
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_TODO_LIST_ID })
-    async findOne(@Param('id', ParseIntPipe) id: number): Promise<TodoList | null> {
-        return await this.todolistService.findOne(id);
+    async findTodoList(@Param('id', ParseIntPipe) id: number): Promise<TodoList | null> {
+        return await this.todolistService.findTodoList(id);
     }
 
     /**
@@ -49,7 +62,16 @@ export class TodoListController {
      */
     @Delete(':id')
     @ApiOkResponse({ type: DeleteResult })
-    async remove(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
-        return await this.todolistService.remove(id);
+    async removeTodoList(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+        return await this.todolistService.deleteTodoList(id);
+    }
+
+    /**
+     * Remove a todo list item by its ID.
+     */
+    @Delete('item/:id')
+    @ApiOkResponse({ type: DeleteResult })
+    async removeTodoListItem(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+        return await this.todolistService.deleteTodoListItem(id);
     }
 }

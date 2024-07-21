@@ -3,10 +3,10 @@ import { TodoListService } from './todo-list.service';
 import { TodoListController } from './todo-list.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodoListRepository } from './todo-list.repository';
-import { TodoList } from './entities/todolist.entity';
+import { Todo, TodoList } from './entities';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([TodoList])],
+    imports: [TypeOrmModule.forFeature([TodoList]), TypeOrmModule.forFeature([Todo])],
     controllers: [TodoListController],
     providers: [TodoListService, TodoListRepository],
 })

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, of, switchMap, take } from 'rxjs';
-import { TodoList, TodoListDto, TodoListService } from '../openapi-client';
+import { BehaviorSubject, catchError, finalize, of } from 'rxjs';
+import { TodoDto, TodoList, TodoListDto, TodoListService } from '../openapi-client';
 import { AuthProvider } from '../providers/auth.provider';
 import { LoadingService } from '../services/loading.service';
 
@@ -19,17 +19,9 @@ export class TodoListProvider {
 
     public getTodoLists(): void {
         this.loadingService.setLoading(true);
-
-        this.authProvider.user$
+        this.todoListService
+            .todoListControllerFindTodoLists()
             .pipe(
-                take(1),
-                switchMap((user) => {
-                    if (!user) {
-                        return of([]);
-                    }
-
-                    return this.todoListService.todoListControllerFindAll(user.sub);
-                }),
                 catchError(() => of([])),
                 finalize(() => this.loadingService.setLoading(false)),
             )
@@ -38,15 +30,15 @@ export class TodoListProvider {
             });
     }
 
-    public getTodoList(todoListId: number): void {
+    public getTodoList(id: number): void {
         if (this.todoListsSubject.value.length > 0) {
-            const todoList = this.todoListsSubject.value.find((todoList) => todoList.id === todoListId) || null;
+            const todoList = this.todoListsSubject.value.find((todoList) => todoList.id === id) || null;
             this.todoListSubject.next(todoList);
         } else {
             this.loadingService.setLoading(true);
 
             this.todoListService
-                .todoListControllerFindOne(todoListId)
+                .todoListControllerFindTodoList(id)
                 .pipe(
                     catchError(() => of(null)),
                     finalize(() => this.loadingService.setLoading(false)),
@@ -60,21 +52,13 @@ export class TodoListProvider {
     public createTodoList(title: string): void {
         this.loadingService.setLoading(true);
 
-        this.authProvider.user$
+        const todoListDto: TodoListDto = {
+            title,
+        };
+
+        this.todoListService
+            .todoListControllerSaveTodoList(todoListDto)
             .pipe(
-                take(1),
-                switchMap((user) => {
-                    if (!user) {
-                        return of(null);
-                    }
-
-                    const createTodolistDto: TodoListDto = {
-                        title,
-                        userId: user.sub,
-                    };
-
-                    return this.todoListService.todoListControllerCreateOrUpdate(createTodolistDto);
-                }),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
@@ -85,19 +69,62 @@ export class TodoListProvider {
             });
     }
 
-    public deleteTodoList(todoListId: number): void {
+    public createTodoListItem(id: number, title: string): void {
+        this.loadingService.setLoading(true);
+
+        const todoDto: TodoDto = {
+            title,
+            completed: false,
+            order: 1,
+            todoListId: id,
+        };
+
+        this.todoListService
+            .todoListControllerSaveTodoListItem(todoDto)
+            .pipe(
+                catchError(() => of(null)),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
+            .subscribe((todoItem) => {
+                if (todoItem) {
+                    const todoList = this.todoListSubject.value;
+                    if (todoList) {
+                        todoList.todos.push(todoItem);
+                        this.todoListSubject.next(todoList);
+                    }
+                }
+            });
+    }
+
+    public deleteTodoList(id: number): void {
         this.loadingService.setLoading(true);
 
         this.todoListService
-            .todoListControllerRemove(todoListId)
+            .todoListControllerRemoveTodoList(id)
             .pipe(
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe(() => {
-                this.todoListsSubject.next(
-                    this.todoListsSubject.value.filter((todoList) => todoList.id !== todoListId),
-                );
+                this.todoListsSubject.next(this.todoListsSubject.value.filter((todoList) => todoList.id !== id));
+            });
+    }
+
+    public deleteTodoListItem(id: number): void {
+        this.loadingService.setLoading(true);
+
+        this.todoListService
+            .todoListControllerRemoveTodoListItem(id)
+            .pipe(
+                catchError(() => of(null)),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
+            .subscribe(() => {
+                const todoList = this.todoListSubject.value;
+                if (todoList) {
+                    todoList.todos = todoList.todos.filter((todo) => todo.id !== id);
+                    this.todoListSubject.next(todoList);
+                }
             });
     }
 }
