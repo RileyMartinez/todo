@@ -1,0 +1,16 @@
+mat-card {
+    width: 100%;
+    max-width: 360px;
+}
+
+@media (min-width: 600px) {
+    mat-card {
+        max-width: 400px;
+    }
+}
+
+@media (min-width: 800px) {
+    mat-card {
+        max-width: 600px;
+    }
+}

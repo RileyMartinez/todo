@@ -6,11 +6,22 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { AuthProvider } from '../../../providers/auth.provider';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, MatFormFieldModule, MatInputModule, MatCardModule, MatButtonModule, ReactiveFormsModule],
+    imports: [
+        CommonModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatCardModule,
+        MatButtonModule,
+        ReactiveFormsModule,
+        MatIcon,
+        MatTooltipModule,
+    ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
 })
@@ -21,6 +32,7 @@ export class LoginComponent implements OnInit {
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
     loginForm!: FormGroup;
+    hide = true;
 
     ngOnInit(): void {
         this.emailFormControl = new FormControl('', [Validators.email, Validators.required]);

@@ -54,6 +54,7 @@ export class TodoListComponent implements OnInit {
 
     addTodoItem(id: number, title: string): void {
         this.todoListProvider.createTodoListItem(id, title);
+        this.todoFormControl.reset();
     }
 
     removeTodoItem(id: number): void {

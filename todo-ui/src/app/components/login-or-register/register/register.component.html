@@ -26,9 +26,19 @@
                             matInput
                             [formControl]="passwordFormControl"
                             autocomplete="new-password"
-                            type="password"
+                            [type]="hide ? 'password' : 'text'"
                             required
                         />
+                        <button
+                            mat-icon-button
+                            matSuffix
+                            matTooltip="Toggle password visibility"
+                            (click)="hide = !hide"
+                            [attr.aria-label]="'Hide password'"
+                            [attr.aria-pressed]="hide"
+                        >
+                            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+                        </button>
                         @if (passwordFormControl.hasError('required')) {
                             <mat-error>Password is required </mat-error>
                         }
@@ -41,7 +51,7 @@
 
             <mat-card-actions>
                 <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
-                    Submit
+                    Register
                 </button>
             </mat-card-actions>
         </mat-card>
