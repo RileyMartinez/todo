@@ -22,7 +22,6 @@ test.beforeEach(async ({ page, browserName }) => {
 });
 
 test('Todo Lists Workflow', async ({ page }) => {
-    await page.coverage.startJSCoverage();
     let todoListName = 'My First List';
     const addTodoPlaceholder = 'Add a new todo item';
     const todoItemName = 'Take out the trash';
