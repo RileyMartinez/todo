@@ -31,22 +31,17 @@ export class TodoListProvider {
     }
 
     public getTodoList(id: number): void {
-        if (this.todoListsSubject.value.length > 0) {
-            const todoList = this.todoListsSubject.value.find((todoList) => todoList.id === id) || null;
-            this.todoListSubject.next(todoList);
-        } else {
-            this.loadingService.setLoading(true);
+        this.loadingService.setLoading(true);
 
-            this.todoListService
-                .todoListControllerFindTodoList(id)
-                .pipe(
-                    catchError(() => of(null)),
-                    finalize(() => this.loadingService.setLoading(false)),
-                )
-                .subscribe((todoList) => {
-                    this.todoListSubject.next(todoList);
-                });
-        }
+        this.todoListService
+            .todoListControllerFindTodoList(id)
+            .pipe(
+                catchError(() => of(null)),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
+            .subscribe((todoList) => {
+                this.todoListSubject.next(todoList);
+            });
     }
 
     public createTodoList(title: string): void {
