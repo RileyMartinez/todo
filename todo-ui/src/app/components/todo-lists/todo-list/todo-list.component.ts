@@ -40,7 +40,8 @@ export class TodoListComponent implements OnInit {
     todoForm!: FormGroup;
     todoFormControl!: FormControl;
 
-    todoList$ = this.todoListProvider.todoList$;
+    todoListId: number | undefined;
+    todoList = this.todoListProvider.todoList;
 
     ngOnInit(): void {
         this.todoFormControl = new FormControl('', Validators.required);

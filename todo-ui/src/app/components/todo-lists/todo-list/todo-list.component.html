@@ -1,10 +1,10 @@
 <div class="flex justify-center p-14">
-    <mat-card *ngIf="todoList$ | async as todoList">
+    <mat-card *ngIf="todoList()">
         <mat-card-header>
-            <mat-card-title>{{ todoList.title }}</mat-card-title>
+            <mat-card-title>{{ todoList()?.title }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(todoList.id, todoFormControl.value)">
+            <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(todoList()?.id || 0, todoFormControl.value)">
                 <div class="flex items-center space-x-2 pt-4">
                     <mat-form-field class="flex-grow">
                         <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
@@ -14,10 +14,10 @@
                     </button>
                 </div>
             </form>
-            <p *ngIf="todoList.todos.length === 0">No todo items to complete.</p>
+            <p *ngIf="(todoList()?.todos?.length || 0) === 0">No todo items to complete.</p>
             <mat-selection-list [multiple]="true">
                 <mat-list-option
-                    *ngFor="let item of todoList.todos"
+                    *ngFor="let item of todoList()?.todos"
                     [togglePosition]="'before'"
                     (click)="removeTodoItem(item.id)"
                 >

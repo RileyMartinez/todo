@@ -25,7 +25,7 @@ export class TodoListsComponent implements OnInit {
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
 
-    todoLists$ = this.todoListProvider.todoLists$;
+    todoLists = this.todoListProvider.todoLists;
 
     ngOnInit(): void {
         this.todoListProvider.getTodoLists();

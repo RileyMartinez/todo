@@ -1,7 +1,6 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, of } from 'rxjs';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { catchError, finalize, of, shareReplay } from 'rxjs';
 import { TodoDto, TodoList, TodoListDto, TodoListService } from '../openapi-client';
-import { AuthProvider } from '../providers/auth.provider';
 import { LoadingService } from '../services/loading.service';
 
 @Injectable({
@@ -10,23 +9,25 @@ import { LoadingService } from '../services/loading.service';
 export class TodoListProvider {
     private readonly loadingService = inject(LoadingService);
     private readonly todoListService = inject(TodoListService);
-    private readonly authProvider = inject(AuthProvider);
 
-    private todoListsSubject = new BehaviorSubject<TodoList[]>([]);
-    private todoListSubject = new BehaviorSubject<TodoList | null>(null);
-    public readonly todoLists$ = this.todoListsSubject.asObservable();
-    public readonly todoList$ = this.todoListSubject.asObservable();
+    private $todoLists = signal<TodoList[]>([]);
+    private $todoList = signal<TodoList | undefined>(undefined);
+
+    public readonly todoLists = computed(() => this.$todoLists());
+    public readonly todoList = computed(() => this.$todoList());
 
     public getTodoLists(): void {
         this.loadingService.setLoading(true);
+
         this.todoListService
             .todoListControllerFindTodoLists()
             .pipe(
+                shareReplay(1),
                 catchError(() => of([])),
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe((todoLists) => {
-                this.todoListsSubject.next(todoLists.sort((a, b) => a.id - b.id));
+                this.$todoLists.set(todoLists);
             });
     }
 
@@ -36,11 +37,14 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerFindTodoList(id)
             .pipe(
+                shareReplay(1),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe((todoList) => {
-                this.todoListSubject.next(todoList);
+                if (todoList) {
+                    this.$todoList.set(todoList);
+                }
             });
     }
 
@@ -59,7 +63,7 @@ export class TodoListProvider {
             )
             .subscribe((todoList) => {
                 if (todoList) {
-                    this.todoListsSubject.next([...this.todoListsSubject.value, todoList]);
+                    this.$todoLists.update((todoLists) => [...todoLists, todoList]);
                 }
             });
     }
@@ -82,11 +86,12 @@ export class TodoListProvider {
             )
             .subscribe((todoItem) => {
                 if (todoItem) {
-                    const todoList = this.todoListSubject.value;
-                    if (todoList) {
-                        todoList.todos.push(todoItem);
-                        this.todoListSubject.next(todoList);
-                    }
+                    this.$todoList.update((todoList) => {
+                        if (todoList) {
+                            todoList.todos = [...todoList.todos, todoItem];
+                        }
+                        return todoList;
+                    });
                 }
             });
     }
@@ -101,7 +106,7 @@ export class TodoListProvider {
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe(() => {
-                this.todoListsSubject.next(this.todoListsSubject.value.filter((todoList) => todoList.id !== id));
+                this.$todoLists.update((todoLists) => todoLists.filter((todoList) => todoList.id !== id));
             });
     }
 
@@ -115,11 +120,12 @@ export class TodoListProvider {
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe(() => {
-                const todoList = this.todoListSubject.value;
-                if (todoList) {
-                    todoList.todos = todoList.todos.filter((todo) => todo.id !== id);
-                    this.todoListSubject.next(todoList);
-                }
+                this.$todoList.update((todoList) => {
+                    if (todoList) {
+                        todoList.todos = todoList.todos.filter((todoItem) => todoItem.id !== id);
+                    }
+                    return todoList;
+                });
             });
     }
 }
