@@ -5,10 +5,10 @@ import { RouteConstants } from '../constants/route.constants';
 import { AuthProvider } from '../providers/auth.provider';
 
 export const authGuard: CanActivateFn = () => {
-    const ngAuthService = inject(AuthProvider);
+    const authProvider = inject(AuthProvider);
     const router = inject(Router);
 
-    return ngAuthService.user$.pipe(
+    return authProvider.user$.pipe(
         take(1),
         map((user) => {
             if (!user) {
