@@ -5,7 +5,7 @@
         </button>
         <span>Todo App</span>
     </mat-toolbar>
-    @if (loading$ | async) {
+    @if (loading()) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     } @else {
         <mat-progress-bar mode="determinate" [value]="0"></mat-progress-bar>

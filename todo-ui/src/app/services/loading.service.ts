@@ -1,24 +1,24 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, first, tap, timer } from 'rxjs';
+import { computed, Injectable, signal } from '@angular/core';
+import { first, tap, timer } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LoadingService {
     private minimumDelay = 500;
-    private loading = new BehaviorSubject<boolean>(false);
-    public readonly loading$ = this.loading.asObservable();
+    private loadingSignal = signal<boolean>(false);
+    public readonly loading = computed(() => this.loadingSignal());
 
     setLoading(isLoading: boolean): void {
-        if (!isLoading && this.loading.value) {
+        if (!isLoading && this.loadingSignal()) {
             timer(this.minimumDelay)
                 .pipe(
                     first(),
-                    tap(() => this.loading.next(isLoading)),
+                    tap(() => this.loadingSignal.set(isLoading)),
                 )
                 .subscribe();
         } else {
-            this.loading.next(isLoading);
+            this.loadingSignal.set(isLoading);
         }
     }
 }

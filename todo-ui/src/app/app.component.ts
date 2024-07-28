@@ -36,7 +36,7 @@ export class AppComponent {
 
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
 
-    loading$ = this.loadingService.loading$;
+    loading = this.loadingService.loading;
     user = this.authProvider.user;
 
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
