@@ -19,6 +19,11 @@ export class TodoListProvider {
     public getTodoLists(): void {
         this.loadingService.setLoading(true);
 
+        if (this.todoListsSignal()?.length) {
+            this.loadingService.setLoading(false);
+            return;
+        }
+
         this.todoListService
             .todoListControllerFindTodoLists()
             .pipe(
@@ -33,6 +38,11 @@ export class TodoListProvider {
 
     public getTodoList(id: number): void {
         this.loadingService.setLoading(true);
+
+        if (this.todoListSignal()?.id === id) {
+            this.loadingService.setLoading(false);
+            return;
+        }
 
         this.todoListService
             .todoListControllerFindTodoList(id)
