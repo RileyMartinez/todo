@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { AccessTokenDto, AuthService } from '../openapi-client';
-import { BehaviorSubject, catchError, finalize, Observable, of, tap } from 'rxjs';
+import { catchError, finalize, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
 import { RouteConstants } from '../constants/route.constants';
@@ -15,11 +15,11 @@ export class AuthProvider {
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
 
-    private accessTokenSubject = new BehaviorSubject<string | null>(null);
-    public readonly accessToken$ = this.accessTokenSubject.asObservable();
+    private accessTokenSignal = signal<string | null>(null);
+    public readonly accessToken = computed(() => this.accessTokenSignal());
 
-    private userSubject = new BehaviorSubject<User | null>(null);
-    public readonly user$ = this.userSubject.asObservable();
+    private userSignal = signal<User | null>(null);
+    public readonly user = computed(() => this.userSignal());
 
     constructor() {
         this.refreshSession();
@@ -84,14 +84,14 @@ export class AuthProvider {
     }
 
     private setTokenAndUserIdentity(token: string): void {
-        this.accessTokenSubject.next(token);
-        this.userSubject.next(this.getUserFromToken(token));
-        localStorage.setItem('todo.sub', this.userSubject.value?.sub.toString() || '');
+        this.accessTokenSignal.set(token);
+        this.userSignal.set(this.getUserFromToken(token));
+        localStorage.setItem('todo.sub', this.userSignal()?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
-        this.accessTokenSubject.next(null);
-        this.userSubject.next(null);
+        this.accessTokenSignal.set(null);
+        this.userSignal.set(null);
         localStorage.removeItem('todo.sub');
     }
 
@@ -106,7 +106,7 @@ export class AuthProvider {
     private refreshSession(): void {
         const userId = parseInt(localStorage.getItem('todo.sub') || '0');
         if (userId) {
-            this.userSubject.next({ sub: userId });
+            this.userSignal.set({ sub: userId });
         }
     }
 

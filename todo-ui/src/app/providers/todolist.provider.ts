@@ -10,11 +10,11 @@ export class TodoListProvider {
     private readonly loadingService = inject(LoadingService);
     private readonly todoListService = inject(TodoListService);
 
-    private $todoLists = signal<TodoList[]>([]);
-    private $todoList = signal<TodoList | undefined>(undefined);
+    private todoListsSignal = signal<TodoList[]>([]);
+    private todoListSignal = signal<TodoList | undefined>(undefined);
 
-    public readonly todoLists = computed(() => this.$todoLists());
-    public readonly todoList = computed(() => this.$todoList());
+    public readonly todoLists = computed(() => this.todoListsSignal());
+    public readonly todoList = computed(() => this.todoListSignal());
 
     public getTodoLists(): void {
         this.loadingService.setLoading(true);
@@ -27,7 +27,7 @@ export class TodoListProvider {
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe((todoLists) => {
-                this.$todoLists.set(todoLists);
+                this.todoListsSignal.set(todoLists);
             });
     }
 
@@ -43,7 +43,7 @@ export class TodoListProvider {
             )
             .subscribe((todoList) => {
                 if (todoList) {
-                    this.$todoList.set(todoList);
+                    this.todoListSignal.set(todoList);
                 }
             });
     }
@@ -63,7 +63,7 @@ export class TodoListProvider {
             )
             .subscribe((todoList) => {
                 if (todoList) {
-                    this.$todoLists.update((todoLists) => [...todoLists, todoList]);
+                    this.todoListsSignal.update((todoLists) => [...todoLists, todoList]);
                 }
             });
     }
@@ -86,7 +86,7 @@ export class TodoListProvider {
             )
             .subscribe((todoItem) => {
                 if (todoItem) {
-                    this.$todoList.update((todoList) => {
+                    this.todoListSignal.update((todoList) => {
                         if (todoList) {
                             todoList.todos = [...todoList.todos, todoItem];
                         }
@@ -106,7 +106,7 @@ export class TodoListProvider {
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe(() => {
-                this.$todoLists.update((todoLists) => todoLists.filter((todoList) => todoList.id !== id));
+                this.todoListsSignal.update((todoLists) => todoLists.filter((todoList) => todoList.id !== id));
             });
     }
 
@@ -120,7 +120,7 @@ export class TodoListProvider {
                 finalize(() => this.loadingService.setLoading(false)),
             )
             .subscribe(() => {
-                this.$todoList.update((todoList) => {
+                this.todoListSignal.update((todoList) => {
                     if (todoList) {
                         todoList.todos = todoList.todos.filter((todoItem) => todoItem.id !== id);
                     }

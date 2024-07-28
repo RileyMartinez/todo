@@ -15,15 +15,10 @@ let refreshTokenSubject: Subject<string | undefined>;
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
     const authProvider = inject(AuthProvider);
-
+    const accessToken = authProvider.accessToken();
     req = req.clone({ withCredentials: true });
 
-    return authProvider.accessToken$.pipe(
-        take(1),
-        switchMap((accessToken) => {
-            return handleRequestWithToken(req, next, accessToken);
-        }),
-    );
+    return handleRequestWithToken(req, next, accessToken);
 
     function handleRequestWithToken(
         req: HttpRequest<any>,
