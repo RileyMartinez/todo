@@ -6,12 +6,12 @@ import {
     HttpRequest,
     HttpStatusCode,
 } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, signal } from '@angular/core';
 import { AuthProvider } from '../providers/auth.provider';
-import { catchError, finalize, Observable, Subject, switchMap, take, throwError } from 'rxjs';
+import { catchError, finalize, Observable, switchMap, throwError } from 'rxjs';
 
 let isRefreshing = false;
-let refreshTokenSubject: Subject<string | undefined>;
+const refreshToken = signal<string | undefined>(undefined);
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
     const authProvider = inject(AuthProvider);
@@ -44,30 +44,23 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
     function refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
         if (isRefreshing) {
-            return refreshTokenSubject.pipe(
-                take(1),
-                switchMap((token) => {
-                    const updatedReq = setAuthorizationHeader(req, token);
-                    return next(updatedReq);
-                }),
-            );
+            const updatedReq = setAuthorizationHeader(req, refreshToken());
+            return next(updatedReq);
         }
 
         isRefreshing = true;
-        refreshTokenSubject = new Subject<string | undefined>();
 
         return authProvider.refresh().pipe(
             switchMap((newToken) => {
                 isRefreshing = false;
-                refreshTokenSubject.next(newToken?.accessToken);
-                refreshTokenSubject.complete();
+                refreshToken.set(newToken?.accessToken);
 
                 const updatedReq = setAuthorizationHeader(req, newToken?.accessToken);
                 return next(updatedReq);
             }),
             catchError((error) => {
                 isRefreshing = false;
-                refreshTokenSubject.error(error);
+                refreshToken.set(undefined);
                 return throwError(() => error);
             }),
             finalize(() => {
