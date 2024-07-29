@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, first, of, shareReplay } from 'rxjs';
+import { catchError, finalize, first, of } from 'rxjs';
 import { TodoDto, TodoList, TodoListDto, TodoListService } from '../openapi-client';
 import { LoadingService } from '../services/loading.service';
 
@@ -28,7 +28,6 @@ export class TodoListProvider {
             .todoListControllerFindTodoLists()
             .pipe(
                 first(),
-                shareReplay(1),
                 catchError(() => of([])),
                 finalize(() => this.loadingService.setLoading(false)),
             )
@@ -49,7 +48,6 @@ export class TodoListProvider {
             .todoListControllerFindTodoList(id)
             .pipe(
                 first(),
-                shareReplay(1),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
