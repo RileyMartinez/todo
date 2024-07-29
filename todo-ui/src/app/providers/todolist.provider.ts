@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, of, shareReplay } from 'rxjs';
+import { catchError, finalize, first, of, shareReplay } from 'rxjs';
 import { TodoDto, TodoList, TodoListDto, TodoListService } from '../openapi-client';
 import { LoadingService } from '../services/loading.service';
 
@@ -27,6 +27,7 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerFindTodoLists()
             .pipe(
+                first(),
                 shareReplay(1),
                 catchError(() => of([])),
                 finalize(() => this.loadingService.setLoading(false)),
@@ -47,6 +48,7 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerFindTodoList(id)
             .pipe(
+                first(),
                 shareReplay(1),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
@@ -68,6 +70,7 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerSaveTodoList(todoListDto)
             .pipe(
+                first(),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
@@ -91,6 +94,7 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerSaveTodoListItem(todoDto)
             .pipe(
+                first(),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
@@ -112,6 +116,7 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerRemoveTodoList(id)
             .pipe(
+                first(),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )
@@ -126,6 +131,7 @@ export class TodoListProvider {
         this.todoListService
             .todoListControllerRemoveTodoListItem(id)
             .pipe(
+                first(),
                 catchError(() => of(null)),
                 finalize(() => this.loadingService.setLoading(false)),
             )

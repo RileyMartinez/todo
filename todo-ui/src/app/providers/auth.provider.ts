@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { AccessTokenDto, AuthService } from '../openapi-client';
-import { catchError, finalize, Observable, of, tap } from 'rxjs';
+import { catchError, finalize, first, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
 import { RouteConstants } from '../constants/route.constants';
@@ -30,7 +30,10 @@ export class AuthProvider {
 
         this.authService
             .authControllerLogin({ email, password })
-            .pipe(finalize(() => this.loadingService.setLoading(false)))
+            .pipe(
+                first(),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
             .subscribe({
                 next: (tokens) => {
                     this.setSessonAndRedirect(tokens.accessToken);
@@ -47,6 +50,7 @@ export class AuthProvider {
         this.authService
             .authControllerLogout()
             .pipe(
+                first(),
                 finalize(() => {
                     this.clearSessionAndRedirect();
                     this.loadingService.setLoading(false);
@@ -60,7 +64,10 @@ export class AuthProvider {
 
         this.authService
             .authControllerRegister({ email, password })
-            .pipe(finalize(() => this.loadingService.setLoading(false)))
+            .pipe(
+                first(),
+                finalize(() => this.loadingService.setLoading(false)),
+            )
             .subscribe({
                 next: (tokens) => {
                     this.setSessonAndRedirect(tokens.accessToken);
@@ -73,6 +80,7 @@ export class AuthProvider {
 
     refresh(): Observable<AccessTokenDto | null> {
         return this.authService.authControllerRefresh().pipe(
+            first(),
             tap((tokens) => {
                 this.setTokenAndUserIdentity(tokens.accessToken);
             }),
