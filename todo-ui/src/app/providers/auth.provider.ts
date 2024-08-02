@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
 import { RouteConstants } from '../constants/route.constants';
 import { jwtDecode } from 'jwt-decode';
-import { User } from '../models/user.model';
+import { User } from '../interfaces/user.interface';
 
 @Injectable({
     providedIn: 'root',
