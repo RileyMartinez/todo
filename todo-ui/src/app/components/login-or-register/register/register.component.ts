@@ -23,7 +23,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         MatTooltipModule,
     ],
     templateUrl: './register.component.html',
-    styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);

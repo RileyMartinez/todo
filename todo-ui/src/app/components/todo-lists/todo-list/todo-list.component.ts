@@ -29,7 +29,6 @@ import { MatLineModule } from '@angular/material/core';
         ReactiveFormsModule,
     ],
     templateUrl: './todo-list.component.html',
-    styleUrl: './todo-list.component.scss',
 })
 export class TodoListComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);

@@ -8,6 +8,5 @@ import { RegisterComponent } from './register/register.component';
     standalone: true,
     imports: [MatTabsModule, LoginComponent, RegisterComponent],
     templateUrl: './login-or-register.component.html',
-    styleUrl: './login-or-register.component.scss',
 })
 export class LoginOrRegisterComponent {}

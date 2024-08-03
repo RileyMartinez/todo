@@ -28,7 +28,6 @@ import { LoadingService } from './services/loading.service';
         MatListModule,
     ],
     templateUrl: './app.component.html',
-    styleUrl: './app.component.scss',
 })
 export class AppComponent {
     private readonly loadingService = inject(LoadingService);

@@ -23,7 +23,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         MatTooltipModule,
     ],
     templateUrl: './login.component.html',
-    styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
     private readonly authProvider = inject(AuthProvider);

@@ -18,7 +18,6 @@ import { Subject, takeUntil } from 'rxjs';
     standalone: true,
     imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatIconModule, MatActionList, MatListModule],
     templateUrl: './todo-lists.component.html',
-    styleUrl: './todo-lists.component.scss',
 })
 export class TodoListsComponent implements OnDestroy {
     private readonly todoListsProvider = inject(TodoListsProvider);

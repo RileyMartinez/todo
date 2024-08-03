@@ -11,7 +11,7 @@
         <mat-progress-bar mode="determinate" [value]="0"></mat-progress-bar>
     }
     <mat-sidenav-container class="flex-grow">
-        <mat-sidenav #sidenav mode="push">
+        <mat-sidenav class="min-w-48" #sidenav mode="push">
             <mat-nav-list>
                 @if (user()) {
                     <a mat-list-item (click)="logout()" [routerLink]="[loginOrRegisterRoute]"> Logout </a>
