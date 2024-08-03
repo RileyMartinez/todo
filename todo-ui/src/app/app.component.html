@@ -3,7 +3,7 @@
         <button mat-icon-button (click)="sidenav.toggle()" class="mr-4">
             <mat-icon>menu</mat-icon>
         </button>
-        <span>Todo App</span>
+        <span>Todo</span>
     </mat-toolbar>
     @if (loading()) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -24,7 +24,7 @@
             <router-outlet></router-outlet>
         </mat-sidenav-content>
     </mat-sidenav-container>
-    <footer class="mt-auto bg-gray-200 text-center py-4">
+    <footer class="mt-auto bg-app-secondary text-center py-4">
         <span>© 2024 Todo by Riley Martinez</span>
     </footer>
 </div>
