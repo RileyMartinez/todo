@@ -56,7 +56,7 @@ async function generateClient() {
                 'generate -g typescript-angular',
                 `-i ${inputPath}`,
                 `-o ${outputPath}`,
-                `--additional-properties=basePath=${basePath}:${port}`,
+                `--additional-properties=basePath=${basePath}:${port},fileNaming=kebab-case`,
             ].join(' '),
             { encoding: 'utf8' },
         );
