@@ -41,6 +41,8 @@ openapi-client/
 # System files
 .DS_Store
 Thumbs.db
+
+# Playwright
 /test-results/
 /playwright-report/
 /blob-report/

@@ -10,7 +10,7 @@ import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { Router } from '@angular/router';
 import { RouteConstants } from '../../constants/route.constants';
-import { TodoListsProvider } from '../../providers/todo-list.provider';
+import { TodoListsProvider } from '../../providers/todo-lists.provider';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
