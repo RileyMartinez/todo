@@ -31,11 +31,11 @@ export class TodoListProvider {
     public readonly error = computed(() => this.state().error);
 
     // sources
-    public readonly get$ = new Subject<GetTodoList>();
+    public readonly load$ = new Subject<GetTodoList>();
     public readonly add$ = new Subject<AddTodo>();
     public readonly remove$ = new Subject<RemoveTodo>();
 
-    private readonly todoListLoaded$ = this.get$.pipe(
+    private readonly todoListLoaded$ = this.load$.pipe(
         switchMap((todoList) =>
             this.todoListService
                 .todoListControllerFindTodoList(todoList.id)

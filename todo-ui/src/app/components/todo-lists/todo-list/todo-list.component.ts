@@ -48,7 +48,7 @@ export class TodoListComponent implements OnInit {
         });
 
         const todoListId = parseInt(this.route.snapshot.params['id']);
-        this.todoListProvider.get$.next({ id: todoListId });
+        this.todoListProvider.load$.next({ id: todoListId });
     }
 
     addTodoItem(id: number, title: string): void {
