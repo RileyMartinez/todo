@@ -41,7 +41,6 @@ export class AuthService {
     public readonly login$ = new Subject<AuthLoginDto>();
     public readonly register$ = new Subject<AuthRegisterDto>();
     public readonly logout$ = new Subject<void>();
-    public readonly refresh$ = new Subject<void>();
 
     constructor() {
         this.initUserSession();
