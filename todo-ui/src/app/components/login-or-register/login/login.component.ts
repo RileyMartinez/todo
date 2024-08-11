@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { AuthProvider } from '../../../providers/auth.provider';
+import { AuthService } from '../../../services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -25,7 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     templateUrl: './login.component.html',
 })
 export class LoginComponent implements OnInit {
-    private readonly authProvider = inject(AuthProvider);
+    private readonly authService = inject(AuthService);
     private readonly formBuilder = inject(FormBuilder);
 
     emailFormControl!: FormControl;
@@ -48,6 +48,6 @@ export class LoginComponent implements OnInit {
             return;
         }
 
-        this.authProvider.login(this.emailFormControl.value, this.passwordFormControl.value);
+        this.authService.login(this.emailFormControl.value, this.passwordFormControl.value);
     }
 }

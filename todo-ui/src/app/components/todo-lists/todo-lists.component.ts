@@ -10,7 +10,7 @@ import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
 import { Router } from '@angular/router';
 import { RouteConstants } from '../../constants/route.constants';
-import { TodoListsProvider } from '../../providers/todo-lists.provider';
+import { TodoListsService } from '../../services/todo-lists.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -20,12 +20,12 @@ import { Subject, takeUntil } from 'rxjs';
     templateUrl: './todo-lists.component.html',
 })
 export class TodoListsComponent implements OnDestroy {
-    private readonly todoListsProvider = inject(TodoListsProvider);
+    private readonly todoListsService = inject(TodoListsService);
     private readonly router = inject(Router);
     private readonly dialog = inject(MatDialog);
     private readonly destroy$ = new Subject<void>();
 
-    todoLists = this.todoListsProvider.todoLists;
+    todoLists = this.todoListsService.todoLists;
 
     ngOnDestroy(): void {
         this.destroy$.next();
@@ -47,7 +47,7 @@ export class TodoListsComponent implements OnDestroy {
                     return;
                 }
 
-                this.todoListsProvider.add$.next({ title });
+                this.todoListsService.add$.next({ title });
             });
     }
 
@@ -65,7 +65,7 @@ export class TodoListsComponent implements OnDestroy {
                     return;
                 }
 
-                this.todoListsProvider.remove$.next({ id: todoList.id });
+                this.todoListsService.remove$.next({ id: todoList.id });
             });
     }
 }

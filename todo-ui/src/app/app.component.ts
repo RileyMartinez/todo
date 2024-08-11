@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from './constants/route.constants';
-import { AuthProvider } from './providers/auth.provider';
+import { AuthService } from './services/auth.service';
 import { LoadingService } from './services/loading.service';
 
 @Component({
@@ -31,12 +31,12 @@ import { LoadingService } from './services/loading.service';
 })
 export class AppComponent {
     private readonly loadingService = inject(LoadingService);
-    private readonly authProvider = inject(AuthProvider);
+    private readonly authService = inject(AuthService);
 
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
 
     loading = this.loadingService.loading;
-    user = this.authProvider.user;
+    user = this.authService.user;
 
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'todo-ui';
@@ -44,6 +44,6 @@ export class AppComponent {
 
     logout(): void {
         this.sidenav?.close();
-        this.authProvider.logout();
+        this.authService.logout();
     }
 }

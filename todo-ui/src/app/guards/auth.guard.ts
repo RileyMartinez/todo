@@ -1,12 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { RouteConstants } from '../constants/route.constants';
-import { AuthProvider } from '../providers/auth.provider';
+import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-    const authProvider = inject(AuthProvider);
+    const authService = inject(AuthService);
     const router = inject(Router);
-    const user = authProvider.user();
+    const user = authService.user();
 
     if (!user) {
         router.navigate([RouteConstants.LOGIN_OR_REGISTER]);

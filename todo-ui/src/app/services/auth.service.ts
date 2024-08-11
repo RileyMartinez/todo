@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { AccessTokenDto, AuthService } from '../openapi-client';
+import { AccessTokenDto, AuthClient } from '../openapi-client';
 import { catchError, finalize, first, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { LoadingService } from '../services/loading.service';
+import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../interfaces/user.interface';
@@ -10,8 +10,8 @@ import { User } from '../interfaces/user.interface';
 @Injectable({
     providedIn: 'root',
 })
-export class AuthProvider {
-    private readonly authService = inject(AuthService);
+export class AuthService {
+    private readonly authClient = inject(AuthClient);
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
 
@@ -28,7 +28,7 @@ export class AuthProvider {
     login(email: string, password: string): void {
         this.loadingService.setLoading(true);
 
-        this.authService
+        this.authClient
             .authControllerLogin({ email, password })
             .pipe(
                 first(),
@@ -47,7 +47,7 @@ export class AuthProvider {
     logout(): void {
         this.loadingService.setLoading(true);
 
-        this.authService
+        this.authClient
             .authControllerLogout()
             .pipe(
                 first(),
@@ -62,7 +62,7 @@ export class AuthProvider {
     register(email: string, password: string): void {
         this.loadingService.setLoading(true);
 
-        this.authService
+        this.authClient
             .authControllerRegister({ email, password })
             .pipe(
                 first(),
@@ -79,7 +79,7 @@ export class AuthProvider {
     }
 
     refresh(): Observable<AccessTokenDto | null> {
-        return this.authService.authControllerRefresh().pipe(
+        return this.authClient.authControllerRefresh().pipe(
             first(),
             tap((tokens) => {
                 this.setTokenAndUserIdentity(tokens.accessToken);

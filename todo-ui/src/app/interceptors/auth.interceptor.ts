@@ -7,15 +7,15 @@ import {
     HttpStatusCode,
 } from '@angular/common/http';
 import { inject, signal } from '@angular/core';
-import { AuthProvider } from '../providers/auth.provider';
+import { AuthService } from '../services/auth.service';
 import { catchError, finalize, Observable, switchMap, throwError } from 'rxjs';
 
 let isRefreshing = false;
 const refreshToken = signal<string | undefined>(undefined);
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
-    const authProvider = inject(AuthProvider);
-    const accessToken = authProvider.accessToken();
+    const authService = inject(AuthService);
+    const accessToken = authService.accessToken();
     req = req.clone({ withCredentials: true });
 
     return handleRequestWithToken(req, next, accessToken);
@@ -50,7 +50,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
         isRefreshing = true;
 
-        return authProvider.refresh().pipe(
+        return authService.refresh().pipe(
             switchMap((newToken) => {
                 isRefreshing = false;
                 refreshToken.set(newToken?.accessToken);

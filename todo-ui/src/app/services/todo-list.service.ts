@@ -1,7 +1,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { catchError, concatMap, EMPTY, merge, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
-import { TodoList, TodoListService } from '../openapi-client';
-import { LoadingService } from '../services/loading.service';
+import { TodoList, TodoListClient } from '../openapi-client';
+import { LoadingService } from './loading.service';
 import { AddTodo, RemoveTodo } from '../interfaces/todo.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GetTodoList } from '../interfaces/todo-list.interface';
@@ -15,9 +15,9 @@ export interface TodoListState {
 @Injectable({
     providedIn: 'root',
 })
-export class TodoListProvider {
+export class TodoListService {
     private readonly loadingService = inject(LoadingService);
-    private readonly todoListService = inject(TodoListService);
+    private readonly todoListClient = inject(TodoListClient);
 
     // state
     private readonly state = signal<TodoListState>({
@@ -38,7 +38,7 @@ export class TodoListProvider {
 
     private readonly todoListLoaded$ = this.load$.pipe(
         switchMap((todoList) =>
-            this.todoListService
+            this.todoListClient
                 .todoListControllerFindTodoList(todoList.id)
                 .pipe(catchError((error) => this.handleError(error))),
         ),
@@ -46,7 +46,7 @@ export class TodoListProvider {
 
     private readonly todoAdded$ = this.add$.pipe(
         concatMap((todo) =>
-            this.todoListService
+            this.todoListClient
                 .todoListControllerSaveTodoListItem(todo)
                 .pipe(catchError((error) => this.handleError(error))),
         ),
@@ -54,7 +54,7 @@ export class TodoListProvider {
 
     private readonly todoRemoved$ = this.remove$.pipe(
         mergeMap((todo) =>
-            this.todoListService
+            this.todoListClient
                 .todoListControllerRemoveTodoListItem(todo.id)
                 .pipe(catchError((error) => this.handleError(error))),
         ),
@@ -70,7 +70,7 @@ export class TodoListProvider {
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
-                    this.todoListService
+                    this.todoListClient
                         .todoListControllerFindTodoList(this.todoList()?.id || 0)
                         .pipe(catchError((error) => this.handleError(error))),
                 ),

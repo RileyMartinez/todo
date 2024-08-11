@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule, MatActionList } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TodoListProvider } from '../../../providers/todo-list.provider';
+import { TodoListService } from '../../../services/todo-list.service';
 import { RouteConstants } from '../../../constants/route.constants';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -33,13 +33,13 @@ import { MatLineModule } from '@angular/material/core';
 export class TodoListComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
-    private readonly todoListProvider = inject(TodoListProvider);
+    private readonly todoListService = inject(TodoListService);
     private readonly formBuilder = inject(FormBuilder);
 
     todoForm!: FormGroup;
     todoFormControl!: FormControl;
 
-    todoList = this.todoListProvider.todoList;
+    todoList = this.todoListService.todoList;
 
     ngOnInit(): void {
         this.todoFormControl = new FormControl('', Validators.required);
@@ -48,16 +48,16 @@ export class TodoListComponent implements OnInit {
         });
 
         const todoListId = parseInt(this.route.snapshot.params['id']);
-        this.todoListProvider.load$.next({ id: todoListId });
+        this.todoListService.load$.next({ id: todoListId });
     }
 
     addTodoItem(id: number, title: string): void {
-        this.todoListProvider.add$.next({ todoListId: id, title, order: 1, completed: false });
+        this.todoListService.add$.next({ todoListId: id, title, order: 1, completed: false });
         this.todoFormControl.reset();
     }
 
     removeTodoItem(id: number): void {
-        this.todoListProvider.remove$.next({ id });
+        this.todoListService.remove$.next({ id });
     }
 
     goBack(): void {

@@ -44,7 +44,7 @@ export class OpenAPIService {
                 'npx openapi-generator-cli generate -g typescript-angular',
                 `-i ${inputPath}`,
                 `-o ${outputPath}`,
-                `--additional-properties=basePath=${basePath}:${port},fileNaming=kebab-case`,
+                `--additional-properties=basePath=${basePath}:${port},fileNaming=kebab-case,serviceSuffix=Client,serviceFileSuffix=.client`,
             ].join(' '),
             { encoding: AppConstants.UTF8 },
         );
