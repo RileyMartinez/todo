@@ -45,6 +45,7 @@ export class AuthService {
     constructor() {
         this.initUserSession();
 
+        // reducers
         this.login$
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
