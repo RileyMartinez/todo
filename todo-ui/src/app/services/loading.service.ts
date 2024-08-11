@@ -1,5 +1,4 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { first, tap, timer } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -11,12 +10,7 @@ export class LoadingService {
 
     setLoading(isLoading: boolean): void {
         if (!isLoading && this.loadingSignal()) {
-            timer(this.minimumDelay)
-                .pipe(
-                    first(),
-                    tap(() => this.loadingSignal.set(isLoading)),
-                )
-                .subscribe();
+            setTimeout(() => this.loadingSignal.set(isLoading), this.minimumDelay);
         } else {
             this.loadingSignal.set(isLoading);
         }
