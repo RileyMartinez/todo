@@ -78,7 +78,7 @@ export class AuthService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe();
+            .subscribe(() => this.clearSessionAndRedirect());
 
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
     }
@@ -97,12 +97,17 @@ export class AuthService {
     }
 
     private setTokenAndUserIdentity(token: string): void {
-        this.state.update((state) => ({ ...state, user: this.getUserFromToken(token), accessToken: token }));
+        this.state.update((state) => ({
+            ...state,
+            user: this.getUserFromToken(token),
+            accessToken: token,
+            loaded: true,
+        }));
         localStorage.setItem('todo.sub', this.user()?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
-        this.state.update((state) => ({ ...state, user: null, accessToken: null }));
+        this.state.update((state) => ({ ...state, user: null, accessToken: null, loaded: true }));
         localStorage.removeItem('todo.sub');
     }
 
