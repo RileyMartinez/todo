@@ -48,6 +48,6 @@ export class LoginComponent implements OnInit {
             return;
         }
 
-        this.authService.login(this.emailFormControl.value, this.passwordFormControl.value);
+        this.authService.login$.next({ email: this.emailFormControl.value, password: this.passwordFormControl.value });
     }
 }

@@ -36,14 +36,6 @@ export class TodoListService {
     public readonly add$ = new Subject<AddTodo>();
     public readonly remove$ = new Subject<RemoveTodo>();
 
-    private readonly todoListLoaded$ = this.load$.pipe(
-        switchMap((todoList) =>
-            this.todoListClient
-                .todoListControllerFindTodoList(todoList.id)
-                .pipe(catchError((error) => this.handleError(error))),
-        ),
-    );
-
     private readonly todoAdded$ = this.add$.pipe(
         concatMap((todo) =>
             this.todoListClient
@@ -62,8 +54,15 @@ export class TodoListService {
 
     constructor() {
         // reducers
-        this.todoListLoaded$
-            .pipe(takeUntilDestroyed())
+        this.load$
+            .pipe(
+                switchMap((todoList) =>
+                    this.todoListClient
+                        .todoListControllerFindTodoList(todoList.id)
+                        .pipe(catchError((error) => this.handleError(error))),
+                ),
+                takeUntilDestroyed(),
+            )
             .subscribe((todoList) => this.state.update((state) => ({ ...state, todoList, loaded: true })));
 
         merge(this.todoAdded$, this.todoRemoved$)

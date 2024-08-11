@@ -1,11 +1,19 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { AccessTokenDto, AuthClient } from '../openapi-client';
-import { catchError, finalize, first, Observable, of, tap } from 'rxjs';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { AccessTokenDto, AuthClient, AuthLoginDto, AuthRegisterDto } from '../openapi-client';
+import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../interfaces/user.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+export interface AuthServiceState {
+    user: User | null;
+    accessToken: string | null;
+    loaded: boolean;
+    error: string | null;
+}
 
 @Injectable({
     providedIn: 'root',
@@ -15,70 +23,67 @@ export class AuthService {
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
 
-    private accessTokenSignal = signal<string | null>(null);
-    public readonly accessToken = computed(() => this.accessTokenSignal());
+    // state
+    private readonly state = signal<AuthServiceState>({
+        user: null,
+        accessToken: null,
+        loaded: false,
+        error: null,
+    });
 
-    private userSignal = signal<User | null>(null);
-    public readonly user = computed(() => this.userSignal());
+    // selectors
+    public readonly user = computed(() => this.state().user);
+    public readonly accessToken = computed(() => this.state().accessToken);
+    public readonly loaded = computed(() => this.state().loaded);
+    public readonly error = computed(() => this.state().error);
+
+    // sources
+    public readonly login$ = new Subject<AuthLoginDto>();
+    public readonly register$ = new Subject<AuthRegisterDto>();
+    public readonly logout$ = new Subject<void>();
+    public readonly refresh$ = new Subject<void>();
 
     constructor() {
-        this.refreshSession();
-    }
+        this.initUserSession();
 
-    login(email: string, password: string): void {
-        this.loadingService.setLoading(true);
-
-        this.authClient
-            .authControllerLogin({ email, password })
+        this.login$
             .pipe(
-                first(),
-                finalize(() => this.loadingService.setLoading(false)),
+                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
+                switchMap((authLoginDto) =>
+                    this.authClient
+                        .authControllerLogin(authLoginDto)
+                        .pipe(catchError((error) => this.handleError(error))),
+                ),
+                takeUntilDestroyed(),
             )
-            .subscribe({
-                next: (tokens) => {
-                    this.setSessonAndRedirect(tokens.accessToken);
-                },
-                error: () => {
-                    this.clearTokenAndUserIdentity();
-                },
-            });
-    }
+            .subscribe((tokens) => this.setSessonAndRedirect(tokens.accessToken));
 
-    logout(): void {
-        this.loadingService.setLoading(true);
-
-        this.authClient
-            .authControllerLogout()
+        this.register$
             .pipe(
-                first(),
-                finalize(() => {
-                    this.clearSessionAndRedirect();
-                    this.loadingService.setLoading(false);
-                }),
+                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
+                switchMap((authRegisterDto) =>
+                    this.authClient
+                        .authControllerRegister(authRegisterDto)
+                        .pipe(catchError((error) => this.handleError(error))),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((tokens) => this.setSessonAndRedirect(tokens.accessToken));
+
+        this.logout$
+            .pipe(
+                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
+                switchMap(() =>
+                    this.authClient.authControllerLogout().pipe(catchError((error) => this.handleError(error))),
+                ),
+                takeUntilDestroyed(),
             )
             .subscribe();
+
+        effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
     }
 
-    register(email: string, password: string): void {
-        this.loadingService.setLoading(true);
-
-        this.authClient
-            .authControllerRegister({ email, password })
-            .pipe(
-                first(),
-                finalize(() => this.loadingService.setLoading(false)),
-            )
-            .subscribe({
-                next: (tokens) => {
-                    this.setSessonAndRedirect(tokens.accessToken);
-                },
-                error: () => {
-                    this.clearTokenAndUserIdentity();
-                },
-            });
-    }
-
-    refresh(): Observable<AccessTokenDto | null> {
+    public refresh(): Observable<AccessTokenDto | null> {
         return this.authClient.authControllerRefresh().pipe(
             first(),
             tap((tokens) => {
@@ -92,14 +97,12 @@ export class AuthService {
     }
 
     private setTokenAndUserIdentity(token: string): void {
-        this.accessTokenSignal.set(token);
-        this.userSignal.set(this.getUserFromToken(token));
-        localStorage.setItem('todo.sub', this.userSignal()?.sub.toString() || '');
+        this.state.update((state) => ({ ...state, user: this.getUserFromToken(token), accessToken: token }));
+        localStorage.setItem('todo.sub', this.user()?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
-        this.accessTokenSignal.set(null);
-        this.userSignal.set(null);
+        this.state.update((state) => ({ ...state, user: null, accessToken: null }));
         localStorage.removeItem('todo.sub');
     }
 
@@ -111,11 +114,9 @@ export class AuthService {
         }
     }
 
-    private refreshSession(): void {
+    private initUserSession(): void {
         const userId = parseInt(localStorage.getItem('todo.sub') || '0');
-        if (userId) {
-            this.userSignal.set({ sub: userId });
-        }
+        this.state.update((state) => ({ ...state, user: { sub: userId }, loaded: true }));
     }
 
     private setSessonAndRedirect(token: string): void {
@@ -126,5 +127,11 @@ export class AuthService {
     private clearSessionAndRedirect(): void {
         this.clearTokenAndUserIdentity();
         this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
+    }
+
+    private handleError(error: any): Observable<never> {
+        this.state.update((state) => ({ ...state, error }));
+        this.clearSessionAndRedirect();
+        return EMPTY;
     }
 }

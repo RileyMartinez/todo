@@ -44,6 +44,6 @@ export class AppComponent {
 
     logout(): void {
         this.sidenav?.close();
-        this.authService.logout();
+        this.authService.logout$.next();
     }
 }
