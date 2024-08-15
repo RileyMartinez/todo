@@ -10,7 +10,7 @@ config();
 
 const isWindows = os.platform() === 'win32';
 const currentDir = isWindows ? '%cd%' : '$(pwd)';
-const runCommand = `docker run --rm -v "${currentDir}:/local" openapitools/openapi-generator-cli:latest-release`;
+const runCommand = `docker run --rm -v "${currentDir}:/local" openapitools/openapi-generator-cli:v7.5.0`;
 const basePath = process.env.BASE_PATH;
 const port = process.env.PORT;
 const fetchPath = `${basePath}:${port}/api-json`;

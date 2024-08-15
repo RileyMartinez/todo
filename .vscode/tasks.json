@@ -5,10 +5,6 @@
       "label": "docker compose up",
       "type": "shell",
       "command": "docker compose up",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
       "runOptions": {
         "runOn": "folderOpen"
       }
@@ -39,6 +35,10 @@
       "runOptions": {
         "runOn": "folderOpen"
       },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "presentation": {
         "reveal": "silent",
         "revealProblems": "onProblem",
@@ -48,3 +48,4 @@
     }
   ]
 }
+
