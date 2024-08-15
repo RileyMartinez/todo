@@ -10,6 +10,16 @@
       }
     },
     {
+      "label": "docker compose up build",
+      "type": "shell",
+      "command": "docker compose up --build"
+    },
+    {
+      "label": "docker compose down",
+      "type": "shell",
+      "command": "docker compose down"
+    },
+    {
       "label": "build-api",
       "type": "shell",
       "command": "sleep 5 && cd ./todo-api && yarn build && yarn generate:client",
