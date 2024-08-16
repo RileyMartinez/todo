@@ -5,14 +5,25 @@ import { writeFile } from 'fs';
 import { promisify } from 'util';
 import * as fs from 'fs-extra';
 import axios from 'axios';
+import { getAdditionalPropertiesString } from '../src/common/configs/openapi-generator.config';
 
 config();
+
+const basePath = process.env.BASE_PATH;
+const port = process.env.PORT;
+
+if (!basePath) {
+    throw new Error('BASE_PATH is not defined');
+}
+
+if (!port) {
+    throw new Error('PORT is not defined');
+}
 
 const isWindows = os.platform() === 'win32';
 const currentDir = isWindows ? '%cd%' : '$(pwd)';
 const runCommand = `docker run --rm -v "${currentDir}:/local" openapitools/openapi-generator-cli:v7.5.0`;
-const basePath = process.env.BASE_PATH;
-const port = process.env.PORT;
+const additionalProperties = getAdditionalPropertiesString(basePath, port);
 const fetchPath = `${basePath}:${port}/api-json`;
 const fileName = 'openapi.json';
 const inputPath = `local/${fileName}`;
@@ -56,9 +67,11 @@ async function generateClient() {
                 'generate -g typescript-angular',
                 `-i ${inputPath}`,
                 `-o ${outputPath}`,
-                `--additional-properties=basePath=${basePath}:${port},fileNaming=kebab-case,serviceSuffix=Client,serviceFileSuffix=.client`,
+                `--additional-properties=${additionalProperties}`,
             ].join(' '),
-            { encoding: 'utf8' },
+            {
+                encoding: 'utf8',
+            },
         );
 
         if (stdout) {

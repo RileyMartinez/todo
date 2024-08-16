@@ -3,6 +3,7 @@ export * from './cors.config';
 export * from './invalid-token-cookie.config';
 export * from './jwt.config';
 export * from './logger.config';
+export * from './openapi-generator.config';
 export * from './refresh-token-cookie.config';
 export * from './swagger.config';
 export * from './throttle.config';
