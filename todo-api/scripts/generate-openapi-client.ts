@@ -38,12 +38,6 @@ const generateOpenAPIClient = async (fetchPath: string) => {
         if (!fetchPath) {
             throw new Error('fetchPath is required');
         }
-        if (!basePath) {
-            throw new Error('basePath is required');
-        }
-        if (!port) {
-            throw new Error('port is required');
-        }
 
         const spec = await fetchOpenApiSpec(fetchPath);
         await writeFileAsync(`./${fileName}`, spec);
