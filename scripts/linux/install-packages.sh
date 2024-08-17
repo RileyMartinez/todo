@@ -20,7 +20,7 @@ then
     exit 1
 fi
 
-directories=("../../todo-api" "../../todo-ui")
+directories=("../../api" "../../ui")
 
 for dir in "${directories[@]}"; do
     run_yarn_command "$dir" "install"

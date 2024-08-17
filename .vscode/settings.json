@@ -1,23 +1,23 @@
 {
   "exportall.config.folderListener": [
-    "/todo-api/src/common/configs",
-    "/todo-api/src/common/constants",
-    "/todo-api/src/common/exception-filters",
-    "/todo-api/src/common/exceptions",
-    "/todo-api/src/common/mappers",
-    "/todo-api/src/utils",
-    "/todo-api/src/modules/app/providers",
-    "/todo-api/src/modules/auth/dto",
-    "/todo-api/src/modules/auth/guards",
-    "/todo-api/src/modules/auth/strategies",
-    "/todo-api/src/modules/todo/dto",
-    "/todo-api/src/modules/todo/entities",
-    "/todo-api/src/modules/todolist/dto",
-    "/todo-api/src/modules/todolist/entities",
-    "/todo-api/src/modules/users/dto",
-    "/todo-api/src/modules/users/entities",
-    "/todo-api/src/common/decorators",
-    "/todo-ui/src/app/interfaces"
+    "/api/src/common/configs",
+    "/api/src/common/constants",
+    "/api/src/common/exception-filters",
+    "/api/src/common/exceptions",
+    "/api/src/common/mappers",
+    "/api/src/utils",
+    "/api/src/modules/app/providers",
+    "/api/src/modules/auth/dto",
+    "/api/src/modules/auth/guards",
+    "/api/src/modules/auth/strategies",
+    "/api/src/modules/todo/dto",
+    "/api/src/modules/todo/entities",
+    "/api/src/modules/todolist/dto",
+    "/api/src/modules/todolist/entities",
+    "/api/src/modules/users/dto",
+    "/api/src/modules/users/entities",
+    "/api/src/common/decorators",
+    "/ui/src/app/interfaces"
   ]
 }
 

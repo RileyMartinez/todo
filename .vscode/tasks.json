@@ -22,9 +22,9 @@
     {
       "label": "build-api",
       "type": "shell",
-      "command": "sleep 5 && cd ./todo-api && yarn build && yarn generate:client",
+      "command": "sleep 5 && cd ./api && yarn build && yarn generate:client",
       "windows": {
-        "command": "start-sleep -seconds 5; cd ./todo-api; yarn build; yarn generate:client;"
+        "command": "start-sleep -seconds 5; cd ./api; yarn build; yarn generate:client;"
       },
       "runOptions": {
         "runOn": "folderOpen"
@@ -38,9 +38,9 @@
     {
       "label": "build-ui",
       "type": "shell",
-      "command": "cd ./todo-ui && yarn build",
+      "command": "cd ./ui && yarn build",
       "windows": {
-        "command": "cd ./todo-ui; yarn build;"
+        "command": "cd ./ui; yarn build;"
       },
       "runOptions": {
         "runOn": "folderOpen"

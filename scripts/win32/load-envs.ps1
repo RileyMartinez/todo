@@ -33,12 +33,12 @@ $paths = @(
         output = "../../.env"
     },
     @{
-        input = "../../todo-api/.env.op"
-        output = "../todo-api/.env"
+        input = "../../api/.env.op"
+        output = "../api/.env"
     },
     @{
-        input = "../../todo-ui/.env.op"
-        output = "../../todo-ui/.env"
+        input = "../../ui/.env.op"
+        output = "../../ui/.env"
     }
 )
 

@@ -28,7 +28,7 @@ const fetchPath = `${basePath}:${port}/api-json`;
 const fileName = 'openapi.json';
 const inputPath = `local/${fileName}`;
 const outputPath = 'local/openapi-client';
-const destinationPath = '../todo-ui/src/app/openapi-client';
+const destinationPath = '../ui/src/app/openapi-client';
 
 const writeFileAsync = promisify(writeFile);
 const execAsync = promisify(exec);

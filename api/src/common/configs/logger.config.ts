@@ -28,7 +28,7 @@ export const LoggerConfig: WinstonModuleAsyncOptions = {
                               `${info.timestamp} [${info.level}][${info.context}][${process.pid}]: ${info.message} ${info.ms} ${info.stack ? `\n${info.stack}` : ''}`,
                       ),
                   ),
-            defaultMeta: { service: 'todo-api', pid: process.pid },
+            defaultMeta: { service: 'api', pid: process.pid },
             handleExceptions: true,
             handleRejections: true,
             transports: [

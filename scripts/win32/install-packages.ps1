@@ -23,7 +23,7 @@ if (-not (Get-Command yarn -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-$directories = @("../../todo-api", "../../todo-ui")
+$directories = @("../../api", "../../ui")
 
 foreach ($dir in $directories) {
     Run-YarnCommand -Directory $dir -Command "install"

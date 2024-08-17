@@ -39,7 +39,7 @@ export class AppComponent {
     user = this.authService.user;
 
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
-    title = 'todo-ui';
+    title = 'ui';
     isAuthenticated = false;
 
     logout(): void {
