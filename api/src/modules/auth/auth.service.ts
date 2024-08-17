@@ -20,6 +20,8 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ValidatorUtil } from 'src/utils/validator.util';
 import { AuthLoginDto, AuthTokenDto, AuthRefreshDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
+import * as argon2 from 'argon2';
+import { argon2HashConfig } from 'src/common/configs';
 
 @Injectable()
 export class AuthService {
@@ -55,11 +57,23 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const passwordMatches = await bcrypt.compare(authLoginDto.password, user.password);
+        if (user.password.startsWith('$2')) {
+            const match = await bcrypt.compare(authLoginDto.password, user.password);
 
-        if (!passwordMatches) {
-            this.logger.warn(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
-            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            if (!match) {
+                this.logger.warn(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
+                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            }
+
+            user.password = await argon2.hash(authLoginDto.password, argon2HashConfig);
+            this.usersService.update(user.id, { password: user.password });
+        } else {
+            const match = await argon2.verify(user.password, authLoginDto.password);
+
+            if (!match) {
+                this.logger.warn(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
+                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            }
         }
 
         const safeUser = this.mapper.map(user, User, SafeUserDto);
@@ -87,8 +101,7 @@ export class AuthService {
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
-        const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
-        const hash = await bcrypt.hash(authRegisterDto.password, saltRounds);
+        const hash = await argon2.hash(authRegisterDto.password, argon2HashConfig);
 
         const newUser = await this.usersService.create({
             email: authRegisterDto.email,
@@ -139,14 +152,29 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const refreshTokenMatches = await bcrypt.compare(authRefreshDto.refreshToken, user.refreshToken);
+        if (user.refreshToken.startsWith('$2')) {
+            const match = await bcrypt.compare(authRefreshDto.refreshToken, user.refreshToken);
 
-        if (!refreshTokenMatches) {
-            this.logger.warn(
-                `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
-                AuthService.name,
-            );
-            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            if (!match) {
+                this.logger.warn(
+                    `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
+                    AuthService.name,
+                );
+                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            }
+
+            user.refreshToken = await argon2.hash(authRefreshDto.refreshToken, argon2HashConfig);
+            await this.usersService.update(authRefreshDto.userId, { refreshToken: user.refreshToken });
+        } else {
+            const match = await argon2.verify(user.refreshToken, authRefreshDto.refreshToken);
+
+            if (!match) {
+                this.logger.warn(
+                    `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
+                    AuthService.name,
+                );
+                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            }
         }
 
         const safeUser = this.mapper.map(user, User, SafeUserDto);
@@ -209,10 +237,7 @@ export class AuthService {
      */
     private async updateUserRefreshToken(authRefreshDto: AuthRefreshDto): Promise<void> {
         await ValidatorUtil.validate(authRefreshDto);
-
-        const saltRounds = Number(this.configService.getOrThrow(ConfigConstants.BCRYPT_SALT_ROUNDS));
-        const hash = await bcrypt.hash(authRefreshDto.refreshToken, saltRounds);
-
+        const hash = await argon2.hash(authRefreshDto.refreshToken, argon2HashConfig);
         await this.usersService.update(authRefreshDto.userId, { refreshToken: hash });
     }
 }
