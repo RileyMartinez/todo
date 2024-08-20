@@ -8,12 +8,8 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { ConfigConstants } from 'src/common/constants/config.constants';
 import { ConfigService } from '@nestjs/config';
-import { SafeUserDto } from 'src/modules/users/dto/safe-user.dto';
-import { Mapper } from '@automapper/core';
-import { InjectMapper } from '@automapper/nestjs';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -26,13 +22,11 @@ import { argon2HashConfig } from 'src/common/configs';
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectMapper() private readonly mapper: Mapper,
         @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
     ) {
-        this.mapper = mapper;
         this.logger = logger;
         this.usersService = usersService;
         this.jwtService = jwtService;
@@ -42,7 +36,8 @@ export class AuthService {
     /**
      * Authenticates a user by checking their email and password.
      * If the user is authenticated, a JWT token is generated and returned.
-     * @param {AuthLoginDto} credentials - The email and password of the user.
+     *
+     * @param {AuthLoginDto} authLoginDto - The email and password of the user.
      * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the authenticated user.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the email or password is incorrect.
@@ -53,40 +48,27 @@ export class AuthService {
         const user = await this.usersService.findOneByEmail(authLoginDto.email);
 
         if (!user) {
-            this.logger.warn(`User with email ${authLoginDto.email} not found`, AuthService.name);
+            this.logger.error(`User with email ${authLoginDto.email} not found`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (user.password.startsWith('$2')) {
-            const match = await bcrypt.compare(authLoginDto.password, user.password);
+        const match = await argon2.verify(user.password, authLoginDto.password);
 
-            if (!match) {
-                this.logger.warn(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
-                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-            }
-
-            user.password = await argon2.hash(authLoginDto.password, argon2HashConfig);
-            this.usersService.update(user.id, { password: user.password });
-        } else {
-            const match = await argon2.verify(user.password, authLoginDto.password);
-
-            if (!match) {
-                this.logger.warn(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
-                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-            }
+        if (!match) {
+            this.logger.error(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const safeUser = this.mapper.map(user, User, SafeUserDto);
-        const tokens = await this.getTokens(safeUser);
-
-        await this.updateUserRefreshToken(new AuthRefreshDto(safeUser.id, tokens.refreshToken));
+        const tokens = await this.getTokens(user);
+        await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
 
         return tokens;
     }
 
     /**
      * Registers a new user with the provided email and password.
-     * @param {AuthRegisterDto} data - The registration data containing email and password.
+     *
+     * @param {AuthRegisterDto} authRegisterDto - The registration data containing email and password.
      * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ConflictException} - If a user with the provided email already exists.
@@ -97,7 +79,7 @@ export class AuthService {
         const user = await this.usersService.findOneByEmail(authRegisterDto.email);
 
         if (user) {
-            this.logger.warn(`User with email ${authRegisterDto.email} already exists`, AuthService.name);
+            this.logger.error(`User with email ${authRegisterDto.email} already exists`, AuthService.name);
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
@@ -108,20 +90,21 @@ export class AuthService {
             password: hash,
         });
 
-        const safeNewUser = this.mapper.map(newUser, User, SafeUserDto);
-        const tokens = await this.getTokens(safeNewUser);
-        await this.updateUserRefreshToken(new AuthRefreshDto(safeNewUser.id, tokens.refreshToken));
+        const tokens = await this.getTokens(newUser);
+        await this.updateUserRefreshToken(new AuthRefreshDto(newUser.id, tokens.refreshToken));
 
         return tokens;
     }
 
     /**
      * Logs out a user by nullifying their refresh token.
+     *
      * @param userId - The ID of the user to log out.
      * @throws {BadRequestException} If user ID is less than 1.
      */
     async logout(userId: number): Promise<void> {
         if (userId < 1) {
+            this.logger.error(ExceptionConstants.InvalidUserId(userId), AuthService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
@@ -131,8 +114,7 @@ export class AuthService {
     /**
      * Refreshes the authentication tokens for a user.
      *
-     * @param userId - The ID of the user.
-     * @param refreshToken - The refresh token provided by the user.
+     * @param {AuthRefreshDto} authRefreshDto - The user ID and refresh token.
      * @returns A promise that resolves to an AuthTokenDto object containing the new authentication tokens.
      * @throws {ValidationException} if the user ID or refresh token is invalid.
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
@@ -143,57 +125,40 @@ export class AuthService {
         const user = await this.usersService.findOneById(authRefreshDto.userId);
 
         if (!user) {
-            this.logger.warn(`User with ID ${authRefreshDto.userId} not found`, AuthService.name);
+            this.logger.error(ExceptionConstants.UserNotFound(authRefreshDto.userId), AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.refreshToken) {
-            this.logger.warn(`User with ID ${authRefreshDto.userId} does not have a refresh token`, AuthService.name);
+            this.logger.error(`User with ID ${authRefreshDto.userId} does not have a refresh token`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (user.refreshToken.startsWith('$2')) {
-            const match = await bcrypt.compare(authRefreshDto.refreshToken, user.refreshToken);
+        const match = await argon2.verify(user.refreshToken, authRefreshDto.refreshToken);
 
-            if (!match) {
-                this.logger.warn(
-                    `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
-                    AuthService.name,
-                );
-                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-            }
-
-            user.refreshToken = await argon2.hash(authRefreshDto.refreshToken, argon2HashConfig);
-            await this.usersService.update(authRefreshDto.userId, { refreshToken: user.refreshToken });
-        } else {
-            const match = await argon2.verify(user.refreshToken, authRefreshDto.refreshToken);
-
-            if (!match) {
-                this.logger.warn(
-                    `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
-                    AuthService.name,
-                );
-                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-            }
+        if (!match) {
+            this.logger.error(
+                `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
+                AuthService.name,
+            );
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const safeUser = this.mapper.map(user, User, SafeUserDto);
-        const tokens = await this.getTokens(safeUser);
-
-        await this.updateUserRefreshToken(new AuthRefreshDto(safeUser.id, tokens.refreshToken));
+        const tokens = await this.getTokens(user);
+        await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
 
         return tokens;
     }
 
     /**
      * Generates access and refresh tokens for a given user.
-     * @param userId - The ID of the user.
-     * @param email - The email of the user.
+     *
+     * @param {User} user - The user for which to generate tokens.
      * @returns An object containing the access and refresh tokens.
      * @throws {ValidationException} If the user ID or email is invalid.
      */
-    private async getTokens(safeUser: SafeUserDto): Promise<AuthTokenDto> {
-        await ValidatorUtil.validate(safeUser);
+    private async getTokens(user: User): Promise<AuthTokenDto> {
+        await ValidatorUtil.validate(user);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
@@ -203,8 +168,8 @@ export class AuthService {
         const [accessToken, refreshToken] = await Promise.all([
             await this.jwtService.signAsync(
                 {
-                    sub: safeUser.id,
-                    email: safeUser.email,
+                    sub: user.id,
+                    email: user.email,
                 },
                 {
                     secret: accessTokenSecret,
@@ -213,7 +178,7 @@ export class AuthService {
             ),
             await this.jwtService.signAsync(
                 {
-                    sub: safeUser.id,
+                    sub: user.id,
                 },
                 {
                     secret: refreshTokenSecret,
@@ -230,8 +195,8 @@ export class AuthService {
 
     /**
      * Updates the refresh token for a user.
-     * @param userId - The ID of the user.
-     * @param refreshToken - The new refresh token.
+     *
+     * @param {AuthRefreshDto} authRefreshDto - The user ID and refresh token.
      * @returns A Promise that resolves when the refresh token is updated.
      * @throws {ValidationException} If the user ID or refresh token is invalid.
      */

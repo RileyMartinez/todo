@@ -16,7 +16,6 @@ export class ConfigConstants {
     static readonly JWT_EXPIRATION = 'JWT_EXPIRATION';
     static readonly JWT_REFRESH_EXPIRATION = 'JWT_REFRESH_EXPIRATION';
     static readonly REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
-    static readonly BCRYPT_SALT_ROUNDS = 'BCRYPT_SALT_ROUNDS';
     static readonly LOGGER_LEVEL = 'LOGGER_LEVEL';
     static readonly LOGGER_DIRECTORY = 'LOGGER_DIRECTORY';
     static readonly LOGGER_MAX_SIZE = 'LOGGER_MAX_SIZE';
