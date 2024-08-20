@@ -5,16 +5,17 @@ services:
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
-    container_name: postgres-full
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    container_name: postgres
+    # volumes:
+    # Persist data
+    # - pgdata:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:${DB_PORT}"
 
   pgadmin:
     image: dpage/pgadmin4
     restart: always
-    container_name: pgadmin-full
+    container_name: pgadmin
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PG_ADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PG_ADMIN_PASSWORD}
@@ -30,7 +31,7 @@ services:
       - api
       - ui
     restart: always
-    container_name: nginx-full
+    container_name: nginx
     build:
       context: ./nginx
       dockerfile: Dockerfile.${ENV}
@@ -41,7 +42,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.${ENV}
-    container_name: api-full
+    container_name: api
     environment:
       - PORT=${API_PORT}
     ports:
@@ -58,7 +59,7 @@ services:
     build:
       context: ./ui
       dockerfile: Dockerfile.${ENV}
-    container_name: ui-full
+    container_name: ui
     environment:
       - PORT=${UI_PORT}
     ports:
@@ -70,7 +71,8 @@ services:
       - api
 
 volumes:
-  pgdata:
+  # Persist data
+  # pgdata:
   pgadmin:
   openapi:
 

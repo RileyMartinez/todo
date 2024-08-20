@@ -1,3 +1,4 @@
+export * from './argon2-hash.config';
 export * from './automapper.config';
 export * from './cors.config';
 export * from './invalid-token-cookie.config';
@@ -8,4 +9,3 @@ export * from './refresh-token-cookie.config';
 export * from './swagger.config';
 export * from './throttle.config';
 export * from './typeorm.config';
-export * from './argon2-hash.config';
