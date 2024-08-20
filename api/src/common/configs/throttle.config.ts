@@ -2,7 +2,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerAsyncOptions, ThrottlerModuleOptions } from '@nestjs/throttler';
 import { ConfigConstants } from '../constants/config.constants';
 
-export const ThrottlerConfig: ThrottlerAsyncOptions = {
+export const throttlerConfig: ThrottlerAsyncOptions = {
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService): Promise<ThrottlerModuleOptions> => ({
         throttlers: [

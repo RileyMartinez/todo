@@ -1,7 +1,7 @@
 import { classes } from '@automapper/classes';
 import { AutomapperAsyncOptions } from '@automapper/nestjs';
 
-export const AutomapperConfig: AutomapperAsyncOptions = {
+export const automapperConfig: AutomapperAsyncOptions = {
     useFactory: async () => ({
         strategyInitializer: classes(),
     }),

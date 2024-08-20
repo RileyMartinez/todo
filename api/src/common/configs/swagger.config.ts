@@ -1,6 +1,6 @@
 import { DocumentBuilder } from '@nestjs/swagger';
 
-export const SwaggerConfig = new DocumentBuilder()
+export const swaggerConfig = new DocumentBuilder()
     .setTitle('Todo API')
     .setDescription('Todo List API with NestJS, TypeORM, and PostgreSQL')
     .setVersion('1.0')

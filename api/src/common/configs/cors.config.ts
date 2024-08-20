@@ -13,7 +13,7 @@ if (!uiPort) {
     throw new Error('UI_PORT is not defined');
 }
 
-export const CorsConfig: CorsOptions = {
+export const corsConfig: CorsOptions = {
     origin: `${basePath}:${uiPort}`,
     credentials: true,
 };

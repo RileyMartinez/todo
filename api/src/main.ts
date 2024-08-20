@@ -6,7 +6,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { OpenAPIService } from './modules/app/providers';
-import { SwaggerConfig, CorsConfig } from './common/configs';
+import { swaggerConfig, corsConfig } from './common/configs';
 import { ConfigConstants } from './common/constants';
 import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-filters';
 import * as cookieParser from 'cookie-parser';
@@ -21,7 +21,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.use(cookieParser());
 
-    const document = SwaggerModule.createDocument(app, SwaggerConfig);
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api', app, document);
 
     const configService = app.get(ConfigService);
@@ -30,7 +30,7 @@ async function bootstrap() {
     const openApiService = app.get(OpenAPIService);
     await openApiService.generateClient(document);
 
-    app.enableCors(CorsConfig);
+    app.enableCors(corsConfig);
 
     await app.listen(port);
 }

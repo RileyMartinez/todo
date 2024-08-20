@@ -10,17 +10,17 @@ import { TodoListModule } from '../todolist/todo-list.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
 import { OpenAPIService } from './providers';
-import { TypeOrmConfig, ThrottlerConfig, AutomapperConfig, LoggerConfig } from 'src/common/configs';
+import { typeOrmConfig, throttlerConfig, automapperConfig, loggerConfig } from 'src/common/configs';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/guards';
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        TypeOrmModule.forRootAsync(TypeOrmConfig),
-        ThrottlerModule.forRootAsync(ThrottlerConfig),
-        AutomapperModule.forRootAsync(AutomapperConfig),
-        WinstonModule.forRootAsync(LoggerConfig),
+        TypeOrmModule.forRootAsync(typeOrmConfig),
+        ThrottlerModule.forRootAsync(throttlerConfig),
+        AutomapperModule.forRootAsync(automapperConfig),
+        WinstonModule.forRootAsync(loggerConfig),
         TodoListModule,
         AuthModule,
         UsersModule,

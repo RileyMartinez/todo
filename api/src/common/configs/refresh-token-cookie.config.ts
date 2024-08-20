@@ -39,7 +39,7 @@ const maxAge =
 
 const isProduction = process.env.ENV === AppConstants.PROD;
 
-export const RefreshTokenCookieConfig: CookieOptions = {
+export const refreshTokenCookieConfig: CookieOptions = {
     httpOnly: true,
     secure: isProduction,
     sameSite: 'strict',

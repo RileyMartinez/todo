@@ -25,7 +25,7 @@ import { AuthRegisterDto } from './dto/auth-register.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
 import { ConfigConstants, DecoratorConstants } from 'src/common/constants';
 import { Response } from 'express';
-import { InvalidTokenCookieConfig, RefreshTokenCookieConfig } from 'src/common/configs';
+import { invalidTokenCookieConfig, refreshTokenCookieConfig } from 'src/common/configs';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -52,7 +52,7 @@ export class AuthController {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, RefreshTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
 
         return new AccessTokenDto(tokens.accessToken);
     }
@@ -73,7 +73,7 @@ export class AuthController {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, '', InvalidTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, '', invalidTokenCookieConfig);
 
         return await this.authService.logout(userId);
     }
@@ -91,7 +91,7 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response,
     ): Promise<AccessTokenDto> {
         const tokens = await this.authService.register(authRegisterDto);
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, RefreshTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
 
         return new AccessTokenDto(tokens.accessToken);
     }
@@ -117,7 +117,7 @@ export class AuthController {
         }
 
         const tokens = await this.authService.refresh(new AuthRefreshDto(userId, refreshToken));
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, RefreshTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
 
         return new AccessTokenDto(tokens.accessToken);
     }

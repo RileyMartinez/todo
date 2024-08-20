@@ -4,7 +4,7 @@ import DailyRotateFile = require('winston-daily-rotate-file');
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConfigConstants } from 'src/common/constants/config.constants';
 
-export const LoggerConfig: WinstonModuleAsyncOptions = {
+export const loggerConfig: WinstonModuleAsyncOptions = {
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService): Promise<LoggerOptions> => {
         const isProd = configService.getOrThrow(ConfigConstants.ENV) === 'prod';
