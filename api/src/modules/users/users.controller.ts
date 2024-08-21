@@ -3,29 +3,18 @@ import {
     Get,
     Post,
     Body,
-    Patch,
     Param,
     Delete,
     ParseIntPipe,
     UseInterceptors,
-    Res,
-    HttpStatus,
+    NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import {
-    ApiBearerAuth,
-    ApiCreatedResponse,
-    ApiNoContentResponse,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { SafeUserDto } from './dto/safe-user.dto';
 import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
-import { Response } from 'express';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 
 @Controller('users')
@@ -43,7 +32,7 @@ export class UsersController {
     @ApiCreatedResponse({ type: SafeUserDto })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
-        return this.usersService.create(createUserDto);
+        return this.usersService.createUser(createUserDto);
     }
 
     /**
@@ -54,7 +43,7 @@ export class UsersController {
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneById(@Param('id', ParseIntPipe) id: number): Promise<SafeUserDto> {
-        return await this.usersService.findOneById(id);
+        return await this.usersService.findUserById(id);
     }
 
     /**
@@ -62,27 +51,16 @@ export class UsersController {
      */
     @Get('email/:email')
     @ApiOkResponse({ type: SafeUserDto })
-    @ApiNoContentResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
-    async findOneByEmail(@Param('email') email: string, @Res() res: Response): Promise<SafeUserDto | null> {
-        const user = await this.usersService.findOneByEmail(email);
+    async findOneByEmail(@Param('email') email: string): Promise<SafeUserDto | null> {
+        const user = await this.usersService.findUserByEmail(email);
 
         if (!user) {
-            res.status(HttpStatus.NO_CONTENT).send();
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
         }
 
         return user;
-    }
-
-    /**
-     * Update a user by their ID.
-     */
-    @Patch(':id')
-    @ApiOkResponse({ description: 'The updated user', type: SafeUserDto })
-    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    @UseInterceptors(MapInterceptor(User, SafeUserDto))
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<SafeUserDto> {
-        return this.usersService.update(id, updateUserDto);
     }
 
     /**
@@ -92,6 +70,6 @@ export class UsersController {
     @ApiOkResponse({ type: Number })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     remove(@Param('id', ParseIntPipe) id: number): Promise<number> {
-        return this.usersService.remove(id);
+        return this.usersService.deleteUser(id);
     }
 }

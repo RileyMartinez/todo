@@ -13,11 +13,11 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ValidatorUtil } from 'src/utils/validator.util';
 import { AuthLoginDto, AuthTokenDto, AuthRefreshDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import * as argon2 from 'argon2';
 import { argon2HashConfig } from 'src/common/configs';
+import { ValidationService } from 'src/common/services/validaton.service';
 
 @Injectable()
 export class AuthService {
@@ -26,11 +26,13 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
+        private readonly validationService: ValidationService,
     ) {
         this.logger = logger;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
+        this.validationService = validationService;
     }
 
     /**
@@ -43,9 +45,9 @@ export class AuthService {
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
     async login(authLoginDto: AuthLoginDto): Promise<AuthTokenDto> {
-        await ValidatorUtil.validate(authLoginDto);
+        await this.validationService.validateObject(authLoginDto);
 
-        const user = await this.usersService.findOneByEmail(authLoginDto.email);
+        const user = await this.usersService.findUserByEmail(authLoginDto.email);
 
         if (!user) {
             this.logger.error(`User with email ${authLoginDto.email} not found`, AuthService.name);
@@ -74,9 +76,9 @@ export class AuthService {
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
     async register(authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
-        await ValidatorUtil.validate(authRegisterDto);
+        await this.validationService.validateObject(authRegisterDto);
 
-        const user = await this.usersService.findOneByEmail(authRegisterDto.email);
+        const user = await this.usersService.findUserByEmail(authRegisterDto.email);
 
         if (user) {
             this.logger.error(`User with email ${authRegisterDto.email} already exists`, AuthService.name);
@@ -85,7 +87,7 @@ export class AuthService {
 
         const hash = await argon2.hash(authRegisterDto.password, argon2HashConfig);
 
-        const newUser = await this.usersService.create({
+        const newUser = await this.usersService.createUser({
             email: authRegisterDto.email,
             password: hash,
         });
@@ -104,11 +106,11 @@ export class AuthService {
      */
     async logout(userId: number): Promise<void> {
         if (userId < 1) {
-            this.logger.error(ExceptionConstants.InvalidUserId(userId), AuthService.name);
+            this.logger.error(ExceptionConstants.invalidUserId(userId), AuthService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        await this.usersService.nullifyUserRefreshToken(userId);
+        await this.usersService.clearUserRefreshToken(userId);
     }
 
     /**
@@ -120,12 +122,12 @@ export class AuthService {
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
      */
     async refresh(authRefreshDto: AuthRefreshDto): Promise<AuthTokenDto> {
-        await ValidatorUtil.validate(authRefreshDto);
+        await this.validationService.validateObject(authRefreshDto);
 
-        const user = await this.usersService.findOneById(authRefreshDto.userId);
+        const user = await this.usersService.findUserById(authRefreshDto.userId);
 
         if (!user) {
-            this.logger.error(ExceptionConstants.UserNotFound(authRefreshDto.userId), AuthService.name);
+            this.logger.error(ExceptionConstants.userNotFound(authRefreshDto.userId), AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -158,7 +160,7 @@ export class AuthService {
      * @throws {ValidationException} If the user ID or email is invalid.
      */
     private async getTokens(user: User): Promise<AuthTokenDto> {
-        await ValidatorUtil.validate(user);
+        await this.validationService.validateObject(user);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
@@ -188,7 +190,7 @@ export class AuthService {
         ]);
 
         const tokens = new AuthTokenDto(accessToken, refreshToken);
-        await ValidatorUtil.validate(tokens);
+        await this.validationService.validateObject(tokens);
 
         return tokens;
     }
@@ -201,8 +203,8 @@ export class AuthService {
      * @throws {ValidationException} If the user ID or refresh token is invalid.
      */
     private async updateUserRefreshToken(authRefreshDto: AuthRefreshDto): Promise<void> {
-        await ValidatorUtil.validate(authRefreshDto);
+        await this.validationService.validateObject(authRefreshDto);
         const hash = await argon2.hash(authRefreshDto.refreshToken, argon2HashConfig);
-        await this.usersService.update(authRefreshDto.userId, { refreshToken: hash });
+        await this.usersService.updateUserRefreshToken(authRefreshDto.userId, hash);
     }
 }

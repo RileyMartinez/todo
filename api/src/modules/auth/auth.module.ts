@@ -7,10 +7,11 @@ import { PassportModule } from '@nestjs/passport';
 import { jwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
 import { LocalStrategy, JwtAuthStrategy, JwtRefreshStrategy } from './strategies';
+import { ValidationService } from 'src/common/services/validaton.service';
 
 @Module({
     imports: [ConfigModule, PassportModule, JwtModule.registerAsync(jwtConfig), UsersModule],
     controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtAuthStrategy, JwtRefreshStrategy],
+    providers: [AuthService, ValidationService, LocalStrategy, JwtAuthStrategy, JwtRefreshStrategy],
 })
 export class AuthModule {}

@@ -9,10 +9,10 @@ import { AuthModule } from '../auth/auth.module';
 import { TodoListModule } from '../todolist/todo-list.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
-import { OpenAPIService } from './providers';
 import { typeOrmConfig, throttlerConfig, automapperConfig, loggerConfig } from 'src/common/configs';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/guards';
+import { OpenAPIService } from 'src/common/services/openapi.service';
 
 @Module({
     imports: [
