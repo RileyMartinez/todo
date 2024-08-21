@@ -21,5 +21,10 @@
     },
     "watchOptions": {
         "watchFile": "fixedPollingInterval"
+    },
+    "typedocOptions": {
+        "entryPoints": ["./src/index.ts"],
+        "out": "./docs",
+        "exclude": ["node_modules", "dist", "test", "docs"]
     }
 }

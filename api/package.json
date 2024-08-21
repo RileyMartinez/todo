@@ -7,7 +7,7 @@
     "license": "UNLICENSED",
     "scripts": {
         "build": "nest build",
-        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/**/*.md\"",
         "start": "nest start",
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug 0.0.0.0:9229 --watch",
@@ -18,7 +18,8 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
-        "generate:client": "yarn ts-node ./scripts/generate-openapi-client.ts"
+        "generate:client": "yarn ts-node ./scripts/generate-openapi-client.ts",
+        "generate:docs": "typedoc"
     },
     "dependencies": {
         "@automapper/classes": "^8.8.1",
@@ -77,6 +78,7 @@
         "ts-loader": "^9.4.3",
         "ts-node": "^10.9.1",
         "tsconfig-paths": "^4.2.0",
+        "typedoc": "^0.26.6",
         "typescript": "^5.1.3"
     },
     "jest": {

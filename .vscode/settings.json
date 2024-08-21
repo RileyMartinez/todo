@@ -17,7 +17,9 @@
     "/api/src/modules/users/dto",
     "/api/src/modules/users/entities",
     "/api/src/common/decorators",
-    "/ui/src/app/interfaces"
+    "/ui/src/app/interfaces",
+    "/api/src/common/services",
+    "/api/src"
   ]
 }
 
