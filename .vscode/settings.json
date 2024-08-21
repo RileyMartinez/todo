@@ -19,7 +19,12 @@
     "/api/src/common/decorators",
     "/ui/src/app/interfaces",
     "/api/src/common/services",
-    "/api/src"
+    "/api/src",
+    "/api/src/common",
+    "/api/src/modules",
+    "/api/src/modules/auth",
+    "/api/src/modules/todolist",
+    "/api/src/modules/users"
   ]
 }
 
