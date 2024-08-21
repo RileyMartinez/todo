@@ -16,13 +16,14 @@ import { SafeUserDto } from './dto/safe-user.dto';
 import { MapInterceptor } from '@automapper/nestjs';
 import { User } from './entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
+import { DeleteResult } from 'typeorm';
 
-@Controller('users')
-@ApiTags('users')
+@Controller('user')
+@ApiTags('user')
 @ApiBearerAuth()
-export class UsersController {
-    constructor(private readonly usersService: UserService) {
-        this.usersService = usersService;
+export class UserController {
+    constructor(private readonly userService: UserService) {
+        this.userService = userService;
     }
 
     /**
@@ -32,7 +33,7 @@ export class UsersController {
     @ApiCreatedResponse({ type: SafeUserDto })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
-        return this.usersService.createUser(createUserDto);
+        return this.userService.createUser(createUserDto);
     }
 
     /**
@@ -43,7 +44,7 @@ export class UsersController {
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneById(@Param('id', ParseIntPipe) id: number): Promise<SafeUserDto> {
-        return await this.usersService.findUserById(id);
+        return await this.userService.findUserById(id);
     }
 
     /**
@@ -54,7 +55,7 @@ export class UsersController {
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneByEmail(@Param('email') email: string): Promise<SafeUserDto | null> {
-        const user = await this.usersService.findUserByEmail(email);
+        const user = await this.userService.findUserByEmail(email);
 
         if (!user) {
             throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
@@ -67,9 +68,9 @@ export class UsersController {
      * Remove a user by their ID.
      */
     @Delete(':id')
-    @ApiOkResponse({ type: Number })
+    @ApiOkResponse({ type: Number, description: 'The number of users deleted' })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    remove(@Param('id', ParseIntPipe) id: number): Promise<number> {
-        return this.usersService.deleteUser(id);
+    async remove(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+        return await this.userService.deleteUser(id);
     }
 }

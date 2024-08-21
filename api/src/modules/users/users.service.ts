@@ -5,7 +5,7 @@ import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ValidationService } from 'src/common/services/validaton.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -71,7 +71,7 @@ export class UserService {
      * @throws {BadRequestException} If the user ID is invalid or the token is invalid.
      * @throws {NotFoundException} If the user is not found.
      */
-    async updateUserRefreshToken(id: number, refreshToken: string): Promise<number> {
+    async updateUserRefreshToken(id: number, refreshToken: string): Promise<UpdateResult> {
         if (!id || id < 1) {
             this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -89,7 +89,7 @@ export class UserService {
             throw new NotFoundException(ExceptionConstants.userNotFound(id));
         }
 
-        return result.affected;
+        return result;
     }
 
     /**
@@ -100,7 +100,7 @@ export class UserService {
      * @throws {BadRequestException} if the provided user ID is invalid.
      * @throws {NotFoundException} if the user is not found.
      */
-    async clearUserRefreshToken(id: number): Promise<number> {
+    async deleteUserRefreshToken(id: number): Promise<DeleteResult> {
         if (!id || id < 1) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
@@ -112,7 +112,7 @@ export class UserService {
             throw new NotFoundException(ExceptionConstants.userNotFound(id));
         }
 
-        return result.affected;
+        return result;
     }
 
     /**
@@ -123,7 +123,7 @@ export class UserService {
      * @throws {BadRequestException} If the user ID is less than 1.
      * @throws {NotFoundException} If the user to delete is not found.
      */
-    async deleteUser(id: number): Promise<number> {
+    async deleteUser(id: number): Promise<DeleteResult> {
         if (!id || id < 1) {
             this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -136,6 +136,6 @@ export class UserService {
             throw new NotFoundException(ExceptionConstants.userNotFound(id));
         }
 
-        return result.affected;
+        return result;
     }
 }

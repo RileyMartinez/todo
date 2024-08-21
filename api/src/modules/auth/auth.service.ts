@@ -110,7 +110,7 @@ export class AuthService {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        await this.usersService.clearUserRefreshToken(userId);
+        await this.usersService.deleteUserRefreshToken(userId);
     }
 
     /**

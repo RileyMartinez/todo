@@ -20,6 +20,9 @@ export class TodoListController {
      */
     @Post()
     @ApiOkResponse({ type: TodoList })
+    @ApiBadRequestResponse({
+        description: `${ExceptionConstants.INVALID_USER_ID} | ${ExceptionConstants.VALIDATION_FAILED}`,
+    })
     async saveTodoList(
         @GetCurrentUser(DecoratorConstants.SUB, ParseIntPipe) userId: number,
         @Body() todoListDto: TodoListDto,
@@ -32,6 +35,7 @@ export class TodoListController {
      */
     @Post('item')
     @ApiOkResponse({ type: Todo })
+    @ApiBadRequestResponse({ description: ExceptionConstants.VALIDATION_FAILED })
     async saveTodoListItem(@Body() todoDto: TodoDto): Promise<Todo> {
         return await this.todolistService.saveTodoListItem(todoDto);
     }
@@ -42,7 +46,6 @@ export class TodoListController {
     @Get()
     @ApiOkResponse({ type: [TodoList] })
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
-    @ApiNotFoundResponse({ description: 'No Todo lists found' })
     async findTodoLists(@GetCurrentUser(DecoratorConstants.SUB, ParseIntPipe) userId: number): Promise<TodoList[]> {
         return await this.todolistService.findTodoLists(userId);
     }
@@ -62,6 +65,8 @@ export class TodoListController {
      */
     @Delete(':id')
     @ApiOkResponse({ type: DeleteResult })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_TODO_LIST_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.TODO_LIST_NOT_FOUND })
     async removeTodoList(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
         return await this.todolistService.deleteTodoList(id);
     }
@@ -71,6 +76,8 @@ export class TodoListController {
      */
     @Delete('item/:id')
     @ApiOkResponse({ type: DeleteResult })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_TODO_ITEM_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.TODO_ITEM_NOT_FOUND })
     async removeTodoListItem(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
         return await this.todolistService.deleteTodoListItem(id);
     }
