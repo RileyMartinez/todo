@@ -4,11 +4,14 @@ import { User } from './entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ValidationService } from 'src/common/services/validaton.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class UsersService {
+export class UserService {
     constructor(
         @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
+        @InjectRepository(User) private readonly userRepository: Repository<User>,
         private readonly validationService: ValidationService,
     ) {
         this.logger = logger;
@@ -24,7 +27,7 @@ export class UsersService {
      */
     async createUser(createUserDto: CreateUserDto): Promise<User> {
         await this.validationService.validateObject(createUserDto);
-        return await User.save({ ...createUserDto });
+        return await this.userRepository.save(createUserDto);
     }
 
     /**
@@ -36,11 +39,11 @@ export class UsersService {
      */
     async findUserById(id: number): Promise<User> {
         if (!id || id < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(id), UsersService.name);
+            this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        return await User.findOneByOrFail({ id });
+        return await this.userRepository.findOneByOrFail({ id });
     }
 
     /**
@@ -52,11 +55,11 @@ export class UsersService {
      */
     async findUserByEmail(email: string): Promise<User | null> {
         if (!email) {
-            this.logger.error('User email cannot be empty or undefined', UsersService.name);
+            this.logger.error('User email cannot be empty or undefined', UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
         }
 
-        return await User.findOneBy({ email });
+        return await this.userRepository.findOneBy({ email });
     }
 
     /**
@@ -70,19 +73,19 @@ export class UsersService {
      */
     async updateUserRefreshToken(id: number, refreshToken: string): Promise<number> {
         if (!id || id < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(id), UsersService.name);
+            this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
         if (!refreshToken) {
-            this.logger.error('Refresh token cannot be empty or undefined', UsersService.name);
+            this.logger.error('Refresh token cannot be empty or undefined', UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_TOKEN);
         }
 
-        const result = await User.update(id, { refreshToken });
+        const result = await this.userRepository.update(id, { refreshToken });
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userNotFound(id), UsersService.name);
+            this.logger.error(ExceptionConstants.userNotFound(id), UserService.name);
             throw new NotFoundException(ExceptionConstants.userNotFound(id));
         }
 
@@ -102,10 +105,10 @@ export class UsersService {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        const result = await User.update(id, { refreshToken: null });
+        const result = await this.userRepository.update(id, { refreshToken: null });
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userNotFound(id), UsersService.name);
+            this.logger.error(ExceptionConstants.userNotFound(id), UserService.name);
             throw new NotFoundException(ExceptionConstants.userNotFound(id));
         }
 
@@ -122,14 +125,14 @@ export class UsersService {
      */
     async deleteUser(id: number): Promise<number> {
         if (!id || id < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(id), UsersService.name);
+            this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        const result = await User.delete(id);
+        const result = await this.userRepository.delete(id);
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userNotFound(id), UsersService.name);
+            this.logger.error(ExceptionConstants.userNotFound(id), UserService.name);
             throw new NotFoundException(ExceptionConstants.userNotFound(id));
         }
 

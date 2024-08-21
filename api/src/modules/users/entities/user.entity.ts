@@ -1,9 +1,9 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 @Entity()
 @Unique(['email'])
-export class User extends BaseEntity {
+export class User {
     /**
      * User id
      * @example 1

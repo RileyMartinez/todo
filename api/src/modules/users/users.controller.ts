@@ -9,7 +9,7 @@ import {
     UseInterceptors,
     NotFoundException,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { SafeUserDto } from './dto/safe-user.dto';
@@ -21,7 +21,7 @@ import { ExceptionConstants } from 'src/common/constants/exception.constants';
 @ApiTags('users')
 @ApiBearerAuth()
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {
+    constructor(private readonly usersService: UserService) {
         this.usersService = usersService;
     }
 

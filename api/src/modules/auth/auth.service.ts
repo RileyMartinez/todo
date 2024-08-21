@@ -6,7 +6,7 @@ import {
     Injectable,
     LoggerService,
 } from '@nestjs/common';
-import { UsersService } from 'src/modules/users/users.service';
+import { UserService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigConstants } from 'src/common/constants/config.constants';
 import { ConfigService } from '@nestjs/config';
@@ -23,7 +23,7 @@ import { ValidationService } from 'src/common/services/validaton.service';
 export class AuthService {
     constructor(
         @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
-        private readonly usersService: UsersService,
+        private readonly usersService: UserService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly validationService: ValidationService,
