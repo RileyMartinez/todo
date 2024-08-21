@@ -11,6 +11,17 @@ import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-fi
 import * as cookieParser from 'cookie-parser';
 import { OpenAPIService } from './common/services/openapi.service';
 
+/**
+ * Bootstraps the application.
+ *
+ * This function initializes and starts the NestJS application.
+ * It creates an instance of the NestExpressApplication, sets up the logger,
+ * global filters, global pipes, and middleware.
+ * It also generates the Swagger document and sets up the Swagger UI.
+ * Finally, it enables CORS and starts listening on the specified port.
+ *
+ * @returns {Promise<void>} A promise that resolves when the application is successfully started.
+ */
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const logger = app.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
