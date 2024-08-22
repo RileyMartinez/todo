@@ -31,11 +31,7 @@
     "/ui/src/app/interceptors",
     "/ui/src/app/guards",
     "/ui/src/app/constants",
-    "/ui/src/app/components/login-or-register/login",
-    "/ui/src/app/components/login-or-register/register",
-    "/ui/src/app/components/login-or-register",
-    "/ui/src/app/components/todo-lists",
-    "/ui/src/app/components/todo-lists/todo-list"
+    "/ui/src/app/components/dialogs"
   ]
 }
 
