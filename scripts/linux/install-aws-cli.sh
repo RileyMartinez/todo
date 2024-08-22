@@ -14,3 +14,4 @@ else
 fi
 
 rm -rf aws awscliv2.zip
+aws --version
