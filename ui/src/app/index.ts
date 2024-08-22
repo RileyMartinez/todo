@@ -1,6 +1,6 @@
-export * from './app.component';
 export * from './app.config';
 export * from './app.routes';
+export * from './components';
 export * from './constants';
 export * from './guards';
 export * from './interceptors';

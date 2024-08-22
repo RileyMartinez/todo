@@ -8,9 +8,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { RouteConstants } from './constants/route.constants';
-import { AuthService } from './services/auth.service';
-import { LoadingService } from './services/loading.service';
+import { RouteConstants } from '../constants/route.constants';
+import { AuthService } from '../services/auth.service';
+import { LoadingService } from '../services/loading.service';
 
 @Component({
     selector: 'app-root',
