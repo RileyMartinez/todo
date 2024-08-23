@@ -17,7 +17,10 @@
     {
       "label": "docker compose down",
       "type": "shell",
-      "command": "docker compose down"
+      "command": "docker compose down -v && docker image prune -f",
+      "windows": {
+        "command": "docker compose down -v; docker image prune -f"
+      }
     },
     {
       "label": "build-api",

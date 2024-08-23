@@ -6,9 +6,8 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     container_name: postgres
-    # volumes:
-    # Persist data
-    # - pgdata:/var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:${DB_PORT}"
 
@@ -71,8 +70,7 @@ services:
       - api
 
 volumes:
-  # Persist data
-  # pgdata:
+  pgdata:
   pgadmin:
   openapi:
 
