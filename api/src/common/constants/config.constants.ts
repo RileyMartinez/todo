@@ -20,4 +20,5 @@ export class ConfigConstants {
     static readonly LOGGER_DIRECTORY = 'LOGGER_DIRECTORY';
     static readonly LOGGER_MAX_SIZE = 'LOGGER_MAX_SIZE';
     static readonly LOGGER_FILE_LIFETIME = 'LOGGER_FILE_LIFETIME';
+    static readonly AWS_REGION = 'AWS_REGION';
 }

@@ -8,7 +8,7 @@ import { join } from 'path';
 import { getAdditionalPropertiesString } from 'src/common/configs';
 import { AppConstants } from 'src/common/constants/app.constants';
 import { ConfigConstants } from 'src/common/constants/config.constants';
-import { PathUtil } from 'src/utils/path.util';
+import { PathUtil } from 'src/common/utils/path.util';
 import { promisify } from 'util';
 
 @Injectable()

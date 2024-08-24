@@ -8,7 +8,7 @@ export class PathUtil {
     /**
      * The relative root directory path.
      */
-    private static readonly rootDirectoryPath = Array(4).fill('..').join('/');
+    private static readonly rootDirectoryPath = Array(5).fill('..').join('/');
 
     /**
      * Get the root path.

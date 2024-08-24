@@ -5,3 +5,4 @@ export * from './exception-filters';
 export * from './exceptions';
 export * from './mappers';
 export * from './services';
+export * from './utils';
