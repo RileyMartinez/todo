@@ -18,8 +18,9 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
-        "generate:client": "yarn ts-node ./scripts/generate-openapi-client.ts",
-        "generate:docs": "typedoc"
+        "generate:client": "yarn ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
+        "generate:docs": "typedoc",
+        "create:email-template": "yarn ts-node -r tsconfig-paths/register scripts/create-ses-email-template.ts"
     },
     "dependencies": {
         "@automapper/classes": "^8.8.1",
@@ -49,6 +50,7 @@
         "reflect-metadata": "0.1.13",
         "rxjs": "^7.8.1",
         "typeorm": "^0.3.20",
+        "uuid": "^10.0.0",
         "winston": "^3.13.0",
         "winston-daily-rotate-file": "^5.0.0"
     },
@@ -64,6 +66,7 @@
         "@types/passport-jwt": "^4.0.1",
         "@types/passport-local": "^1.0.38",
         "@types/supertest": "^6.0.0",
+        "@types/uuid": "^10.0.0",
         "@typescript-eslint/eslint-plugin": "^6.0.0",
         "@typescript-eslint/parser": "^6.0.0",
         "axios": "^1.7.2",
