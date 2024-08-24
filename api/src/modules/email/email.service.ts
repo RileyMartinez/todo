@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMessagingDto } from './dto/create-messaging.dto';
-import { UpdateMessagingDto } from './dto/update-messaging.dto';
+import { CreateEmailDto } from './dto/create-email.dto';
+import { UpdateEmailDto } from './dto/update-email.dto';
 
 @Injectable()
-export class MessagingService {
-    create(createMessagingDto: CreateMessagingDto) {
+export class EmailService {
+    create(createEmailDto: CreateEmailDto) {
         return 'This action adds a new messaging';
     }
 
@@ -16,7 +16,7 @@ export class MessagingService {
         return `This action returns a #${id} messaging`;
     }
 
-    update(id: number, updateMessagingDto: UpdateMessagingDto) {
+    update(id: number, updateEmailDto: UpdateEmailDto) {
         return `This action updates a #${id} messaging`;
     }
 

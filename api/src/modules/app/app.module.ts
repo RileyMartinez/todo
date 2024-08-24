@@ -13,7 +13,7 @@ import { typeOrmConfig, throttlerConfig, automapperConfig, loggerConfig } from '
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/guards';
 import { OpenAPIService } from 'src/common/services/openapi.service';
-import { MessagingModule } from '../messaging/messaging.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
     imports: [
@@ -25,7 +25,7 @@ import { MessagingModule } from '../messaging/messaging.module';
         TodoListModule,
         AuthModule,
         UsersModule,
-        MessagingModule,
+        EmailModule,
     ],
     controllers: [AppController],
     providers: [
