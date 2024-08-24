@@ -19,8 +19,7 @@
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
         "generate:client": "yarn ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
-        "generate:docs": "typedoc",
-        "create:email-template": "yarn ts-node -r tsconfig-paths/register scripts/create-ses-email-template.ts"
+        "generate:docs": "typedoc"
     },
     "dependencies": {
         "@automapper/classes": "^8.8.1",
