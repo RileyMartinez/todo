@@ -9,11 +9,12 @@ import { AuthModule } from '../auth/auth.module';
 import { TodoListModule } from '../todolist/todo-list.module';
 import { UsersModule } from '../users/users.module';
 import { AppController } from './app.controller';
-import { typeOrmConfig, throttlerConfig, automapperConfig, loggerConfig } from 'src/common/configs';
+import { typeOrmConfig, throttlerConfig, automapperConfig, loggerConfig, eventEmitterConfig } from 'src/common/configs';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/guards';
 import { OpenAPIService } from 'src/common/services/openapi.service';
 import { EmailModule } from '../email/email.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { EmailModule } from '../email/email.module';
         ThrottlerModule.forRootAsync(throttlerConfig),
         AutomapperModule.forRootAsync(automapperConfig),
         WinstonModule.forRootAsync(loggerConfig),
+        EventEmitterModule.forRoot(eventEmitterConfig),
         TodoListModule,
         AuthModule,
         UsersModule,

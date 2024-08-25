@@ -1,6 +1,7 @@
 export * from './argon2-hash.config';
 export * from './automapper.config';
 export * from './cors.config';
+export * from './event-emitter.config';
 export * from './invalid-token-cookie.config';
 export * from './jwt.config';
 export * from './logger.config';

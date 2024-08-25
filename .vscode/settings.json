@@ -37,7 +37,8 @@
     "/ui/src/app/components/todo-lists/todo-list",
     "/ui/src/app/components/login-or-register",
     "/ui/src/app/components/login-or-register/register",
-    "/ui/src/app/components/login-or-register/login"
+    "/ui/src/app/components/login-or-register/login",
+    "/api/src/common/events"
   ]
 }
 
