@@ -1,16 +1,16 @@
-import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class OtpTokenDto {
     @IsString()
     @IsNotEmpty()
-    value: string;
+    email: string;
 
-    @IsDateString()
+    @IsString()
     @IsNotEmpty()
-    expiration: Date;
+    otp: string;
 
-    constructor(value: string, expiration: Date) {
-        this.value = value;
-        this.expiration = expiration;
+    constructor(email: string, otp: string) {
+        this.email = email;
+        this.otp = otp;
     }
 }

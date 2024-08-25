@@ -90,7 +90,7 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (!user.token || !user.tokenExpiration) {
+        if (!user.token) {
             this.logger.error(
                 `resetPassword: User token/expiration for user with email ${authLoginDto.email} not found`,
                 AuthService.name,
@@ -98,19 +98,21 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (user.tokenExpiration < new Date()) {
+        try {
+            await this.jwtService.verifyAsync(user.token);
+        } catch {
             this.logger.error(
-                `resetPassword: Token for user with email ${authLoginDto.email} has expired`,
+                `resetPassword: Token for user with email ${authLoginDto.email} is expired`,
                 AuthService.name,
             );
-            throw new ForbiddenException(ExceptionConstants.TOKEN_EXPIRED);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const match = await argon2.verify(user.token, authLoginDto.password);
+        const decodedToken = this.jwtService.decode<OtpTokenDto>(user.token);
 
-        if (!match) {
+        if (decodedToken?.otp !== authLoginDto.password) {
             this.logger.error(
-                `Password reset request: token for user with email ${authLoginDto.email} does not match`,
+                `resetPassword: Token for user with email ${authLoginDto.email} does not match`,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -223,12 +225,20 @@ export class AuthService {
             return;
         }
 
-        const otp = new OtpTokenDto(generateRandomNumber(6).toString(), new Date(Date.now() + 15 * 60 * 1000));
-        const hash = await argon2.hash(otp.value, argon2HashConfig);
+        const token = await this.jwtService.signAsync(
+            {
+                email: user.email,
+                otp: generateRandomNumber(6).toString(),
+            },
+            {
+                secret: this.configService.getOrThrow(ConfigConstants.JWT_SECRET),
+                expiresIn: this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION),
+            },
+        );
 
-        await this.usersService.updateUserToken(user.id, hash, otp.expiration);
+        await this.usersService.updateUserToken(user.id, token);
 
-        this.eventEmitter.emit(EventConstants.PASSWORD_RESET, new PasswordResetEvent(user.email, otp.value));
+        this.eventEmitter.emit(EventConstants.PASSWORD_RESET, new PasswordResetEvent(token));
     }
 
     /**

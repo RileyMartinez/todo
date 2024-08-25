@@ -71,7 +71,7 @@ export class UserService {
      * @throws {BadRequestException} If the user ID is invalid or the token is invalid.
      * @throws {NotFoundException} If the user is not found.
      */
-    async updateUserToken(id: number, token: string, tokenExpiration?: Date): Promise<UpdateResult> {
+    async updateUserToken(id: number, token: string): Promise<UpdateResult> {
         if (!id || id < 1) {
             this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -82,7 +82,7 @@ export class UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_TOKEN);
         }
 
-        const result = await this.userRepository.update(id, { token, tokenExpiration });
+        const result = await this.userRepository.update(id, { token });
 
         if (!result.affected) {
             this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);

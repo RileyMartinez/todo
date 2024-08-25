@@ -34,13 +34,4 @@ export class User {
         nullable: true,
     })
     token: string | null = null;
-
-    /**
-     * User hashed token expiration date
-     */
-    @Column({
-        type: 'timestamp',
-        nullable: true,
-    })
-    tokenExpiration: Date | null = null;
 }
