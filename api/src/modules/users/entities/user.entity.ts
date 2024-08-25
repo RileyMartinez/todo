@@ -21,19 +21,26 @@ export class User {
     email!: string;
 
     /**
-     * User password
-     * @example fooBar123!
+     * User hashed password
      */
     @Column()
     password!: string;
 
     /**
-     * User jwt refresh token
-     * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkZvbyBCYXIiLCJpYXQiOjE1MTYyMzkwMjJ9.1Jf8
+     * User hashed token
      */
     @Column({
         type: 'text',
         nullable: true,
     })
-    refreshToken: string | null = null;
+    token: string | null = null;
+
+    /**
+     * User hashed token expiration date
+     */
+    @Column({
+        type: 'timestamp',
+        nullable: true,
+    })
+    tokenExpiration: Date | null = null;
 }

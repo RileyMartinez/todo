@@ -4,6 +4,7 @@ export class ExceptionConstants {
     static readonly INVALID_CREDENTIALS = 'Invalid credentials';
     static readonly INTERNAL_SERVER_ERROR = 'Internal server error';
     static readonly INVALID_TOKEN = 'Invalid token';
+    static readonly TOKEN_EXPIRED = 'Token expired';
     static readonly USER_ALREADY_EXISTS = 'User already exists';
     static readonly USER_NOT_FOUND = 'User not found';
     static readonly INVALID_USER_ID = 'User ID must be greater than 0';
@@ -15,6 +16,7 @@ export class ExceptionConstants {
 
     // dynamic strings
     static readonly invalidUserId = (id: number | undefined) => `User ID ${id} must be greater than 0`;
-    static readonly userNotFound = (id: number | undefined) => `User with ID ${id} not found`;
+    static readonly userIdNotFound = (id: number | undefined) => `User with ID ${id} not found`;
+    static readonly userEmailNotFound = (email: string | undefined) => `User with email ${email} not found`;
     static readonly invalidTodoListId = (id: number | undefined) => `Todo list ID ${id} must be greater than 0`;
 }

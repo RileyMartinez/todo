@@ -19,7 +19,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
-import { LocalGuard, JwtRefreshGuard } from './guards';
+import { OtpGuard, JwtRefreshGuard, LocalGuard } from './guards';
 import { AccessTokenDto, AuthLoginDto, AuthRefreshDto, AuthTokenDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
@@ -35,7 +35,12 @@ export class AuthController {
     }
 
     /**
+     * [Public]
      * Handles the login request.
+     *
+     * @param {AuthLoginDto} _ - The email and password of the user.
+     * @returns {Promise<AccessTokenDto>} - A promise that resolves to the authentication tokens for the authenticated user.
+     * @throws {ForbiddenException} - If the email or password is incorrect.
      */
     @Public()
     @Post('login')
@@ -57,8 +62,31 @@ export class AuthController {
         return new AccessTokenDto(tokens.accessToken);
     }
 
+    @Public()
+    @Post('one-time-login')
+    @UseGuards(OtpGuard)
+    @ApiOkResponse({ type: AccessTokenDto })
+    @HttpCode(HttpStatus.OK)
+    async oneTimeLogin(
+        @GetCurrentUser() tokens: AuthTokenDto,
+        @Body() _: AuthLoginDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<AccessTokenDto> {
+        if (!tokens) {
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
+
+        return new AccessTokenDto(tokens.accessToken);
+    }
+
     /**
      * Handles the logout request.
+     *
+     * @param {number} userId - The ID of the user to log out.
+     * @returns {Promise<void>} - A promise that resolves when the user is logged out.
+     * @throws {ForbiddenException} - If the user ID is invalid.
      */
     @Post('logout')
     @ApiBearerAuth()
@@ -79,7 +107,12 @@ export class AuthController {
     }
 
     /**
+     * [Public]
      * Handles the registration request.
+     *
+     * @param {AuthRegisterDto} authRegisterDto - The email and password of the user.
+     * @returns {Promise<AccessTokenDto>} - A promise that resolves to the authentication tokens for the registered user.
+     * @throws {ConflictException} - If a user with the provided email already exists.
      */
     @Public()
     @Post('register')
@@ -98,7 +131,13 @@ export class AuthController {
 
     /**
      * Handles the refresh request.
-     * Remarks: Needs Public decorator to bypass global JwtAuthGuard. JwtRefreshGuard is used instead.
+     *
+     * @param {number} userId - The ID of the user.
+     * @param {string} refreshToken - The refresh token.
+     * @returns {Promise<AccessTokenDto>} - A promise that resolves to the new access token.
+     * @throws {ForbiddenException} - If the user ID or refresh token is invalid.
+     *
+     * @remarks Needs [Public] decorator to bypass the JwtAuthGuard and use JwtRefreshGuard instead.
      */
     @Public()
     @Post('refresh')
@@ -120,5 +159,20 @@ export class AuthController {
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
 
         return new AccessTokenDto(tokens.accessToken);
+    }
+
+    /**
+     * [Public]
+     * Handles the password reset request.
+     *
+     * @param {string} email - The email of the user.
+     * @returns {Promise<void>} - A promise that resolves when the password reset request is sent.
+     */
+    @Public()
+    @Post('send-password-reset')
+    @ApiOkResponse({ description: 'Password reset email event sent successfully if email exists.' })
+    @HttpCode(HttpStatus.OK)
+    async sendPasswordResetRequest(@Body('email') email: string): Promise<void> {
+        return await this.authService.sendPasswordResetEvent(email);
     }
 }

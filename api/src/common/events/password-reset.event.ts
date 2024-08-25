@@ -1,9 +1,20 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+
 export class PasswordResetEvent {
-    userId: number;
+    /**
+     * Email address
+     * @example foo.bar@foobar.com
+     */
+    @IsString()
+    @IsNotEmpty()
     email: string;
 
-    constructor(userId: number, email: string) {
-        this.userId = userId;
+    @IsString()
+    @IsNotEmpty()
+    token: string;
+
+    constructor(email: string, token: string) {
         this.email = email;
+        this.token = token;
     }
 }

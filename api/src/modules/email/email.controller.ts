@@ -1,34 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { EmailService } from './email.service';
-import { CreateEmailDto } from './dto/create-email.dto';
-import { UpdateEmailDto } from './dto/update-email.dto';
+import { ExceptionConstants, PasswordResetEvent } from '@/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('email')
+@ApiTags('email')
+@ApiBearerAuth()
 export class EmailController {
-    constructor(private readonly emailService: EmailService) {}
-
-    @Post()
-    create(@Body() createEmailDto: CreateEmailDto) {
-        return this.emailService.create(createEmailDto);
+    constructor(private readonly emailService: EmailService) {
+        this.emailService = emailService;
     }
 
-    @Get()
-    findAll() {
-        return this.emailService.findAll();
-    }
-
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.emailService.findOne(+id);
-    }
-
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updateEmailDto: UpdateEmailDto) {
-        return this.emailService.update(+id, updateEmailDto);
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.emailService.remove(+id);
+    @Post('send-password-reset')
+    @ApiOkResponse({ description: 'Password reset email sent successfully' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.VALIDATION_FAILED })
+    @HttpCode(HttpStatus.OK)
+    async sendPasswordReset(@Body() passwordResetEvent: PasswordResetEvent): Promise<void> {
+        await this.emailService.sendPasswordReset(passwordResetEvent);
     }
 }

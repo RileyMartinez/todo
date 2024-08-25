@@ -63,53 +63,53 @@ export class UserService {
     }
 
     /**
-     * Updates the refresh token of a user.
+     * Updates the token of a user.
      *
      * @param id - The ID of the user.
-     * @param refreshToken - The new refresh token.
+     * @param token - The new token.
      * @returns A promise that resolves to an UpdateResult object.
      * @throws {BadRequestException} If the user ID is invalid or the token is invalid.
      * @throws {NotFoundException} If the user is not found.
      */
-    async updateUserRefreshToken(id: number, refreshToken: string): Promise<UpdateResult> {
+    async updateUserToken(id: number, token: string, tokenExpiration?: Date): Promise<UpdateResult> {
         if (!id || id < 1) {
             this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        if (!refreshToken) {
+        if (!token) {
             this.logger.error('Refresh token cannot be empty or undefined', UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_TOKEN);
         }
 
-        const result = await this.userRepository.update(id, { refreshToken });
+        const result = await this.userRepository.update(id, { token, tokenExpiration });
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userNotFound(id), UserService.name);
-            throw new NotFoundException(ExceptionConstants.userNotFound(id));
+            this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);
+            throw new NotFoundException(ExceptionConstants.userIdNotFound(id));
         }
 
         return result;
     }
 
     /**
-     * Clears the refresh token of a user.
+     * Clears the token of a user.
      *
      * @param id - The ID of the user.
      * @returns A promise that resolves to an UpdateResult object.
      * @throws {BadRequestException} if the provided user ID is invalid.
      * @throws {NotFoundException} if the user is not found.
      */
-    async deleteUserRefreshToken(id: number): Promise<DeleteResult> {
+    async deleteUserToken(id: number): Promise<DeleteResult> {
         if (!id || id < 1) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        const result = await this.userRepository.update(id, { refreshToken: null });
+        const result = await this.userRepository.update(id, { token: null });
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userNotFound(id), UserService.name);
-            throw new NotFoundException(ExceptionConstants.userNotFound(id));
+            this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);
+            throw new NotFoundException(ExceptionConstants.userIdNotFound(id));
         }
 
         return result;
@@ -132,8 +132,8 @@ export class UserService {
         const result = await this.userRepository.delete(id);
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userNotFound(id), UserService.name);
-            throw new NotFoundException(ExceptionConstants.userNotFound(id));
+            this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);
+            throw new NotFoundException(ExceptionConstants.userIdNotFound(id));
         }
 
         return result;

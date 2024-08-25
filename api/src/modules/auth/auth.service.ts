@@ -13,11 +13,14 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { AuthLoginDto, AuthTokenDto, AuthRefreshDto } from './dto';
+import { AuthLoginDto, AuthTokenDto, AuthRefreshDto, OtpTokenDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import * as argon2 from 'argon2';
 import { argon2HashConfig } from 'src/common/configs';
 import { ValidationService } from 'src/common/services/validaton.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventConstants, PasswordResetEvent } from '@/common';
+import { generateRandomNumber } from '@/common/utils/number.util';
 
 @Injectable()
 export class AuthService {
@@ -27,12 +30,14 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly validationService: ValidationService,
+        private readonly eventEmitter: EventEmitter2,
     ) {
         this.logger = logger;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
         this.validationService = validationService;
+        this.eventEmitter = eventEmitter;
     }
 
     /**
@@ -58,6 +63,56 @@ export class AuthService {
 
         if (!match) {
             this.logger.error(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        const tokens = await this.getTokens(user);
+        await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
+
+        return tokens;
+    }
+
+    /**
+     * Performs a one-time login for the user.
+     *
+     * @param authLoginDto - The authentication login data transfer object.
+     * @returns A promise that resolves to an AuthTokenDto.
+     * @throws {ValidationException} If the email or password is invalid.
+     * @throws {ForbiddenException} If the user is not found, does not have a token, token is expired, or if the provided token does not match.
+     */
+    async oneTimeLogin(authLoginDto: AuthLoginDto): Promise<AuthTokenDto> {
+        await this.validationService.validateObject(authLoginDto);
+
+        const user = await this.usersService.findUserByEmail(authLoginDto.email);
+
+        if (!user) {
+            this.logger.error(`resetPassword: User email ${authLoginDto.email} not found`, AuthService.name);
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        if (!user.token || !user.tokenExpiration) {
+            this.logger.error(
+                `resetPassword: User token/expiration for user with email ${authLoginDto.email} not found`,
+                AuthService.name,
+            );
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        if (user.tokenExpiration < new Date()) {
+            this.logger.error(
+                `resetPassword: Token for user with email ${authLoginDto.email} has expired`,
+                AuthService.name,
+            );
+            throw new ForbiddenException(ExceptionConstants.TOKEN_EXPIRED);
+        }
+
+        const match = await argon2.verify(user.token, authLoginDto.password);
+
+        if (!match) {
+            this.logger.error(
+                `Password reset request: token for user with email ${authLoginDto.email} does not match`,
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -110,7 +165,7 @@ export class AuthService {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        await this.usersService.deleteUserRefreshToken(userId);
+        await this.usersService.deleteUserToken(userId);
     }
 
     /**
@@ -127,16 +182,16 @@ export class AuthService {
         const user = await this.usersService.findUserById(authRefreshDto.userId);
 
         if (!user) {
-            this.logger.error(ExceptionConstants.userNotFound(authRefreshDto.userId), AuthService.name);
+            this.logger.error(ExceptionConstants.userIdNotFound(authRefreshDto.userId), AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (!user.refreshToken) {
+        if (!user.token) {
             this.logger.error(`User with ID ${authRefreshDto.userId} does not have a refresh token`, AuthService.name);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const match = await argon2.verify(user.refreshToken, authRefreshDto.refreshToken);
+        const match = await argon2.verify(user.token, authRefreshDto.refreshToken);
 
         if (!match) {
             this.logger.error(
@@ -150,6 +205,30 @@ export class AuthService {
         await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
 
         return tokens;
+    }
+
+    /**
+     * Sends a password reset event for the given email.
+     *
+     * @remarks We intentionally do not provide feedback if the email does not exist to prevent user enumeration.
+     *
+     * @param email - The email of the user.
+     * @returns A promise that resolves to void.
+     */
+    async sendPasswordResetEvent(email: string): Promise<void> {
+        const user = await this.usersService.findUserByEmail(email);
+
+        if (!user) {
+            this.logger.error(`Password reset request: user email ${email} not found`, AuthService.name);
+            return;
+        }
+
+        const otp = new OtpTokenDto(generateRandomNumber(6).toString(), new Date(Date.now() + 15 * 60 * 1000));
+        const hash = await argon2.hash(otp.value, argon2HashConfig);
+
+        await this.usersService.updateUserToken(user.id, hash, otp.expiration);
+
+        this.eventEmitter.emit(EventConstants.PASSWORD_RESET, new PasswordResetEvent(user.email, otp.value));
     }
 
     /**
@@ -205,6 +284,6 @@ export class AuthService {
     private async updateUserRefreshToken(authRefreshDto: AuthRefreshDto): Promise<void> {
         await this.validationService.validateObject(authRefreshDto);
         const hash = await argon2.hash(authRefreshDto.refreshToken, argon2HashConfig);
-        await this.usersService.updateUserRefreshToken(authRefreshDto.userId, hash);
+        await this.usersService.updateUserToken(authRefreshDto.userId, hash);
     }
 }

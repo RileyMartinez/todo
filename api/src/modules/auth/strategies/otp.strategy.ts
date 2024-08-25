@@ -3,9 +3,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { IStrategyOptions, Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
 import { AuthTokenDto } from '../dto/auth-token.dto';
+import { AppConstants } from '@/common';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class OtpStrategy extends PassportStrategy(Strategy, AppConstants.OTP_STRATEGY_NAME) {
     constructor(private readonly authService: AuthService) {
         super({
             usernameField: 'email',
@@ -21,11 +22,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
      * @returns A promise that resolves to an AuthTokenDto.
      */
     async validate(email: string, password: string): Promise<AuthTokenDto> {
-        const user = await this.authService.login({
-            email,
-            password,
-        });
-
+        const user = await this.authService.oneTimeLogin({ email, password });
         return user;
     }
 }
