@@ -303,6 +303,7 @@ export class AuthService {
         );
 
         const encryptedToken = this.encryptionService.encrypt(token);
+        await this.usersService.deleteUserToken(user.id);
         await this.usersService.updateUserToken(user.id, encryptedToken);
 
         this.eventEmitter.emit(EventConstants.PASSWORD_RESET, new PasswordResetEvent(token));
