@@ -9,7 +9,9 @@ export class User {
      * @example 1
      */
     @AutoMap()
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        type: 'bigint',
+    })
     id!: number;
 
     /**
@@ -34,4 +36,9 @@ export class User {
         nullable: true,
     })
     token: string | null = null;
+
+    @Column({
+        default: 1,
+    })
+    tokenVersion: number = 1;
 }

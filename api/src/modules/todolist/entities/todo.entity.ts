@@ -7,7 +7,9 @@ export class Todo {
      * Todo item id
      * @example 1
      */
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        type: 'bigint',
+    })
     id!: number;
 
     /**

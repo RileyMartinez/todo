@@ -7,7 +7,9 @@ export class TodoList {
      * Todo list id
      * @example 1
      */
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        type: 'bigint',
+    })
     id!: number;
 
     /**
