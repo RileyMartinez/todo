@@ -13,7 +13,7 @@
     <mat-sidenav-container class="flex-grow">
         <mat-sidenav class="min-w-48" #sidenav mode="push">
             <mat-nav-list>
-                @if (user()) {
+                @if (userContext()) {
                     <a mat-list-item (click)="logout()" [routerLink]="[loginOrRegisterRoute]"> Logout </a>
                 } @else {
                     <a mat-list-item (click)="sidenav.close()" [routerLink]="[loginOrRegisterRoute]"> Login </a>

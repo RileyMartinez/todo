@@ -15,7 +15,7 @@ export interface TodoListDto {
     /**
      * Todo list id
      */
-    id?: number;
+    id?: string;
     /**
      * Todo list title
      */

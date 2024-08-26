@@ -1,13 +1,13 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class TodoListDto {
     /**
      * Todo list id
-     * @example 1
+     * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
-    @IsNumber()
+    @IsString()
     @IsOptional()
-    id?: number;
+    id?: string;
 
     /**
      * Todo list title

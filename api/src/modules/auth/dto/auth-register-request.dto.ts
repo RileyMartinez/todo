@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class AuthRegisterDto {
+export class AuthRegisterRequestDto {
     /**
      * Registration email address
      * @example foo.bar@foobar.com

@@ -3,11 +3,11 @@ import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Min } fr
 export class TodoDto {
     /**
      * Todo item id
-     * @example 1
+     * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
-    @IsNumber()
+    @IsString()
     @IsOptional()
-    id?: number;
+    id?: string;
 
     /**
      * Todo item title
@@ -54,8 +54,7 @@ export class TodoDto {
      * Todo list id
      * @example 1
      */
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    @Min(1)
-    todoListId: number = 0;
+    todoListId: string = '';
 }

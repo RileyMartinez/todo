@@ -16,7 +16,7 @@ export interface TodoList {
     /**
      * Todo list id
      */
-    id: number;
+    id: string;
     /**
      * Todo list title
      */
@@ -24,7 +24,7 @@ export interface TodoList {
     /**
      * User id
      */
-    userId: number;
+    userId: string;
     /**
      * Todo list items
      */

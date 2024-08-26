@@ -6,6 +6,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ValidationService } from 'src/common/services/validaton.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { formatLogMessage } from '@/common/utils/logger.util';
 
 @Injectable()
 export class UserService {
@@ -37,9 +38,12 @@ export class UserService {
      * @returns A promise that resolves to the found user.
      * @throws {BadRequestException} If the user ID is less than 1.
      */
-    async findUserById(id: number): Promise<User> {
-        if (!id || id < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
+    async findUserById(id: string): Promise<User> {
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USFUBId001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                UserService.name,
+            );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
@@ -71,45 +75,61 @@ export class UserService {
      * @throws {BadRequestException} If the user ID is invalid or the token is invalid.
      * @throws {NotFoundException} If the user is not found.
      */
-    async updateUserToken(id: number, token: string): Promise<UpdateResult> {
-        if (!id || id < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
+    async updateUserToken(id: string, token: string): Promise<UpdateResult> {
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USUUTok001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                UserService.name,
+            );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
         if (!token) {
-            this.logger.error('Refresh token cannot be empty or undefined', UserService.name);
+            this.logger.error(
+                formatLogMessage('USUUTok002', ExceptionConstants.INVALID_TOKEN, { userId: id }),
+                UserService.name,
+            );
             throw new BadRequestException(ExceptionConstants.INVALID_TOKEN);
         }
 
         const result = await this.userRepository.update(id, { token });
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);
-            throw new NotFoundException(ExceptionConstants.userIdNotFound(id));
+            this.logger.error(
+                formatLogMessage('USUUTok003', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                UserService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
         }
 
         return result;
     }
 
     /**
-     * Clears the token of a user.
+     * Clears the token of a user. Increments the token version to invalidate the token.
      *
      * @param id - The ID of the user.
      * @returns A promise that resolves to an UpdateResult object.
      * @throws {BadRequestException} if the provided user ID is invalid.
      * @throws {NotFoundException} if the user is not found.
      */
-    async deleteUserToken(id: number): Promise<DeleteResult> {
-        if (!id || id < 1) {
+    async deleteUserToken(id: string): Promise<DeleteResult> {
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USDUTok001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                UserService.name,
+            );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        const result = await this.userRepository.update(id, { token: null });
+        const result = await this.userRepository.update(id, { token: null, tokenVersion: () => 'tokenVersion + 1' });
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);
-            throw new NotFoundException(ExceptionConstants.userIdNotFound(id));
+            this.logger.error(
+                formatLogMessage('USDUTok002', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                UserService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
         }
 
         return result;

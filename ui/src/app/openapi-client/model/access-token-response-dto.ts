@@ -11,7 +11,7 @@
  */
 
 
-export interface AccessTokenDto { 
+export interface AccessTokenResponseDto { 
     /**
      * Access token
      */

@@ -15,7 +15,7 @@ export interface SafeUserDto {
     /**
      * User id
      */
-    id: number;
+    id: string;
     /**
      * User email address
      */

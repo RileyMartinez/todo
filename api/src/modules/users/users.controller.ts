@@ -43,7 +43,7 @@ export class UserController {
     @ApiOkResponse({ type: SafeUserDto })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     @UseInterceptors(MapInterceptor(User, SafeUserDto))
-    async findOneById(@Param('id', ParseIntPipe) id: number): Promise<SafeUserDto> {
+    async findOneById(@Param('id') id: string): Promise<SafeUserDto> {
         return await this.userService.findUserById(id);
     }
 

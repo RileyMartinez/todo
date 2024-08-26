@@ -70,7 +70,7 @@ export class TodoListService {
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
                     this.todoListClient
-                        .todoListControllerFindTodoList(this.todoList()?.id || 0)
+                        .todoListControllerFindTodoList(this.todoList()?.id || '')
                         .pipe(catchError((error) => this.handleError(error))),
                 ),
                 takeUntilDestroyed(),

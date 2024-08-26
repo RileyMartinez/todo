@@ -47,16 +47,16 @@ export class TodoListComponent implements OnInit {
             todo: this.todoFormControl,
         });
 
-        const todoListId = parseInt(this.route.snapshot.params['id']);
+        const todoListId: string = this.route.snapshot.params['id'];
         this.todoListService.load$.next({ id: todoListId });
     }
 
-    addTodoItem(id: number, title: string): void {
+    addTodoItem(id: string, title: string): void {
         this.todoListService.add$.next({ todoListId: id, title, order: 1, completed: false });
         this.todoFormControl.reset();
     }
 
-    removeTodoItem(id: number): void {
+    removeTodoItem(id: string): void {
         this.todoListService.remove$.next({ id });
     }
 

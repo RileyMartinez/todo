@@ -5,12 +5,10 @@ import { TodoList } from './todo-list.entity';
 export class Todo {
     /**
      * Todo item id
-     * @example 1
+     * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
-    @PrimaryGeneratedColumn({
-        type: 'bigint',
-    })
-    id!: number;
+    @PrimaryGeneratedColumn('uuid')
+    id!: string;
 
     /**
      * Todo item title
@@ -49,10 +47,10 @@ export class Todo {
 
     /**
      * Todo list id
-     * @example 1
+     * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
     @Column()
-    todoListId!: number;
+    todoListId!: string;
 
     @ManyToOne(() => TodoList, (todoList) => todoList.todos, {
         onDelete: 'CASCADE',

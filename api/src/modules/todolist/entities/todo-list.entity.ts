@@ -5,12 +5,10 @@ import { Todo } from './todo.entity';
 export class TodoList {
     /**
      * Todo list id
-     * @example 1
+     * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
-    @PrimaryGeneratedColumn({
-        type: 'bigint',
-    })
-    id!: number;
+    @PrimaryGeneratedColumn('uuid')
+    id!: string;
 
     /**
      * Todo list title
@@ -24,7 +22,7 @@ export class TodoList {
      * @example 1
      */
     @Column()
-    userId!: number;
+    userId!: string;
 
     /**
      * Todo list items

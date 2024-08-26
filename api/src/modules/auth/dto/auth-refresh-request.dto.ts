@@ -1,14 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-export class AuthRefreshDto {
+export class AuthRefreshRequestDto {
     /**
      * User ID
      * @example 1
      */
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    @Min(1)
-    userId: number = 0;
+    userId: string = '';
 
     /**
      * Refresh token
@@ -18,7 +17,7 @@ export class AuthRefreshDto {
     @IsNotEmpty()
     refreshToken: string = '';
 
-    constructor(userId: number, refreshToken: string) {
+    constructor(userId: string, refreshToken: string) {
         this.userId = userId;
         this.refreshToken = refreshToken;
     }

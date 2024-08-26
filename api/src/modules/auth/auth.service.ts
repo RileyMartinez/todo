@@ -13,8 +13,15 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { AuthLoginDto, AuthTokenDto, AuthRefreshDto, OtpTokenDto } from './dto';
-import { AuthRegisterDto } from './dto/auth-register.dto';
+import {
+    AccessTokenResponseDto,
+    AuthLoginRequestDto,
+    AuthRefreshRequestDto,
+    AuthTokensDto,
+    RawOtpTokenDto,
+    RawRefreshTokenDto,
+} from './dto';
+import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { ValidationService } from 'src/common/services/validaton.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EncryptionService, EventConstants, PasswordResetEvent } from '@/common';
@@ -47,12 +54,12 @@ export class AuthService {
      * Authenticates a user by checking their email and password.
      * If the user is authenticated, a JWT token is generated and returned.
      *
-     * @param {AuthLoginDto} authLoginDto - The email and password of the user.
-     * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the authenticated user.
+     * @param {AuthLoginRequestDto} authLoginDto - The email and password of the user.
+     * @returns {Promise<AuthTokensDto>} - A promise that resolves to the authentication tokens for the authenticated user.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
-    async login(authLoginDto: AuthLoginDto): Promise<AuthTokenDto> {
+    async login(authLoginDto: AuthLoginRequestDto): Promise<AuthTokensDto> {
         await this.validationService.validateObject(authLoginDto);
 
         const user = await this.usersService.findUserByEmail(authLoginDto.email);
@@ -68,15 +75,14 @@ export class AuthService {
         const match = await argon2.verify(user.password, authLoginDto.password);
 
         if (!match) {
-            this.logger.error(
-                formatLogMessage('ASLog002', 'Password does not match', { userId: user.id }),
-                AuthService.name,
-            );
+            this.logger.error(formatLogMessage('ASLog002', 'Password does not match', { userId: user.id }), {
+                context: AuthService.name,
+            });
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const tokens = await this.getTokens(user);
-        await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
+        const tokens = await this.issueTokens(user);
+        await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
         return tokens;
     }
@@ -89,7 +95,7 @@ export class AuthService {
      * @throws {ValidationException} If the email or password is invalid.
      * @throws {ForbiddenException} If the user is not found, does not have a token, token is expired, or if the provided token does not match.
      */
-    async oneTimeLogin(authLoginDto: AuthLoginDto): Promise<AuthTokenDto> {
+    async oneTimeLogin(authLoginDto: AuthLoginRequestDto): Promise<AuthTokensDto> {
         await this.validationService.validateObject(authLoginDto);
 
         const user = await this.usersService.findUserByEmail(authLoginDto.email);
@@ -111,10 +117,10 @@ export class AuthService {
         }
 
         const decryptedToken = this.encryptionService.decrypt(user.token);
-        let verifiedToken: OtpTokenDto;
+        let verifiedToken: RawOtpTokenDto;
 
         try {
-            verifiedToken = this.jwtService.verify<OtpTokenDto>(decryptedToken, {
+            verifiedToken = this.jwtService.verify<RawOtpTokenDto>(decryptedToken, {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_SECRET),
             });
         } catch (error) {
@@ -135,8 +141,8 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const tokens = await this.getTokens(user);
-        await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
+        const tokens = await this.issueTokens(user);
+        await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
         return tokens;
     }
@@ -144,12 +150,12 @@ export class AuthService {
     /**
      * Registers a new user with the provided email and password.
      *
-     * @param {AuthRegisterDto} authRegisterDto - The registration data containing email and password.
-     * @returns {Promise<AuthTokenDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
+     * @param {AuthRegisterRequestDto} authRegisterDto - The registration data containing email and password.
+     * @returns {Promise<AuthTokensDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
-    async register(authRegisterDto: AuthRegisterDto): Promise<AuthTokenDto> {
+    async register(authRegisterDto: AuthRegisterRequestDto): Promise<AuthTokensDto> {
         await this.validationService.validateObject(authRegisterDto);
 
         const user = await this.usersService.findUserByEmail(authRegisterDto.email);
@@ -172,8 +178,8 @@ export class AuthService {
             password: hash,
         });
 
-        const tokens = await this.getTokens(newUser);
-        await this.updateUserRefreshToken(new AuthRefreshDto(newUser.id, tokens.refreshToken));
+        const tokens = await this.issueTokens(newUser);
+        await this.updateUserRefreshToken(new AuthRefreshRequestDto(newUser.id, tokens.refreshToken));
 
         return tokens;
     }
@@ -184,8 +190,8 @@ export class AuthService {
      * @param userId - The ID of the user to log out.
      * @throws {BadRequestException} If user ID is less than 1.
      */
-    async logout(userId: number): Promise<void> {
-        if (!userId || userId < 1) {
+    async logout(userId: string): Promise<void> {
+        if (!userId) {
             this.logger.error(
                 formatLogMessage('ASLog001', ExceptionConstants.INVALID_USER_ID, { userId }),
                 AuthService.name,
@@ -199,19 +205,21 @@ export class AuthService {
     /**
      * Refreshes the authentication tokens for a user.
      *
-     * @param {AuthRefreshDto} authRefreshDto - The user ID and refresh token.
+     * @param {AuthRefreshRequestDto} authRefreshRequestDto - The user ID and refresh token.
      * @returns A promise that resolves to an AuthTokenDto object containing the new authentication tokens.
      * @throws {ValidationException} if the user ID or refresh token is invalid.
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
      */
-    async refresh(authRefreshDto: AuthRefreshDto): Promise<AuthTokenDto> {
-        await this.validationService.validateObject(authRefreshDto);
+    async refresh(authRefreshRequestDto: AuthRefreshRequestDto): Promise<AccessTokenResponseDto> {
+        await this.validationService.validateObject(authRefreshRequestDto);
 
-        const user = await this.usersService.findUserById(authRefreshDto.userId);
+        const user = await this.usersService.findUserById(authRefreshRequestDto.userId);
 
         if (!user) {
             this.logger.error(
-                formatLogMessage('ASRef001', ExceptionConstants.USER_NOT_FOUND, { userId: authRefreshDto.userId }),
+                formatLogMessage('ASRef001', ExceptionConstants.USER_NOT_FOUND, {
+                    userId: authRefreshRequestDto.userId,
+                }),
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -225,7 +233,23 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const match = await argon2.verify(user.token, authRefreshDto.refreshToken);
+        let verifiedToken: RawRefreshTokenDto;
+
+        try {
+            verifiedToken = this.jwtService.verify<RawRefreshTokenDto>(user.token, {
+                secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_REFRESH_SECRET),
+            });
+        } catch (error) {
+            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
+            this.logger.error(
+                formatLogMessage('ASRef002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
+                stack,
+                AuthService.name,
+            );
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        const match = verifiedToken?.sub === user.id && verifiedToken?.version === user.tokenVersion;
 
         if (!match) {
             this.logger.error(
@@ -235,10 +259,7 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const tokens = await this.getTokens(user);
-        await this.updateUserRefreshToken(new AuthRefreshDto(user.id, tokens.refreshToken));
-
-        return tokens;
+        return await this.issueAccessToken(user);
     }
 
     /**
@@ -284,7 +305,7 @@ export class AuthService {
      * @returns An object containing the access and refresh tokens.
      * @throws {ValidationException} If the user ID or email is invalid.
      */
-    private async getTokens(user: User): Promise<AuthTokenDto> {
+    private async issueTokens(user: User): Promise<AuthTokensDto> {
         await this.validationService.validateObject(user);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
@@ -296,7 +317,6 @@ export class AuthService {
             await this.jwtService.signAsync(
                 {
                     sub: user.id,
-                    email: user.email,
                 },
                 {
                     secret: accessTokenSecret,
@@ -306,6 +326,7 @@ export class AuthService {
             await this.jwtService.signAsync(
                 {
                     sub: user.id,
+                    version: user.tokenVersion,
                 },
                 {
                     secret: refreshTokenSecret,
@@ -314,22 +335,43 @@ export class AuthService {
             ),
         ]);
 
-        const tokens = new AuthTokenDto(accessToken, refreshToken);
-        await this.validationService.validateObject(tokens);
+        return new AuthTokensDto(accessToken, refreshToken);
+    }
 
-        return tokens;
+    /**
+     * Generates an access token for the given user.
+     *
+     * @param user - The user object for which to generate the access token.
+     * @returns A promise that resolves to an AccessTokenResponseDto containing the generated access token.
+     */
+    private async issueAccessToken(user: User): Promise<AccessTokenResponseDto> {
+        await this.validationService.validateObject(user);
+
+        const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
+        const accessTokenExpiration = this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION);
+
+        const accessToken = await this.jwtService.signAsync(
+            {
+                sub: user.id,
+            },
+            {
+                secret: accessTokenSecret,
+                expiresIn: accessTokenExpiration,
+            },
+        );
+
+        return new AccessTokenResponseDto(accessToken);
     }
 
     /**
      * Updates the refresh token for a user.
      *
-     * @param {AuthRefreshDto} authRefreshDto - The user ID and refresh token.
+     * @param {AuthRefreshRequestDto} authRefreshRequestDto - The user ID and refresh token.
      * @returns A Promise that resolves when the refresh token is updated.
      * @throws {ValidationException} If the user ID or refresh token is invalid.
      */
-    private async updateUserRefreshToken(authRefreshDto: AuthRefreshDto): Promise<void> {
-        await this.validationService.validateObject(authRefreshDto);
-        const hash = await argon2.hash(authRefreshDto.refreshToken, argon2HashConfig);
-        await this.usersService.updateUserToken(authRefreshDto.userId, hash);
+    private async updateUserRefreshToken(authRefreshRequestDto: AuthRefreshRequestDto): Promise<void> {
+        await this.validationService.validateObject(authRefreshRequestDto);
+        await this.usersService.updateUserToken(authRefreshRequestDto.userId, authRefreshRequestDto.refreshToken);
     }
 }

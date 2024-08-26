@@ -6,13 +6,11 @@ import { AutoMap } from '@automapper/classes';
 export class User {
     /**
      * User id
-     * @example 1
+     * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
     @AutoMap()
-    @PrimaryGeneratedColumn({
-        type: 'bigint',
-    })
-    id!: number;
+    @PrimaryGeneratedColumn('uuid')
+    id!: string;
 
     /**
      * User email address

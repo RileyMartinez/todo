@@ -6,7 +6,7 @@ import { SESV2ClientFactory } from './sesv2-client.factory';
 import { SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { OtpTokenDto } from '../auth';
+import { RawOtpTokenDto } from '../auth';
 
 @Injectable()
 export class EmailService {
@@ -39,10 +39,10 @@ export class EmailService {
 
         const client = this.sesv2ClientFactory.createClient();
         const fromEmail = this.configService.getOrThrow<string>(ConfigConstants.AWS_SES_FROM_EMAIL);
-        let verifiedToken: OtpTokenDto;
+        let verifiedToken: RawOtpTokenDto;
 
         try {
-            verifiedToken = this.jwtService.verify<OtpTokenDto>(passwordResetEvent.token, {
+            verifiedToken = this.jwtService.verify<RawOtpTokenDto>(passwordResetEvent.token, {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_SECRET),
             });
         } catch (error) {

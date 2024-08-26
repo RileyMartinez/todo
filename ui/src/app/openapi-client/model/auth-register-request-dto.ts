@@ -11,13 +11,13 @@
  */
 
 
-export interface AuthLoginDto { 
+export interface AuthRegisterRequestDto { 
     /**
-     * Login email address
+     * Registration email address
      */
     email: string;
     /**
-     * Login password
+     * Registration password
      */
     password: string;
 }

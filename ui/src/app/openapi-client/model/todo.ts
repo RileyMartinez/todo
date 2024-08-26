@@ -16,7 +16,7 @@ export interface Todo {
     /**
      * Todo item id
      */
-    id: number;
+    id: string;
     /**
      * Todo item title
      */
@@ -40,7 +40,7 @@ export interface Todo {
     /**
      * Todo list id
      */
-    todoListId: number;
+    todoListId: string;
     todoList: TodoList;
 }
 

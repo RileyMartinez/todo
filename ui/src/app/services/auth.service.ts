@@ -1,15 +1,15 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { AccessTokenDto, AuthClient, AuthLoginDto, AuthRegisterDto } from '../openapi-client';
+import { AccessTokenResponseDto, AuthClient, AuthLoginRequestDto, AuthRegisterRequestDto } from '../openapi-client';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
 import { jwtDecode } from 'jwt-decode';
-import { User } from '../interfaces/user.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UserContext } from '../interfaces';
 
 export interface AuthServiceState {
-    user: User | null;
+    userContext: UserContext | null;
     accessToken: string | null;
     loaded: boolean;
     error: string | null;
@@ -25,21 +25,21 @@ export class AuthService {
 
     // state
     private readonly state = signal<AuthServiceState>({
-        user: null,
+        userContext: null,
         accessToken: null,
         loaded: false,
         error: null,
     });
 
     // selectors
-    public readonly user = computed(() => this.state().user);
+    public readonly userContext = computed(() => this.state().userContext);
     public readonly accessToken = computed(() => this.state().accessToken);
     public readonly loaded = computed(() => this.state().loaded);
     public readonly error = computed(() => this.state().error);
 
     // sources
-    public readonly login$ = new Subject<AuthLoginDto>();
-    public readonly register$ = new Subject<AuthRegisterDto>();
+    public readonly login$ = new Subject<AuthLoginRequestDto>();
+    public readonly register$ = new Subject<AuthRegisterRequestDto>();
     public readonly logout$ = new Subject<void>();
 
     constructor() {
@@ -83,7 +83,7 @@ export class AuthService {
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
     }
 
-    public refresh(): Observable<AccessTokenDto | null> {
+    public refresh(): Observable<AccessTokenResponseDto | null> {
         return this.authClient.authControllerRefresh().pipe(
             first(),
             tap((tokens) => {
@@ -99,29 +99,35 @@ export class AuthService {
     private setTokenAndUserIdentity(token: string): void {
         this.state.update((state) => ({
             ...state,
-            user: this.getUserFromToken(token),
+            userContext: this.getUserContextFromToken(token),
             accessToken: token,
             loaded: true,
         }));
-        localStorage.setItem('todo.sub', this.user()?.sub.toString() || '');
+        localStorage.setItem('todo.sub', this.userContext()?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
-        this.state.update((state) => ({ ...state, user: null, accessToken: null, loaded: true }));
+        this.state.update((state) => ({ ...state, userContext: null, accessToken: null, loaded: true }));
         localStorage.removeItem('todo.sub');
     }
 
-    private getUserFromToken(token: string): User | null {
+    private getUserContextFromToken(token: string): UserContext | null {
         try {
-            return jwtDecode<User>(token);
+            return jwtDecode<UserContext>(token);
         } catch {
             return null;
         }
     }
 
     private initUserSession(): void {
-        const userId = parseInt(localStorage.getItem('todo.sub') || '0');
-        this.state.update((state) => ({ ...state, user: { sub: userId }, loaded: true }));
+        const userId = localStorage.getItem('todo.sub');
+
+        if (!userId) {
+            this.clearTokenAndUserIdentity();
+            return;
+        }
+
+        this.state.update((state) => ({ ...state, userContext: { sub: userId }, loaded: true }));
     }
 
     private setSessonAndRedirect(token: string): void {
