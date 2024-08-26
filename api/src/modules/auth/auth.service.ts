@@ -67,6 +67,7 @@ export class AuthService {
         if (!user) {
             this.logger.error(
                 formatLogMessage('ASLog001', ExceptionConstants.USER_NOT_FOUND, { email: authLoginDto.email }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -75,9 +76,11 @@ export class AuthService {
         const match = await argon2.verify(user.password, authLoginDto.password);
 
         if (!match) {
-            this.logger.error(formatLogMessage('ASLog002', 'Password does not match', { userId: user.id }), {
-                context: AuthService.name,
-            });
+            this.logger.error(
+                formatLogMessage('ASLog002', 'Password does not match', { userId: user.id }),
+                undefined,
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -103,6 +106,7 @@ export class AuthService {
         if (!user) {
             this.logger.error(
                 formatLogMessage('ASOTLog001', ExceptionConstants.USER_NOT_FOUND, { email: authLoginDto.email }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -111,6 +115,7 @@ export class AuthService {
         if (!user.token) {
             this.logger.error(
                 formatLogMessage('ASOTLog002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -136,6 +141,7 @@ export class AuthService {
         if (verifiedToken?.otp !== authLoginDto.password) {
             this.logger.error(
                 formatLogMessage('ASOTLog004', 'OTP does not match', { userId: user.id }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -161,7 +167,7 @@ export class AuthService {
         const user = await this.usersService.findUserByEmail(authRegisterDto.email);
 
         if (user) {
-            this.logger.error(
+            this.logger.warn(
                 formatLogMessage('ASReg001', ExceptionConstants.USER_ALREADY_EXISTS, {
                     userId: user.id,
                     email: user.email,
@@ -194,6 +200,7 @@ export class AuthService {
         if (!userId) {
             this.logger.error(
                 formatLogMessage('ASLog001', ExceptionConstants.INVALID_USER_ID, { userId }),
+                undefined,
                 AuthService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -220,6 +227,7 @@ export class AuthService {
                 formatLogMessage('ASRef001', ExceptionConstants.USER_NOT_FOUND, {
                     userId: authRefreshRequestDto.userId,
                 }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -228,6 +236,7 @@ export class AuthService {
         if (!user.token) {
             this.logger.error(
                 formatLogMessage('ASRef002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -254,6 +263,7 @@ export class AuthService {
         if (!match) {
             this.logger.error(
                 formatLogMessage('ASRef003', 'Refresh token does not match', { userId: user.id }),
+                undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -274,7 +284,7 @@ export class AuthService {
         const user = await this.usersService.findUserByEmail(email);
 
         if (!user) {
-            this.logger.error(
+            this.logger.warn(
                 formatLogMessage('ASSPREve001', ExceptionConstants.USER_NOT_FOUND, { email }),
                 AuthService.name,
             );

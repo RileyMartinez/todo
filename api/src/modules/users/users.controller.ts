@@ -1,14 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Param,
-    Delete,
-    ParseIntPipe,
-    UseInterceptors,
-    NotFoundException,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, NotFoundException } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -70,7 +60,7 @@ export class UserController {
     @Delete(':id')
     @ApiOkResponse({ type: Number, description: 'The number of users deleted' })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async remove(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+    async remove(@Param('id') id: string): Promise<DeleteResult> {
         return await this.userService.deleteUser(id);
     }
 }

@@ -37,6 +37,7 @@ export class TodoListService {
         if (!userId) {
             this.logger.error(
                 formatLogMessage('TLSSTLis001', ExceptionConstants.INVALID_USER_ID, { userId }),
+                undefined,
                 TodoListService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -67,6 +68,7 @@ export class TodoListService {
         if (!userId) {
             this.logger.error(
                 formatLogMessage('TLSFTLis001', ExceptionConstants.INVALID_USER_ID, { userId }),
+                undefined,
                 TodoListService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -89,6 +91,7 @@ export class TodoListService {
         if (!id) {
             this.logger.error(
                 formatLogMessage('TLSFTLis002', ExceptionConstants.INVALID_TODO_LIST_ID, { todoListId: id }),
+                undefined,
                 TodoListService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_TODO_LIST_ID);
@@ -112,6 +115,7 @@ export class TodoListService {
         if (!id) {
             this.logger.error(
                 formatLogMessage('TLSDTLis001', ExceptionConstants.INVALID_TODO_LIST_ID, { todoListId: id }),
+                undefined,
                 TodoListService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_TODO_LIST_ID);
@@ -124,6 +128,7 @@ export class TodoListService {
                 'TLSDTLis002',
                 ExceptionConstants.TODO_LIST_NOT_FOUND,
                 { todoListid: id },
+                undefined,
                 TodoListService.name,
             );
             throw new NotFoundException(ExceptionConstants.TODO_LIST_NOT_FOUND);
@@ -144,6 +149,7 @@ export class TodoListService {
         if (!id) {
             this.logger.error(
                 formatLogMessage('TLSDTLIte001', ExceptionConstants.INVALID_TODO_ITEM_ID, { todoItemId: id }),
+                undefined,
                 TodoListService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_TODO_ITEM_ID);
@@ -154,6 +160,7 @@ export class TodoListService {
         if (!result.affected) {
             this.logger.error(
                 formatLogMessage('TLSDTLIte001', ExceptionConstants.TODO_ITEM_NOT_FOUND, { todoItemId: id }),
+                undefined,
                 TodoListService.name,
             );
             throw new NotFoundException(ExceptionConstants.TODO_ITEM_NOT_FOUND);

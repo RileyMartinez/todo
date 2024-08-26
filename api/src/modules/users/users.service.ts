@@ -42,6 +42,7 @@ export class UserService {
         if (!id) {
             this.logger.error(
                 formatLogMessage('USFUBId001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
                 UserService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -59,7 +60,7 @@ export class UserService {
      */
     async findUserByEmail(email: string): Promise<User | null> {
         if (!email) {
-            this.logger.error('User email cannot be empty or undefined', UserService.name);
+            this.logger.error('User email cannot be empty or undefined', undefined, UserService.name);
             throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
         }
 
@@ -79,6 +80,7 @@ export class UserService {
         if (!id) {
             this.logger.error(
                 formatLogMessage('USUUTok001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
                 UserService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -87,6 +89,7 @@ export class UserService {
         if (!token) {
             this.logger.error(
                 formatLogMessage('USUUTok002', ExceptionConstants.INVALID_TOKEN, { userId: id }),
+                undefined,
                 UserService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_TOKEN);
@@ -97,6 +100,7 @@ export class UserService {
         if (!result.affected) {
             this.logger.error(
                 formatLogMessage('USUUTok003', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                undefined,
                 UserService.name,
             );
             throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
@@ -117,6 +121,7 @@ export class UserService {
         if (!id) {
             this.logger.error(
                 formatLogMessage('USDUTok001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
                 UserService.name,
             );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -127,6 +132,7 @@ export class UserService {
         if (!result.affected) {
             this.logger.error(
                 formatLogMessage('USDUTok002', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                undefined,
                 UserService.name,
             );
             throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
@@ -140,20 +146,28 @@ export class UserService {
      *
      * @param id - The ID of the user to remove.
      * @returns A promise that resolves to the number of deleted rows.
-     * @throws {BadRequestException} If the user ID is less than 1.
+     * @throws {BadRequestException} If the user ID is invalid.
      * @throws {NotFoundException} If the user to delete is not found.
      */
-    async deleteUser(id: number): Promise<DeleteResult> {
-        if (!id || id < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(id), UserService.name);
+    async deleteUser(id: string): Promise<DeleteResult> {
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USDUse001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
+                UserService.name,
+            );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
         const result = await this.userRepository.delete(id);
 
         if (!result.affected) {
-            this.logger.error(ExceptionConstants.userIdNotFound(id), UserService.name);
-            throw new NotFoundException(ExceptionConstants.userIdNotFound(id));
+            this.logger.error(
+                formatLogMessage('USDUse002', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
         }
 
         return result;
