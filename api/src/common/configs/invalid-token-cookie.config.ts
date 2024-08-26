@@ -13,6 +13,6 @@ const isProduction = process.env.ENV === AppConstants.PROD;
 export const invalidTokenCookieConfig: CookieOptions = {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 0,
 };
