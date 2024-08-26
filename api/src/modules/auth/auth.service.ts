@@ -18,10 +18,10 @@ import { AuthRegisterDto } from './dto/auth-register.dto';
 import { ValidationService } from 'src/common/services/validaton.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EncryptionService, EventConstants, PasswordResetEvent } from '@/common';
-import { generateRandomNumber } from '@/common/utils/number.util';
 import { formatLogMessage } from '@/common/utils/logger.util';
 import { argon2HashConfig } from 'src/common/configs';
 import * as argon2 from 'argon2';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -263,7 +263,7 @@ export class AuthService {
         const token = await this.jwtService.signAsync(
             {
                 email: user.email,
-                otp: generateRandomNumber(6).toString(),
+                otp: randomInt(100000, 999999),
             },
             {
                 secret: this.configService.getOrThrow(ConfigConstants.JWT_SECRET),

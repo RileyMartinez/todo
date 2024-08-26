@@ -26,6 +26,7 @@ export class EncryptionService {
      *
      * @param data - The data to be encrypted.
      * @returns The encrypted data in the format: iv:encrypted:authTag.
+     * @see {@link https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html}
      */
     encrypt(data: string): string {
         try {
@@ -50,6 +51,7 @@ export class EncryptionService {
      *
      * @param encryptedData - The encrypted data to be decrypted.
      * @returns The decrypted data as a string.
+     * @see {@link https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html}
      */
     decrypt(encryptedData: string): string {
         try {
