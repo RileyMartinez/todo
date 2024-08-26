@@ -206,7 +206,7 @@ export class AuthService {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        await this.usersService.deleteUserToken(userId);
+        await this.usersService.revokeUserToken(userId);
     }
 
     /**
@@ -303,7 +303,7 @@ export class AuthService {
         );
 
         const encryptedToken = this.encryptionService.encrypt(token);
-        await this.usersService.deleteUserToken(user.id);
+        await this.usersService.revokeUserToken(user.id);
         await this.usersService.updateUserToken(user.id, encryptedToken);
 
         this.eventEmitter.emit(EventConstants.PASSWORD_RESET, new PasswordResetEvent(token));

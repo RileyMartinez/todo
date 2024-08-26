@@ -117,7 +117,7 @@ export class UserService {
      * @throws {BadRequestException} if the provided user ID is invalid.
      * @throws {NotFoundException} if the user is not found.
      */
-    async deleteUserToken(id: string): Promise<DeleteResult> {
+    async revokeUserToken(id: string): Promise<DeleteResult> {
         if (!id) {
             this.logger.error(
                 formatLogMessage('USDUTok001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
