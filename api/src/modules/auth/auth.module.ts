@@ -8,10 +8,11 @@ import { jwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
 import { OtpStrategy, JwtAuthStrategy, JwtRefreshStrategy } from './strategies';
 import { ValidationService } from 'src/common/services/validaton.service';
+import { EncryptionService } from '@/common';
 
 @Module({
     imports: [ConfigModule, PassportModule, JwtModule.registerAsync(jwtConfig), UsersModule],
     controllers: [AuthController],
-    providers: [AuthService, ValidationService, OtpStrategy, JwtAuthStrategy, JwtRefreshStrategy],
+    providers: [AuthService, ValidationService, EncryptionService, OtpStrategy, JwtAuthStrategy, JwtRefreshStrategy],
 })
 export class AuthModule {}

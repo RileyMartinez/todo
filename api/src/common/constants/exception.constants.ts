@@ -1,5 +1,6 @@
 export class ExceptionConstants {
     // static strings
+    static readonly UNKNOWN_ERROR = 'Unknown error';
     static readonly VALIDATION_FAILED = 'Validation failed';
     static readonly INVALID_CREDENTIALS = 'Invalid credentials';
     static readonly INTERNAL_SERVER_ERROR = 'Internal server error';

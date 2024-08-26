@@ -15,12 +15,13 @@ import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AuthLoginDto, AuthTokenDto, AuthRefreshDto, OtpTokenDto } from './dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
-import * as argon2 from 'argon2';
-import { argon2HashConfig } from 'src/common/configs';
 import { ValidationService } from 'src/common/services/validaton.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventConstants, PasswordResetEvent } from '@/common';
+import { EncryptionService, EventConstants, PasswordResetEvent } from '@/common';
 import { generateRandomNumber } from '@/common/utils/number.util';
+import { formatLogMessage } from '@/common/utils/logger.util';
+import { argon2HashConfig } from 'src/common/configs';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +31,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly validationService: ValidationService,
+        private readonly encryptionService: EncryptionService,
         private readonly eventEmitter: EventEmitter2,
     ) {
         this.logger = logger;
@@ -37,6 +39,7 @@ export class AuthService {
         this.jwtService = jwtService;
         this.configService = configService;
         this.validationService = validationService;
+        this.encryptionService = encryptionService;
         this.eventEmitter = eventEmitter;
     }
 
@@ -55,14 +58,20 @@ export class AuthService {
         const user = await this.usersService.findUserByEmail(authLoginDto.email);
 
         if (!user) {
-            this.logger.error(`User with email ${authLoginDto.email} not found`, AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASLog001', ExceptionConstants.USER_NOT_FOUND, { email: authLoginDto.email }),
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const match = await argon2.verify(user.password, authLoginDto.password);
 
         if (!match) {
-            this.logger.error(`Password for user with email ${authLoginDto.email} does not match`, AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASLog002', 'Password does not match', { userId: user.id }),
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -86,33 +95,41 @@ export class AuthService {
         const user = await this.usersService.findUserByEmail(authLoginDto.email);
 
         if (!user) {
-            this.logger.error(`resetPassword: User email ${authLoginDto.email} not found`, AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASOTLog001', ExceptionConstants.USER_NOT_FOUND, { email: authLoginDto.email }),
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.token) {
             this.logger.error(
-                `resetPassword: User token/expiration for user with email ${authLoginDto.email} not found`,
+                formatLogMessage('ASOTLog002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
+
+        const decryptedToken = this.encryptionService.decrypt(user.token);
+        let verifiedToken: OtpTokenDto;
 
         try {
-            await this.jwtService.verifyAsync(user.token);
-        } catch {
+            verifiedToken = this.jwtService.verify<OtpTokenDto>(decryptedToken, {
+                secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_SECRET),
+            });
+        } catch (error) {
+            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
             this.logger.error(
-                `resetPassword: Token for user with email ${authLoginDto.email} is expired`,
+                formatLogMessage('ASOTLog003', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
+                stack,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const decodedToken = this.jwtService.decode<OtpTokenDto>(user.token);
-
-        if (decodedToken?.otp !== authLoginDto.password) {
+        if (verifiedToken?.otp !== authLoginDto.password) {
             this.logger.error(
-                `resetPassword: Token for user with email ${authLoginDto.email} does not match`,
+                formatLogMessage('ASOTLog004', 'OTP does not match', { userId: user.id }),
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -138,7 +155,13 @@ export class AuthService {
         const user = await this.usersService.findUserByEmail(authRegisterDto.email);
 
         if (user) {
-            this.logger.error(`User with email ${authRegisterDto.email} already exists`, AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASReg001', ExceptionConstants.USER_ALREADY_EXISTS, {
+                    userId: user.id,
+                    email: user.email,
+                }),
+                AuthService.name,
+            );
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
@@ -162,8 +185,11 @@ export class AuthService {
      * @throws {BadRequestException} If user ID is less than 1.
      */
     async logout(userId: number): Promise<void> {
-        if (userId < 1) {
-            this.logger.error(ExceptionConstants.invalidUserId(userId), AuthService.name);
+        if (!userId || userId < 1) {
+            this.logger.error(
+                formatLogMessage('ASLog001', ExceptionConstants.INVALID_USER_ID, { userId }),
+                AuthService.name,
+            );
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
@@ -184,12 +210,18 @@ export class AuthService {
         const user = await this.usersService.findUserById(authRefreshDto.userId);
 
         if (!user) {
-            this.logger.error(ExceptionConstants.userIdNotFound(authRefreshDto.userId), AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASRef001', ExceptionConstants.USER_NOT_FOUND, { userId: authRefreshDto.userId }),
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.token) {
-            this.logger.error(`User with ID ${authRefreshDto.userId} does not have a refresh token`, AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASRef002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
+                AuthService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -197,7 +229,7 @@ export class AuthService {
 
         if (!match) {
             this.logger.error(
-                `Refresh token for user with ID ${authRefreshDto.userId} does not match`,
+                formatLogMessage('ASRef003', 'Refresh token does not match', { userId: user.id }),
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -221,7 +253,10 @@ export class AuthService {
         const user = await this.usersService.findUserByEmail(email);
 
         if (!user) {
-            this.logger.error(`Password reset request: user email ${email} not found`, AuthService.name);
+            this.logger.error(
+                formatLogMessage('ASSPREve001', ExceptionConstants.USER_NOT_FOUND, { email }),
+                AuthService.name,
+            );
             return;
         }
 
@@ -236,7 +271,8 @@ export class AuthService {
             },
         );
 
-        await this.usersService.updateUserToken(user.id, token);
+        const encryptedToken = this.encryptionService.encrypt(token);
+        await this.usersService.updateUserToken(user.id, encryptedToken);
 
         this.eventEmitter.emit(EventConstants.PASSWORD_RESET, new PasswordResetEvent(token));
     }
