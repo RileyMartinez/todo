@@ -1,10 +1,12 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../services';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-one-time-login',
@@ -13,11 +15,13 @@ import { AuthService } from '../../../services';
     templateUrl: './one-time-login.component.html',
 })
 export class OneTimeLoginComponent implements OnInit {
-    @Input() email: string | undefined;
-    @Output() completeOtpLogin = new EventEmitter<{ show: boolean; email: string }>();
     private readonly authService = inject(AuthService);
     private readonly formBuilder = inject(FormBuilder);
+    private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
+    private readonly destroy$ = new Subject<void>();
 
+    email!: string | undefined;
     otpLoginForm!: FormGroup;
     otpFormControl!: FormControl;
 
@@ -32,6 +36,10 @@ export class OneTimeLoginComponent implements OnInit {
         this.otpLoginForm = this.formBuilder.group({
             otp: this.otpFormControl,
         });
+
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+            this.email = params['email'];
+        });
     }
 
     onSubmit(): void {
@@ -40,6 +48,13 @@ export class OneTimeLoginComponent implements OnInit {
         }
 
         this.authService.otpLogin$.next({ email: this.email, password: this.otpFormControl.value });
-        this.completeOtpLogin.emit({ show: false, email: '' });
+    }
+
+    resendOtp(): void {
+        if (!this.email) {
+            return;
+        }
+
+        this.authService.requestPasswordReset$.next({ email: this.email });
     }
 }

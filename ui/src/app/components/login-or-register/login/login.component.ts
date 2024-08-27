@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordDialog } from '../../dialogs';
 import { Subject, takeUntil } from 'rxjs';
+import { RouteConstants } from '../../../constants';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-login',
@@ -28,14 +30,12 @@ import { Subject, takeUntil } from 'rxjs';
     templateUrl: './login.component.html',
 })
 export class LoginComponent implements OnInit, OnDestroy {
-    @Output() showOtpLogin = new EventEmitter<{ show: boolean; email: string }>();
-
     private readonly authService = inject(AuthService);
     private readonly formBuilder = inject(FormBuilder);
     private readonly dialog = inject(MatDialog);
+    private readonly router = inject(Router);
     private readonly destroy$ = new Subject<void>();
 
-    userContext = this.authService.userContext;
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
     loginForm!: FormGroup;
@@ -75,7 +75,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                 }
 
                 this.authService.requestPasswordReset$.next({ email });
-                this.showOtpLogin.emit({ show: true, email });
+                this.router.navigate([`/${RouteConstants.OTP_LOGIN}`], { queryParams: { email } });
             });
     }
 }

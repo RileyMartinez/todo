@@ -10,12 +10,4 @@ import { OneTimeLoginComponent } from './one-time-login/one-time-login.component
     imports: [MatTabsModule, LoginComponent, RegisterComponent, OneTimeLoginComponent],
     templateUrl: './login-or-register.component.html',
 })
-export class LoginOrRegisterComponent {
-    otpLoginVisible = false;
-    email: string | undefined;
-
-    updateOtpLoginVisibility(event: { show: boolean; email: string }): void {
-        this.otpLoginVisible = event.show;
-        this.email = event.email;
-    }
-}
+export class LoginOrRegisterComponent {}

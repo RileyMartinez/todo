@@ -1,4 +1,5 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +12,8 @@ import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from '../constants/route.constants';
 import { AuthService } from '../services/auth.service';
 import { LoadingService } from '../services/loading.service';
+import { SnackBarNotificationService } from '../services';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -29,9 +32,12 @@ import { LoadingService } from '../services/loading.service';
     ],
     templateUrl: './app.component.html',
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
     private readonly loadingService = inject(LoadingService);
     private readonly authService = inject(AuthService);
+    private readonly snackBarNotificationService = inject(SnackBarNotificationService);
+    private readonly snackBar = inject(MatSnackBar);
+    private readonly destroy$ = new Subject<void>();
 
     @ViewChild('sidenav') sidenav: MatSidenav | undefined;
 
@@ -41,6 +47,17 @@ export class AppComponent {
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
     title = 'ui';
     isAuthenticated = false;
+
+    ngOnInit(): void {
+        this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
+            this.snackBar.open(notification.message, notification.action, { duration: notification.duration });
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 
     logout(): void {
         this.sidenav?.close();

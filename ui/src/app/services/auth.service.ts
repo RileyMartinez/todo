@@ -13,6 +13,7 @@ import { RouteConstants } from '../constants/route.constants';
 import { jwtDecode } from 'jwt-decode';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserContext } from '../interfaces';
+import { SnackBarNotificationService } from './snack-bar.service';
 
 export interface AuthServiceState {
     userContext: UserContext | null;
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly authClient = inject(AuthClient);
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
+    private readonly snackBarNotificationService = inject(SnackBarNotificationService);
 
     // state
     private readonly state = signal<AuthServiceState>({
@@ -49,7 +51,6 @@ export class AuthService {
     readonly register$ = new Subject<AuthRegisterRequestDto>();
     readonly logout$ = new Subject<void>();
     readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
-    readonly setUserContext$ = new Subject<UserContext>();
 
     constructor() {
         this.initUserSession();
@@ -111,13 +112,12 @@ export class AuthService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe(() => this.state.update((state) => ({ ...state, loaded: true })));
+            .subscribe(() => {
+                this.state.update((state) => ({ ...state, loaded: true }));
+                this.snackBarNotificationService.emit({ message: 'Password reset email sent.' });
+            });
 
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
-
-        this.setUserContext$
-            .pipe(takeUntilDestroyed())
-            .subscribe((userContext) => this.state.update((state) => ({ ...state, userContext })));
     }
 
     public refresh(): Observable<AccessTokenResponseDto | null> {
@@ -179,6 +179,7 @@ export class AuthService {
 
     private handleError(error: any): Observable<never> {
         this.state.update((state) => ({ ...state, error }));
+        this.snackBarNotificationService.emit({ message: 'Ope. Something goofed. Please try again.' });
         this.clearSessionAndRedirect();
         return EMPTY;
     }
