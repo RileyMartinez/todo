@@ -34,12 +34,4 @@ export class ForgotPasswordDialog implements OnInit {
             email: this.emailFormControl,
         });
     }
-
-    onSubmit(): void {
-        if (this.passwordResetForm?.invalid) {
-            return;
-        }
-
-        // Send password reset
-    }
 }
