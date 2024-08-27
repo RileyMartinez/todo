@@ -14,10 +14,4 @@ export class ExceptionConstants {
     static readonly TODO_LIST_NOT_FOUND = 'Todo list not found';
     static readonly INVALID_TODO_ITEM_ID = 'Todo item ID must be greater than 0';
     static readonly TODO_ITEM_NOT_FOUND = 'Todo item not found';
-
-    // dynamic strings
-    static readonly invalidUserId = (id: number | undefined) => `User ID ${id} must be greater than 0`;
-    static readonly userIdNotFound = (id: number | undefined) => `User with ID ${id} not found`;
-    static readonly userEmailNotFound = (email: string | undefined) => `User with email ${email} not found`;
-    static readonly invalidTodoListId = (id: number | undefined) => `Todo list ID ${id} must be greater than 0`;
 }

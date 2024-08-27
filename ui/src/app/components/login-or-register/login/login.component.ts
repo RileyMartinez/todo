@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,9 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } 
 import { AuthService } from '../../../services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { ForgotPasswordDialog } from '../../dialogs';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-login',
@@ -24,9 +27,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ],
     templateUrl: './login.component.html',
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
     private readonly authService = inject(AuthService);
     private readonly formBuilder = inject(FormBuilder);
+    private readonly dialog = inject(MatDialog);
+    private readonly destroy$ = new Subject<void>();
 
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
@@ -43,11 +48,30 @@ export class LoginComponent implements OnInit {
         });
     }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     onSubmit(): void {
         if (this.loginForm?.invalid) {
             return;
         }
 
         this.authService.login$.next({ email: this.emailFormControl.value, password: this.passwordFormControl.value });
+    }
+
+    openForgotPasswordDialog(): void {
+        this.dialog
+            .open(ForgotPasswordDialog)
+            .afterClosed()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((email) => {
+                if (!email) {
+                    return;
+                }
+
+                // Send password reset
+            });
     }
 }
