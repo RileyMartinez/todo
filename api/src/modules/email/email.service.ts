@@ -7,6 +7,7 @@ import { SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RawOtpTokenDto } from '../auth';
+import { formatLogMessage } from '@/common/utils/logger.util';
 
 @Injectable()
 export class EmailService {
@@ -46,7 +47,12 @@ export class EmailService {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_SECRET),
             });
         } catch (error) {
-            this.logger.error('Failed to verify password reset token.', error);
+            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
+            this.logger.error(
+                formatLogMessage('ESSPRes001', ExceptionConstants.INVALID_TOKEN, { token: passwordResetEvent.token }),
+                stack,
+                EmailService.name,
+            );
             throw new ForbiddenException(ExceptionConstants.INVALID_TOKEN);
         }
 
@@ -57,7 +63,7 @@ export class EmailService {
             },
             Content: {
                 Template: {
-                    TemplateName: 'todo-password-reset',
+                    TemplateName: '66af6bd3-b733-403a-8f2c-b4e7d0fc5446-password-reset',
                     TemplateData: JSON.stringify({
                         otp: verifiedToken.otp,
                         year: new Date().getFullYear().toString(),

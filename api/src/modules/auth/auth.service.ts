@@ -281,11 +281,20 @@ export class AuthService {
      * @returns A promise that resolves to void.
      */
     async sendPasswordResetEvent(email: string): Promise<void> {
+        if (!email) {
+            this.logger.error(
+                formatLogMessage('ASSPREve001', ExceptionConstants.INVALID_EMAIL, { email }),
+                undefined,
+                AuthService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
+        }
+
         const user = await this.usersService.findUserByEmail(email);
 
         if (!user) {
             this.logger.warn(
-                formatLogMessage('ASSPREve001', ExceptionConstants.USER_NOT_FOUND, { email }),
+                formatLogMessage('ASSPREve002', ExceptionConstants.USER_NOT_FOUND, { email }),
                 AuthService.name,
             );
             return;

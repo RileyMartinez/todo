@@ -10,7 +10,13 @@ import {
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { OtpGuard, JwtRefreshGuard, LocalGuard } from './guards';
-import { AccessTokenResponseDto, AuthLoginRequestDto, AuthRefreshRequestDto, AuthTokensDto } from './dto';
+import {
+    AccessTokenResponseDto,
+    AuthLoginRequestDto,
+    AuthRefreshRequestDto,
+    AuthTokensDto,
+    PasswordResetRequestDto,
+} from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
 import { ConfigConstants, DecoratorConstants } from 'src/common/constants';
@@ -100,7 +106,7 @@ export class AuthController {
      * [Public]
      * Handles the registration request.
      *
-     * @param {AuthRegisterRequestDto} authRegisterDto - The email and password of the user.
+     * @param {AuthRegisterRequestDto} authRegisterRequestDto - The email and password of the user.
      * @returns {Promise<AccessTokenResponseDto>} - A promise that resolves to the authentication tokens for the registered user.
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
@@ -110,10 +116,10 @@ export class AuthController {
     @ApiConflictResponse({ description: ExceptionConstants.USER_ALREADY_EXISTS })
     @HttpCode(HttpStatus.CREATED)
     async register(
-        @Body() authRegisterDto: AuthRegisterRequestDto,
+        @Body() authRegisterRequestDto: AuthRegisterRequestDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<AccessTokenResponseDto> {
-        const tokens = await this.authService.register(authRegisterDto);
+        const tokens = await this.authService.register(authRegisterRequestDto);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
 
         return new AccessTokenResponseDto(tokens.accessToken);
@@ -156,9 +162,8 @@ export class AuthController {
      */
     @Public()
     @Post('send-password-reset')
-    @ApiOkResponse({ description: 'Password reset email event sent successfully if email exists.' })
     @HttpCode(HttpStatus.OK)
-    async sendPasswordResetRequest(@Body('email') email: string): Promise<void> {
-        return await this.authService.sendPasswordResetEvent(email);
+    async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
+        return await this.authService.sendPasswordResetEvent(passwordResetRequestDto.email);
     }
 }

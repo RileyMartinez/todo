@@ -24,6 +24,8 @@ import { AccessTokenResponseDto } from '../model/access-token-response-dto';
 import { AuthLoginRequestDto } from '../model/auth-login-request-dto';
 // @ts-ignore
 import { AuthRegisterRequestDto } from '../model/auth-register-request-dto';
+// @ts-ignore
+import { PasswordResetRequestDto } from '../model/password-reset-request-dto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -456,13 +458,17 @@ export class AuthClient {
     /**
      * 
      * [Public] Handles the password reset request.
+     * @param passwordResetRequestDto 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public authControllerSendPasswordResetRequest(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public authControllerSendPasswordResetRequest(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public authControllerSendPasswordResetRequest(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public authControllerSendPasswordResetRequest(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public authControllerSendPasswordResetRequest(passwordResetRequestDto: PasswordResetRequestDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public authControllerSendPasswordResetRequest(passwordResetRequestDto: PasswordResetRequestDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public authControllerSendPasswordResetRequest(passwordResetRequestDto: PasswordResetRequestDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public authControllerSendPasswordResetRequest(passwordResetRequestDto: PasswordResetRequestDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (passwordResetRequestDto === null || passwordResetRequestDto === undefined) {
+            throw new Error('Required parameter passwordResetRequestDto was null or undefined when calling authControllerSendPasswordResetRequest.');
+        }
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -488,6 +494,15 @@ export class AuthClient {
         }
 
 
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -503,6 +518,7 @@ export class AuthClient {
         return this.httpClient.request<any>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                body: passwordResetRequestDto,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

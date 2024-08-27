@@ -17,6 +17,7 @@ model/auth-login-request-dto.ts
 model/auth-register-request-dto.ts
 model/create-user-dto.ts
 model/models.ts
+model/password-reset-request-dto.ts
 model/safe-user-dto.ts
 model/todo-dto.ts
 model/todo-list-dto.ts

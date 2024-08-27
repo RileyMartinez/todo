@@ -71,7 +71,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                     return;
                 }
 
-                // Send password reset
+                this.authService.requestPasswordReset$.next({ email });
             });
     }
 }

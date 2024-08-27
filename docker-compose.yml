@@ -52,6 +52,7 @@ services:
     volumes:
       - ./api/src:/app/src
       - openapi:/share/openapi-client
+      - ~/.aws:/root/.aws
     command: yarn start:debug
 
   ui:

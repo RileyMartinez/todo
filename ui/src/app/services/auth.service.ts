@@ -1,5 +1,11 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { AccessTokenResponseDto, AuthClient, AuthLoginRequestDto, AuthRegisterRequestDto } from '../openapi-client';
+import {
+    AccessTokenResponseDto,
+    AuthClient,
+    AuthLoginRequestDto,
+    AuthRegisterRequestDto,
+    PasswordResetRequestDto,
+} from '../openapi-client';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
@@ -32,15 +38,16 @@ export class AuthService {
     });
 
     // selectors
-    public readonly userContext = computed(() => this.state().userContext);
-    public readonly accessToken = computed(() => this.state().accessToken);
-    public readonly loaded = computed(() => this.state().loaded);
-    public readonly error = computed(() => this.state().error);
+    readonly userContext = computed(() => this.state().userContext);
+    readonly accessToken = computed(() => this.state().accessToken);
+    readonly loaded = computed(() => this.state().loaded);
+    readonly error = computed(() => this.state().error);
 
     // sources
-    public readonly login$ = new Subject<AuthLoginRequestDto>();
-    public readonly register$ = new Subject<AuthRegisterRequestDto>();
-    public readonly logout$ = new Subject<void>();
+    readonly login$ = new Subject<AuthLoginRequestDto>();
+    readonly register$ = new Subject<AuthRegisterRequestDto>();
+    readonly logout$ = new Subject<void>();
+    readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
 
     constructor() {
         this.initUserSession();
@@ -79,6 +86,18 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe(() => this.clearSessionAndRedirect());
+
+        this.requestPasswordReset$
+            .pipe(
+                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
+                switchMap((passwordResetRequestDto) =>
+                    this.authClient
+                        .authControllerSendPasswordResetRequest(passwordResetRequestDto)
+                        .pipe(catchError((error) => this.handleError(error))),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe(() => this.state.update((state) => ({ ...state, loaded: true })));
 
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
     }
