@@ -45,9 +45,11 @@ export class AuthService {
 
     // sources
     readonly login$ = new Subject<AuthLoginRequestDto>();
+    readonly otpLogin$ = new Subject<AuthLoginRequestDto>();
     readonly register$ = new Subject<AuthRegisterRequestDto>();
     readonly logout$ = new Subject<void>();
     readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
+    readonly setUserContext$ = new Subject<UserContext>();
 
     constructor() {
         this.initUserSession();
@@ -59,6 +61,18 @@ export class AuthService {
                 switchMap((authLoginDto) =>
                     this.authClient
                         .authControllerLogin(authLoginDto)
+                        .pipe(catchError((error) => this.handleError(error))),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((tokens) => this.setSessonAndRedirect(tokens.accessToken));
+
+        this.otpLogin$
+            .pipe(
+                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
+                switchMap((authLoginDto) =>
+                    this.authClient
+                        .authControllerOneTimeLogin(authLoginDto)
                         .pipe(catchError((error) => this.handleError(error))),
                 ),
                 takeUntilDestroyed(),
@@ -100,6 +114,10 @@ export class AuthService {
             .subscribe(() => this.state.update((state) => ({ ...state, loaded: true })));
 
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
+
+        this.setUserContext$
+            .pipe(takeUntilDestroyed())
+            .subscribe((userContext) => this.state.update((state) => ({ ...state, userContext })));
     }
 
     public refresh(): Observable<AccessTokenResponseDto | null> {

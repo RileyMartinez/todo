@@ -138,7 +138,7 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (verifiedToken?.otp !== authLoginDto.password) {
+        if (verifiedToken?.otp.toString() !== authLoginDto.password) {
             this.logger.error(
                 formatLogMessage('ASOTLog004', 'OTP does not match', { userId: user.id }),
                 undefined,

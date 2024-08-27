@@ -1,7 +1,14 @@
 <div class="flex flex-col overflow-hidden">
     <mat-tab-group>
         <mat-tab label="Login">
-            <app-login></app-login>
+            @if (otpLoginVisible) {
+                <app-one-time-login
+                    (completeOtpLogin)="updateOtpLoginVisibility($event)"
+                    [email]="email"
+                ></app-one-time-login>
+            } @else {
+                <app-login (showOtpLogin)="updateOtpLoginVisibility($event)"></app-login>
+            }
         </mat-tab>
         <mat-tab label="Register">
             <app-register></app-register>

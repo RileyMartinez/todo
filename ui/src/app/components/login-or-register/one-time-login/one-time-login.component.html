@@ -1,0 +1,21 @@
+<form [formGroup]="otpLoginForm" (ngSubmit)="onSubmit()">
+    <div class="flex justify-center p-14">
+        <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
+            <mat-card-header class="mb-4">
+                <mat-card-title>One-time Login</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-form-field appearance="fill" class="w-3/4">
+                    <mat-label>Code</mat-label>
+                    <input matInput [formControl]="otpFormControl" autocomplete="current-password" required />
+                    @if (otpFormControl.hasError('required')) {
+                        <mat-error>One-time password code is required </mat-error>
+                    }
+                </mat-form-field>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" type="submit" [disabled]="otpLoginForm.invalid">Login</button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</form>

@@ -162,6 +162,7 @@ export class AuthController {
      */
     @Public()
     @Post('send-password-reset')
+    @ApiOkResponse({ description: 'Password reset request sent successfully.' })
     @HttpCode(HttpStatus.OK)
     async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
         return await this.authService.sendPasswordResetEvent(passwordResetRequestDto.email);
