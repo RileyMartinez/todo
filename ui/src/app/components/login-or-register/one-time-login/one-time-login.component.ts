@@ -7,11 +7,19 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../services';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-one-time-login',
     standalone: true,
-    imports: [MatFormFieldModule, MatInputModule, MatCardModule, MatButtonModule, ReactiveFormsModule],
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        MatCardModule,
+        MatButtonModule,
+        ReactiveFormsModule,
+        MatTooltipModule,
+    ],
     templateUrl: './one-time-login.component.html',
 })
 export class OneTimeLoginComponent implements OnInit {

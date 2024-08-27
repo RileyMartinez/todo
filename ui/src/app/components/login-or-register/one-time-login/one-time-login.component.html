@@ -15,7 +15,14 @@
             </mat-card-content>
             <mat-card-actions>
                 <button mat-raised-button color="primary" type="submit" [disabled]="otpLoginForm.invalid">Login</button>
-                <button mat-button color="accent" (click)="resendOtp()" class="ml-4">Resend OTP</button>
+                <div
+                    [matTooltip]="!email ? 'Resending is currently unavailable. Try again from the Login page.' : ''"
+                    [matTooltipDisabled]="email"
+                >
+                    <button mat-button color="accent" (click)="resendOtp()" class="ml-4" [disabled]="!email">
+                        Resend Code
+                    </button>
+                </div>
             </mat-card-actions>
         </mat-card>
     </div>
