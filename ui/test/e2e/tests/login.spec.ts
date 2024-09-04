@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from '../fixtures';
 
 test('test', async ({ page }) => {
     await page.goto('http://localhost:4200/login-or-register');
