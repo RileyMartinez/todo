@@ -22,6 +22,8 @@ export interface AuthServiceState {
     error: string | null;
 }
 
+export const USER_CONTEXT_KEY: string = 'todo.sub';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -140,12 +142,12 @@ export class AuthService {
             accessToken: token,
             loaded: true,
         }));
-        localStorage.setItem('todo.sub', this.userContext()?.sub.toString() || '');
+        localStorage.setItem(USER_CONTEXT_KEY, this.userContext()?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
         this.state.update((state) => ({ ...state, userContext: null, accessToken: null, loaded: true }));
-        localStorage.removeItem('todo.sub');
+        localStorage.removeItem(USER_CONTEXT_KEY);
     }
 
     private getUserContextFromToken(token: string): UserContext | null {
@@ -157,7 +159,7 @@ export class AuthService {
     }
 
     private initUserSession(): void {
-        const userId = localStorage.getItem('todo.sub');
+        const userId = localStorage.getItem(USER_CONTEXT_KEY);
 
         if (!userId) {
             this.clearTokenAndUserIdentity();
