@@ -23,8 +23,6 @@ export default defineConfig({
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: [['html', { outputFolder: './test-reports' }]],
     outputDir: './test-results',
-    globalSetup: './global.setup.ts',
-    globalTeardown: './global.teardown.ts',
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Base URL to use in actions like `await page.goto('/')`. */
@@ -37,7 +35,17 @@ export default defineConfig({
     /* Configure projects for major browsers */
     projects: [
         {
+            name: 'setup',
+            testMatch: /global\.setup\.ts/,
+            teardown: 'teardown',
+        },
+        {
+            name: 'teardown',
+            testMatch: /global\.teardown\.ts/,
+        },
+        {
             name: 'chromium',
+            dependencies: ['setup'],
             use: { ...devices['Desktop Chrome'] },
         },
         {
