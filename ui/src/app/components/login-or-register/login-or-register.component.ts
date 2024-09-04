@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
-import { LoginComponent } from './login/login.component';
-import { RegisterComponent } from './register/register.component';
-import { OneTimeLoginComponent } from './one-time-login/one-time-login.component';
+import { RegisterComponent } from '../register/register.component';
+import { OneTimeLoginComponent } from '../one-time-login/one-time-login.component';
+import { LoginComponent } from '../login';
 
 @Component({
     selector: 'app-login-or-register',

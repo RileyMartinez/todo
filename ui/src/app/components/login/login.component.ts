@@ -5,14 +5,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { AuthService } from '../../../services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
-import { ForgotPasswordDialog } from '../../dialogs';
 import { Subject, takeUntil } from 'rxjs';
-import { RouteConstants } from '../../../constants';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services';
+import { RouteConstants } from '../../constants';
+import { ForgotPasswordDialog } from '../dialogs';
 
 @Component({
     selector: 'app-login',
