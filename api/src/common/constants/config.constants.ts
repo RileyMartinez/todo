@@ -21,6 +21,7 @@ export class ConfigConstants {
     static readonly LOGGER_MAX_SIZE = 'LOGGER_MAX_SIZE';
     static readonly LOGGER_FILE_LIFETIME = 'LOGGER_FILE_LIFETIME';
     static readonly AWS_REGION = 'AWS_REGION';
+    static readonly AWS_PROFILE = 'AWS_PROFILE';
     static readonly AWS_SES_FROM_EMAIL = 'AWS_SES_FROM_EMAIL';
     static readonly ENCRYPTION_KEY = 'ENCRYPTION_KEY';
     static readonly KDF_SALT = 'KDF_SALT';

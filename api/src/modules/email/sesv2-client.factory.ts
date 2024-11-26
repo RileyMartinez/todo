@@ -8,6 +8,7 @@ import { AppConstants, ConfigConstants } from 'src/common';
 @Injectable()
 export class SESV2ClientFactory {
     private readonly region: string;
+    private readonly profile: string;
     private client: SESv2Client;
 
     constructor(
@@ -17,6 +18,7 @@ export class SESV2ClientFactory {
         this.logger = logger;
         this.configService = configService;
         this.region = this.configService.get(ConfigConstants.AWS_REGION) || AppConstants.DEFAULT_AWS_REGION;
+        this.profile = this.configService.get(ConfigConstants.AWS_PROFILE) || AppConstants.DEFAULT_AWS_PROFILE;
         this.client = this.createClient();
     }
 
@@ -30,7 +32,9 @@ export class SESV2ClientFactory {
         this.logger.log(`Creating SES client for region: ${clientRegion}`, SESV2ClientFactory.name);
         this.client = new SESv2Client({
             region: clientRegion,
-            credentials: fromSSO(),
+            credentials: fromSSO({
+                profile: this.profile,
+            }),
         });
 
         return this.client;
