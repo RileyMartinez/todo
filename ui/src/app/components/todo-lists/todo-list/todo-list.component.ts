@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule, MatActionList } from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TodoListService } from '../../../services/todo-list.service';
@@ -22,7 +22,6 @@ import { MatLineModule } from '@angular/material/core';
         MatLineModule,
         MatListModule,
         MatIconModule,
-        MatActionList,
         MatListModule,
         MatInputModule,
         MatFormFieldModule,

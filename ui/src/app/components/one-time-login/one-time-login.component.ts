@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../services';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -25,7 +25,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class OneTimeLoginComponent implements OnInit {
     private readonly authService = inject(AuthService);
     private readonly formBuilder = inject(FormBuilder);
-    private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
     private readonly destroy$ = new Subject<void>();
 

@@ -1,4 +1,4 @@
-import { catchError, concatMap, EMPTY, merge, mergeMap, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, EMPTY, merge, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
 import { TodoList, TodoListClient } from '../openapi-client';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -31,6 +31,7 @@ export class TodoListsService {
     public readonly error = computed(() => this.state().error);
 
     // sources
+    public readonly load$ = new Subject<void>();
     public readonly add$ = new Subject<AddTodoList>();
     public readonly remove$ = new Subject<RemoveTodoList>();
 
@@ -52,9 +53,8 @@ export class TodoListsService {
 
     constructor() {
         // reducers
-        merge(this.todoListAdded$, this.todoListRemoved$)
+        merge(this.load$, this.todoListAdded$, this.todoListRemoved$)
             .pipe(
-                startWith(null),
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
                     this.todoListClient

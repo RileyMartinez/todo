@@ -20,7 +20,11 @@
                 }
                 <mat-selection-list [multiple]="true">
                     @for (item of list.todos; track item.id) {
-                        <mat-list-option [togglePosition]="'before'" (click)="removeTodoItem(item.id)">
+                        <mat-list-option
+                            [togglePosition]="'before'"
+                            (click)="removeTodoItem(item.id)"
+                            (keydown.enter)="removeTodoItem(item.id)"
+                        >
                             {{ item.title }}
                         </mat-list-option>
                     }
