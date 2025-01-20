@@ -8,7 +8,7 @@ import {
 } from '@angular/common/http';
 import { inject, signal } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { catchError, finalize, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 
 let isRefreshing = false;
 const refreshToken = signal<string | undefined>(undefined);
@@ -44,8 +44,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
     function refreshTokenAndRetry(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
         if (isRefreshing) {
-            const updatedReq = setAuthorizationHeader(req, refreshToken());
-            return next(updatedReq);
+            return handleRequestWithNewToken(req, refreshToken(), next);
         }
 
         isRefreshing = true;
@@ -55,16 +54,12 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
                 isRefreshing = false;
                 refreshToken.set(newToken?.accessToken);
 
-                const updatedReq = setAuthorizationHeader(req, newToken?.accessToken);
-                return next(updatedReq);
+                return handleRequestWithNewToken(req, newToken?.accessToken, next);
             }),
             catchError((error) => {
                 isRefreshing = false;
                 refreshToken.set(undefined);
                 return throwError(() => error);
-            }),
-            finalize(() => {
-                isRefreshing = false;
             }),
         );
     }
@@ -77,5 +72,14 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
         return req.clone({
             headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
         });
+    }
+
+    function handleRequestWithNewToken(
+        req: HttpRequest<any>,
+        newToken: string | null | undefined,
+        next: HttpHandlerFn,
+    ): Observable<HttpEvent<any>> {
+        const updatedReq = setAuthorizationHeader(req, newToken);
+        return next(updatedReq);
     }
 };
