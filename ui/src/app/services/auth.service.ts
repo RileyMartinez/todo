@@ -62,61 +62,90 @@ export class AuthService {
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((authLoginDto) =>
-                    this.authClient
-                        .authControllerLogin(authLoginDto)
-                        .pipe(catchError((error) => this.handleError(error))),
+                    this.authClient.authControllerLogin(authLoginDto).pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Invalid email or password' });
+                            return this.handleError(error);
+                        }),
+                    ),
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((tokens) => this.setSessonAndRedirect(tokens.accessToken));
+            .subscribe((tokens) => {
+                this.snackBarNotificationService.emit({ message: 'Login successful' });
+                this.setSessonAndRedirect(tokens.accessToken);
+            });
 
         this.otpLogin$
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((authLoginDto) =>
-                    this.authClient
-                        .authControllerOneTimeLogin(authLoginDto)
-                        .pipe(catchError((error) => this.handleError(error))),
+                    this.authClient.authControllerOneTimeLogin(authLoginDto).pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Invalid one-time password' });
+                            return this.handleError(error);
+                        }),
+                    ),
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((tokens) => this.setSessonAndRedirect(tokens.accessToken));
+            .subscribe((tokens) => {
+                this.snackBarNotificationService.emit({ message: 'Login successful' });
+                this.setSessonAndRedirect(tokens.accessToken);
+            });
 
         this.register$
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((authRegisterDto) =>
-                    this.authClient
-                        .authControllerRegister(authRegisterDto)
-                        .pipe(catchError((error) => this.handleError(error))),
+                    this.authClient.authControllerRegister(authRegisterDto).pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Registration failed' });
+                            return this.handleError(error);
+                        }),
+                    ),
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((tokens) => this.setSessonAndRedirect(tokens.accessToken));
+            .subscribe((tokens) => {
+                this.snackBarNotificationService.emit({ message: 'Registration successful' });
+                this.setSessonAndRedirect(tokens.accessToken);
+            });
 
         this.logout$
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
-                    this.authClient.authControllerLogout().pipe(catchError((error) => this.handleError(error))),
+                    this.authClient.authControllerLogout().pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Something went wrong' });
+                            return this.handleError(error);
+                        }),
+                    ),
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe(() => this.clearSessionAndRedirect());
+            .subscribe(() => {
+                this.snackBarNotificationService.emit({ message: 'Logout successful' });
+                return this.clearSessionAndRedirect();
+            });
 
         this.requestPasswordReset$
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((passwordResetRequestDto) =>
-                    this.authClient
-                        .authControllerSendPasswordResetRequest(passwordResetRequestDto)
-                        .pipe(catchError((error) => this.handleError(error))),
+                    this.authClient.authControllerSendPasswordResetRequest(passwordResetRequestDto).pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Password reset email send failed' });
+                            return this.handleError(error);
+                        }),
+                    ),
                 ),
                 takeUntilDestroyed(),
             )
             .subscribe(() => {
                 this.state.update((state) => ({ ...state, loaded: true }));
-                this.snackBarNotificationService.emit({ message: 'Password reset email sent.' });
+                this.snackBarNotificationService.emit({ message: 'Password reset email sent' });
             });
 
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
@@ -181,7 +210,6 @@ export class AuthService {
 
     private handleError(error: any): Observable<never> {
         this.state.update((state) => ({ ...state, error }));
-        this.snackBarNotificationService.emit({ message: 'Ope. Something goofed. Please try again.' });
         this.clearSessionAndRedirect();
         return EMPTY;
     }
