@@ -50,7 +50,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
-            this.snackBar.open(notification.message, notification.action, { duration: notification.duration });
+            this.snackBar.open(notification.message, notification.action, {
+                duration: notification.duration,
+                verticalPosition: 'top',
+            });
         });
     }
 
