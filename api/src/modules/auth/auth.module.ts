@@ -6,7 +6,7 @@ import { UsersModule } from 'src/modules/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
-import { OtpStrategy, JwtAuthStrategy, JwtRefreshStrategy, LocalStrategy } from './strategies';
+import { OtpStrategy, JwtAuthStrategy, JwtRefreshStrategy, LocalStrategy, GoogleAuthStrategy } from './strategies';
 import { ValidationService } from 'src/common/services/validaton.service';
 import { EncryptionService } from '@/common';
 
@@ -21,6 +21,7 @@ import { EncryptionService } from '@/common';
         OtpStrategy,
         JwtAuthStrategy,
         JwtRefreshStrategy,
+        GoogleAuthStrategy,
     ],
 })
 export class AuthModule {}

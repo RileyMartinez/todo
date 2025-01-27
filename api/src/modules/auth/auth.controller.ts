@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
     ApiBearerAuth,
@@ -9,7 +9,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
-import { OtpGuard, JwtRefreshGuard, LocalGuard } from './guards';
+import { OtpGuard, JwtRefreshGuard, LocalGuard, GoogleAuthGuard } from './guards';
 import {
     AccessTokenResponseDto,
     AuthLoginRequestDto,
@@ -47,6 +47,31 @@ export class AuthController {
     async login(
         @GetCurrentUser() tokens: AuthTokensDto,
         @Body() _: AuthLoginRequestDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<AccessTokenResponseDto> {
+        if (!tokens) {
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
+
+        return new AccessTokenResponseDto(tokens.accessToken);
+    }
+
+    @Public()
+    @Get('google/login')
+    @UseGuards(GoogleAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    googleLogin(): void {}
+
+    @Public()
+    @Get('google/redirect')
+    @ApiOkResponse({ type: AccessTokenResponseDto })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @UseGuards(GoogleAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async googleRedirect(
+        @GetCurrentUser() tokens: AuthTokensDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<AccessTokenResponseDto> {
         if (!tokens) {

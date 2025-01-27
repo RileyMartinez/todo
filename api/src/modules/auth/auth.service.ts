@@ -54,26 +54,26 @@ export class AuthService {
      * Authenticates a user by checking their email and password.
      * If the user is authenticated, a JWT token is generated and returned.
      *
-     * @param {AuthLoginRequestDto} authLoginDto - The email and password of the user.
+     * @param {AuthLoginRequestDto} login - The email and password of the user.
      * @returns {Promise<AuthTokensDto>} - A promise that resolves to the authentication tokens for the authenticated user.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
-    async login(authLoginDto: AuthLoginRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(authLoginDto);
+    async login(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
+        await this.validationService.validateObject(login);
 
-        const user = await this.usersService.findUserByEmail(authLoginDto.email);
+        const user = await this.usersService.findUserByEmail(login.email);
 
         if (!user) {
             this.logger.error(
-                formatLogMessage('ASLog001', ExceptionConstants.USER_NOT_FOUND, { email: authLoginDto.email }),
+                formatLogMessage('ASLog001', ExceptionConstants.USER_NOT_FOUND, { email: login.email }),
                 undefined,
                 AuthService.name,
             );
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const match = await argon2.verify(user.password, authLoginDto.password);
+        const match = await argon2.verify(user.password, login.password);
 
         if (!match) {
             this.logger.error(
@@ -93,19 +93,19 @@ export class AuthService {
     /**
      * Performs a one-time login for the user.
      *
-     * @param authLoginDto - The authentication login data transfer object.
+     * @param login - The authentication login data transfer object.
      * @returns A promise that resolves to an AuthTokenDto.
      * @throws {ValidationException} If the email or password is invalid.
      * @throws {ForbiddenException} If the user is not found, does not have a token, token is expired, or if the provided token does not match.
      */
-    async oneTimeLogin(authLoginDto: AuthLoginRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(authLoginDto);
+    async oneTimeLogin(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
+        await this.validationService.validateObject(login);
 
-        const user = await this.usersService.findUserByEmail(authLoginDto.email);
+        const user = await this.usersService.findUserByEmail(login.email);
 
         if (!user) {
             this.logger.error(
-                formatLogMessage('ASOTLog001', ExceptionConstants.USER_NOT_FOUND, { email: authLoginDto.email }),
+                formatLogMessage('ASOTLog001', ExceptionConstants.USER_NOT_FOUND, { email: login.email }),
                 undefined,
                 AuthService.name,
             );
@@ -138,7 +138,7 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (verifiedToken?.otp.toString() !== authLoginDto.password) {
+        if (verifiedToken?.otp.toString() !== login.password) {
             this.logger.error(
                 formatLogMessage('ASOTLog004', 'OTP does not match', { userId: user.id }),
                 undefined,
@@ -156,15 +156,15 @@ export class AuthService {
     /**
      * Registers a new user with the provided email and password.
      *
-     * @param {AuthRegisterRequestDto} authRegisterDto - The registration data containing email and password.
+     * @param {AuthRegisterRequestDto} registration - The registration data containing email and password.
      * @returns {Promise<AuthTokensDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
-    async register(authRegisterDto: AuthRegisterRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(authRegisterDto);
+    async register(registration: AuthRegisterRequestDto): Promise<AuthTokensDto> {
+        await this.validationService.validateObject(registration);
 
-        const user = await this.usersService.findUserByEmail(authRegisterDto.email);
+        const user = await this.usersService.findUserByEmail(registration.email);
 
         if (user) {
             this.logger.warn(
@@ -177,15 +177,55 @@ export class AuthService {
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
-        const hash = await argon2.hash(authRegisterDto.password, argon2HashConfig);
+        const hash = await argon2.hash(registration.password, argon2HashConfig);
 
         const newUser = await this.usersService.createUser({
-            email: authRegisterDto.email,
+            email: registration.email,
             password: hash,
         });
 
         const tokens = await this.issueTokens(newUser);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(newUser.id, tokens.refreshToken));
+
+        return tokens;
+    }
+
+    /**
+     * Logs in an existing user or registers a new user if they do not exist.
+     * Primarily used for single-sign-on (SSO) scenarios.
+     *
+     * @param {AuthLoginRequestDto} login - The login/registration data containing email and password.
+     * @returns {Promise<AuthTokensDto>} - A promise that resolves to the authentication tokens for the user..
+     * @throws {ValidationException} - If the email or password is invalid.
+     * @throws {ForbiddenException} - If the provided password does not match the stored password for an existing user.
+     */
+    async loginOrRegister(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
+        await this.validationService.validateObject(login);
+
+        let user = await this.usersService.findUserByEmail(login.email);
+
+        if (!user) {
+            const hash = await argon2.hash(login.password, argon2HashConfig);
+
+            user = await this.usersService.createUser({
+                email: login.email,
+                password: hash,
+            });
+        } else {
+            const match = await argon2.verify(user.password, login.password);
+
+            if (!match) {
+                this.logger.error(
+                    formatLogMessage('ASLOR001', 'Password does not match', { userId: user.id }),
+                    undefined,
+                    AuthService.name,
+                );
+                throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+            }
+        }
+
+        const tokens = await this.issueTokens(user);
+        await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
         return tokens;
     }

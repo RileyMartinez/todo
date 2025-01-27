@@ -25,4 +25,6 @@ export class ConfigConstants {
     static readonly AWS_SES_FROM_EMAIL = 'AWS_SES_FROM_EMAIL';
     static readonly ENCRYPTION_KEY = 'ENCRYPTION_KEY';
     static readonly KDF_SALT = 'KDF_SALT';
+    static readonly GOOGLE_OAUTH20_CLIENT_ID = 'GOOGLE_OAUTH20_CLIENT_ID';
+    static readonly GOOGLE_OAUTH20_CLIENT_SECRET = 'GOOGLE_OAUTH20_CLIENT_SECRET';
 }
