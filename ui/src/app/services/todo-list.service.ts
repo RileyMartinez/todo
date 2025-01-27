@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { catchError, concatMap, EMPTY, merge, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, delay, EMPTY, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
 import { TodoList, TodoListClient } from '../openapi-client';
 import { LoadingService } from './loading.service';
 import { AddTodo, RemoveTodo } from '../interfaces/todo.interface';
@@ -65,7 +65,7 @@ export class TodoListService {
             )
             .subscribe((todoList) => this.state.update((state) => ({ ...state, todoList, loaded: true })));
 
-        merge(this.todoAdded$, this.todoRemoved$)
+        this.todoAdded$
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
@@ -77,6 +77,21 @@ export class TodoListService {
             )
             .subscribe((todoList) => {
                 this.state.update((state) => ({ ...state, todoList, loaded: true }));
+            });
+
+        this.todoRemoved$
+            .pipe(
+                switchMap(() =>
+                    this.todoListClient.todoListControllerFindTodoList(this.todoList()?.id || '').pipe(
+                        // Delay to allow the UI to animate todo item completion state
+                        delay(250),
+                        catchError((error) => this.handleError(error)),
+                    ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((todoList) => {
+                this.state.update((state) => ({ ...state, todoList }));
             });
 
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });

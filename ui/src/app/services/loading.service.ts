@@ -4,10 +4,10 @@ import { computed, Injectable, signal } from '@angular/core';
     providedIn: 'root',
 })
 export class LoadingService {
-    private loadingSignal = signal<boolean>(false);
-    public readonly loading = computed(() => this.loadingSignal());
+    private loadingState = signal<boolean>(false);
+    public readonly loading = computed(() => this.loadingState());
 
     setLoading(isLoading: boolean): void {
-        this.loadingSignal.set(isLoading);
+        this.loadingState.set(isLoading);
     }
 }
