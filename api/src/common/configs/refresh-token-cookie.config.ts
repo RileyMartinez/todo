@@ -42,6 +42,6 @@ const isProduction = process.env.ENV === AppConstants.PROD;
 export const refreshTokenCookieConfig: CookieOptions = {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge: maxAge,
 };
