@@ -1,12 +1,7 @@
 import { config } from 'dotenv';
-import { AppConstants } from '../constants';
 import { CookieOptions } from 'express';
 
 config();
-
-if (!process.env.ENV) {
-    throw new Error('ENV is not defined');
-}
 
 if (!process.env.JWT_REFRESH_EXPIRATION) {
     throw new Error('JWT_REFRESH_EXPIRATION is not defined');
@@ -37,11 +32,9 @@ const maxAge =
             : 1) *
     1000;
 
-const isProduction = process.env.ENV === AppConstants.PROD;
-
 export const refreshTokenCookieConfig: CookieOptions = {
     httpOnly: true,
-    secure: isProduction,
+    secure: true,
     sameSite: 'strict',
     maxAge: maxAge,
 };
