@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services';
 import { RouteConstants } from '../../constants';
 import { ForgotPasswordDialog } from '../dialogs';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
     selector: 'app-login',
@@ -26,6 +27,7 @@ import { ForgotPasswordDialog } from '../dialogs';
         ReactiveFormsModule,
         MatIcon,
         MatTooltipModule,
+        MatDivider,
     ],
     templateUrl: './login.component.html',
 })
@@ -62,6 +64,10 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
 
         this.authService.login$.next({ email: this.emailFormControl.value, password: this.passwordFormControl.value });
+    }
+
+    onGoogleLogin(): void {
+        this.authService.googleLogin$.next();
     }
 
     openForgotPasswordDialog(): void {

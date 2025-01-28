@@ -8,6 +8,7 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormControl } 
 import { AuthService } from '../../services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
     selector: 'app-register',
@@ -21,6 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         ReactiveFormsModule,
         MatIcon,
         MatTooltipModule,
+        MatDivider,
     ],
     templateUrl: './register.component.html',
 })

@@ -1,5 +1,5 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="flex justify-center p-14">
+    <div class="flex flex-col items-center p-14 space-y-4">
         <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
             <mat-card-header class="mb-4">
                 <mat-card-title>Login</mat-card-title>
@@ -45,6 +45,19 @@
                 <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Login</button>
                 <a mat-button color="accent" (click)="openForgotPasswordDialog()" class="ml-4">Forgot Password?</a>
             </mat-card-actions>
+        </mat-card>
+
+        <div class="py-4 w-full">
+            <mat-divider></mat-divider>
+        </div>
+
+        <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
+            <mat-card-header class="mb-4">
+                <mat-card-title>SSO</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <button mat-button (click)="onGoogleLogin()">Sign in with Google</button>
+            </mat-card-content>
         </mat-card>
     </div>
 </form>

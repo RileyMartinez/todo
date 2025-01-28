@@ -60,6 +60,7 @@ export class AuthController {
 
     @Public()
     @Get('google/login')
+    @ApiOkResponse({ type: AccessTokenResponseDto })
     @UseGuards(GoogleAuthGuard)
     @HttpCode(HttpStatus.OK)
     googleLogin(): void {}
