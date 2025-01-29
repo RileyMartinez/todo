@@ -50,7 +50,6 @@ export class AuthService {
     // sources
     readonly login$ = new Subject<AuthLoginRequestDto>();
     readonly otpLogin$ = new Subject<AuthLoginRequestDto>();
-    readonly googleLogin$ = new Subject<void>();
     readonly register$ = new Subject<AuthRegisterRequestDto>();
     readonly logout$ = new Subject<void>();
     readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
@@ -84,24 +83,6 @@ export class AuthService {
                     this.authClient.authControllerOneTimeLogin(authLoginDto).pipe(
                         catchError((error) => {
                             this.snackBarNotificationService.emit({ message: 'Invalid one-time password' });
-                            return this.handleError(error);
-                        }),
-                    ),
-                ),
-                takeUntilDestroyed(),
-            )
-            .subscribe((tokens) => {
-                this.snackBarNotificationService.emit({ message: 'Login successful' });
-                this.setSessonAndRedirect(tokens.accessToken);
-            });
-
-        this.googleLogin$
-            .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
-                switchMap(() =>
-                    this.authClient.authControllerGoogleLogin().pipe(
-                        catchError((error) => {
-                            this.snackBarNotificationService.emit({ message: 'Google login failed' });
                             return this.handleError(error);
                         }),
                     ),

@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     onGoogleLogin(): void {
-        this.authService.googleLogin$.next();
+        window.location.href = 'http://localhost:3000/auth/google/login';
     }
 
     openForgotPasswordDialog(): void {

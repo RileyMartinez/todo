@@ -10,7 +10,7 @@ if [ -d "/usr/local/aws-cli" ]; then
     sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
 else
     echo "Installing AWS CLI..."
-    sudo ./aws/instal
+    sudo ./aws/install
 fi
 
 rm -rf aws awscliv2.zip
