@@ -1,23 +1,20 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import {
-    AccessTokenResponseDto,
     AuthClient,
     AuthLoginRequestDto,
     AuthRegisterRequestDto,
     PasswordResetRequestDto,
+    UserContextDto,
 } from '../openapi-client';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
-import { jwtDecode } from 'jwt-decode';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { UserContext } from '../interfaces';
 import { SnackBarNotificationService } from './snack-bar.service';
 
 export interface AuthServiceState {
-    userContext: UserContext | null;
-    accessToken: string | null;
+    userContext: UserContextDto | null;
     loaded: boolean;
     error: string | null;
 }
@@ -36,14 +33,12 @@ export class AuthService {
     // state
     private readonly state = signal<AuthServiceState>({
         userContext: null,
-        accessToken: null,
         loaded: false,
         error: null,
     });
 
     // selectors
     readonly userContext = computed(() => this.state().userContext);
-    readonly accessToken = computed(() => this.state().accessToken);
     readonly loaded = computed(() => this.state().loaded);
     readonly error = computed(() => this.state().error);
 
@@ -71,9 +66,9 @@ export class AuthService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((tokens) => {
+            .subscribe((userContext) => {
                 this.snackBarNotificationService.emit({ message: 'Login successful' });
-                this.setSessonAndRedirect(tokens.accessToken);
+                this.setSessonAndRedirect(userContext);
             });
 
         this.otpLogin$
@@ -107,9 +102,9 @@ export class AuthService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((tokens) => {
+            .subscribe((userContext) => {
                 this.snackBarNotificationService.emit({ message: 'Registration successful' });
-                this.setSessonAndRedirect(tokens.accessToken);
+                this.setSessonAndRedirect(userContext);
             });
 
         this.logout$
@@ -151,11 +146,11 @@ export class AuthService {
         effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
     }
 
-    public refresh(): Observable<AccessTokenResponseDto | null> {
+    public refresh(): Observable<UserContextDto | null> {
         return this.authClient.authControllerRefresh().pipe(
             first(),
-            tap((tokens) => {
-                this.setTokenAndUserIdentity(tokens.accessToken);
+            tap((userContext) => {
+                this.setTokenAndUserIdentity(userContext);
             }),
             catchError(() => {
                 this.clearSessionAndRedirect();
@@ -164,27 +159,28 @@ export class AuthService {
         );
     }
 
-    private setTokenAndUserIdentity(token: string): void {
+    public setSessonAndRedirect(userContext: UserContextDto): void {
+        this.setTokenAndUserIdentity(userContext);
+        this.router.navigate([RouteConstants.TODO_LISTS]);
+    }
+
+    public clearSessionAndRedirect(): void {
+        this.clearTokenAndUserIdentity();
+        this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
+    }
+
+    private setTokenAndUserIdentity(userContext: UserContextDto): void {
         this.state.update((state) => ({
             ...state,
-            userContext: this.getUserContextFromToken(token),
-            accessToken: token,
+            userContext,
             loaded: true,
         }));
         localStorage.setItem(USER_CONTEXT_KEY, this.userContext()?.sub.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
-        this.state.update((state) => ({ ...state, userContext: null, accessToken: null, loaded: true }));
+        this.state.update((state) => ({ ...state, userContext: null, loaded: true }));
         localStorage.removeItem(USER_CONTEXT_KEY);
-    }
-
-    private getUserContextFromToken(token: string): UserContext | null {
-        try {
-            return jwtDecode<UserContext>(token);
-        } catch {
-            return null;
-        }
     }
 
     private initUserSession(): void {
@@ -196,16 +192,6 @@ export class AuthService {
         }
 
         this.state.update((state) => ({ ...state, userContext: { sub: userId }, loaded: true }));
-    }
-
-    private setSessonAndRedirect(token: string): void {
-        this.setTokenAndUserIdentity(token);
-        this.router.navigate([RouteConstants.TODO_LISTS]);
-    }
-
-    private clearSessionAndRedirect(): void {
-        this.clearTokenAndUserIdentity();
-        this.router.navigate([RouteConstants.LOGIN_OR_REGISTER]);
     }
 
     private handleError(error: any): Observable<never> {

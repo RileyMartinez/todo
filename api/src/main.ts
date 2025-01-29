@@ -5,11 +5,12 @@ import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { swaggerConfig, corsConfig } from './common/configs';
+import { swaggerConfig, corsConfigFactory } from './common/configs';
 import { ConfigConstants } from './common/constants';
 import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-filters';
 import * as cookieParser from 'cookie-parser';
 import { OpenAPIClientUtil } from './common/utils/openapi.util';
+import { config } from 'dotenv';
 
 /**
  * Bootstraps the application.
@@ -22,7 +23,9 @@ import { OpenAPIClientUtil } from './common/utils/openapi.util';
  *
  * @returns {Promise<void>} A promise that resolves when the application is successfully started.
  */
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
+    config();
+
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const logger = app.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
     app.useLogger(logger);
@@ -41,7 +44,7 @@ async function bootstrap() {
     const openApiService = app.get(OpenAPIClientUtil);
     await openApiService.generateClient(document);
 
-    app.enableCors(corsConfig);
+    app.enableCors(corsConfigFactory(configService));
 
     await app.listen(port);
 }

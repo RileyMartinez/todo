@@ -12,7 +12,6 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
-model/access-token-response-dto.ts
 model/auth-login-request-dto.ts
 model/auth-register-request-dto.ts
 model/create-user-dto.ts
@@ -23,5 +22,6 @@ model/todo-dto.ts
 model/todo-list-dto.ts
 model/todo-list.ts
 model/todo.ts
+model/user-context-dto.ts
 param.ts
 variables.ts

@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { IStrategyOptions, Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
-import { AuthTokensDto } from '../dto/auth-tokens.dto';
 import { AppConstants } from '@/common';
+import { AuthLoginResultDto } from '../dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, AppConstants.LOCAL_STRATEGY_NAME) {
@@ -21,7 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, AppConstants.LOCAL
      * @param password - The password of the user.
      * @returns A promise that resolves to an AuthTokenDto.
      */
-    async validate(email: string, password: string): Promise<AuthTokensDto> {
+    async validate(email: string, password: string): Promise<AuthLoginResultDto> {
         const user = await this.authService.login({
             email,
             password,

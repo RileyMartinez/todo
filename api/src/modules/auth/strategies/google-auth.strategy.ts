@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-google-oauth20';
 import { AuthService } from '../auth.service';
-import { AuthTokensDto } from '../dto';
+import { AuthLoginResultDto, AuthTokensDto } from '../dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class GoogleAuthStrategy extends PassportStrategy(Strategy, AppConstants.
         } as StrategyOptions);
     }
 
-    async validate(accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthTokensDto | null> {
+    async validate(accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {
         if (!profile.emails) {
             return null;
         }

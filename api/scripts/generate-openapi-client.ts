@@ -1,11 +1,11 @@
 import { exec } from 'child_process';
-import { config } from 'dotenv';
 import * as os from 'os';
 import { writeFile } from 'fs';
 import { promisify } from 'util';
 import * as fs from 'fs-extra';
 import axios from 'axios';
 import { getAdditionalPropertiesString } from '../src/common/configs/openapi-generator.config';
+import { config } from 'dotenv';
 
 config();
 

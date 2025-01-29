@@ -5,29 +5,37 @@ import {
     ApiConflictResponse,
     ApiCreatedResponse,
     ApiForbiddenResponse,
+    ApiFoundResponse,
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { OtpGuard, JwtRefreshGuard, LocalGuard, GoogleAuthGuard } from './guards';
-import {
-    AccessTokenResponseDto,
-    AuthLoginRequestDto,
-    AuthRefreshRequestDto,
-    AuthTokensDto,
-    PasswordResetRequestDto,
-} from './dto';
+import { AuthLoginRequestDto, AuthLoginResultDto, AuthTokensDto, PasswordResetRequestDto, UserContextDto } from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
-import { ConfigConstants, DecoratorConstants } from 'src/common/constants';
-import { Response } from 'express';
-import { invalidTokenCookieConfig, refreshTokenCookieConfig } from 'src/common/configs';
+import { ConfigConstants, DecoratorConstants, SwaggerConstants } from 'src/common/constants';
+import { CookieOptions, Response } from 'express';
+import { cookieConfigFactory, invalidTokenCookieConfig } from 'src/common/configs';
+import { ConfigService } from '@nestjs/config';
+import { ValidationUtil } from '@/common';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {
+    private readonly accessTokenCookieConfig: CookieOptions;
+    private readonly refreshTokenCookieConfig: CookieOptions;
+
+    constructor(
+        private readonly authService: AuthService,
+        private readonly configService: ConfigService,
+        private readonly validationUtil: ValidationUtil,
+    ) {
         this.authService = authService;
+        this.configService = configService;
+        this.validationUtil = validationUtil;
+        this.accessTokenCookieConfig = cookieConfigFactory(this.configService, ConfigConstants.JWT_EXPIRATION);
+        this.refreshTokenCookieConfig = cookieConfigFactory(this.configService, ConfigConstants.JWT_REFRESH_EXPIRATION);
     }
 
     /**
@@ -40,67 +48,69 @@ export class AuthController {
      */
     @Public()
     @Post('login')
-    @ApiOkResponse({ type: AccessTokenResponseDto })
+    @ApiOkResponse({ type: UserContextDto })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(LocalGuard)
     @HttpCode(HttpStatus.OK)
     async login(
-        @GetCurrentUser() tokens: AuthTokensDto,
+        @GetCurrentUser() result: AuthLoginResultDto,
         @Body() _: AuthLoginRequestDto,
         @Res({ passthrough: true }) response: Response,
-    ): Promise<AccessTokenResponseDto> {
-        if (!tokens) {
-            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-        }
+    ): Promise<UserContextDto> {
+        this.validationUtil.validateObject(result);
 
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
+        const { tokens, userContext } = result;
 
-        return new AccessTokenResponseDto(tokens.accessToken);
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        return userContext;
     }
 
     @Public()
     @Get('google/login')
-    @ApiOkResponse({ type: AccessTokenResponseDto })
     @UseGuards(GoogleAuthGuard)
     @HttpCode(HttpStatus.OK)
     googleLogin(): void {}
 
     @Public()
     @Get('google/redirect')
-    @ApiOkResponse({ type: AccessTokenResponseDto })
+    @ApiFoundResponse({ description: 'Redirect to client with user session' })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(GoogleAuthGuard)
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.FOUND)
     async googleRedirect(
-        @GetCurrentUser() tokens: AuthTokensDto,
+        @GetCurrentUser() result: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
-    ): Promise<AccessTokenResponseDto> {
-        if (!tokens) {
-            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-        }
+    ): Promise<void> {
+        this.validationUtil.validateObject(result);
 
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
+        const { tokens, userContext } = result;
+        const basePath = this.configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
+        const uiPort = this.configService.getOrThrow<string>(ConfigConstants.UI_PORT);
 
-        return new AccessTokenResponseDto(tokens.accessToken);
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        response.redirect(`${basePath}:${uiPort}/auth/callback/${userContext.sub}`);
     }
 
     @Public()
     @Post('one-time-login')
     @UseGuards(OtpGuard)
-    @ApiOkResponse({ type: AccessTokenResponseDto })
+    @ApiOkResponse({ description: SwaggerConstants.USER_LOGIN_SUCCESS })
     @HttpCode(HttpStatus.OK)
     async oneTimeLogin(
         @GetCurrentUser() tokens: AuthTokensDto,
         @Body() _: AuthLoginRequestDto,
         @Res({ passthrough: true }) response: Response,
-    ): Promise<AccessTokenResponseDto> {
+    ): Promise<void> {
         if (!tokens) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
-
-        return new AccessTokenResponseDto(tokens.accessToken);
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
     }
 
     /**
@@ -123,9 +133,10 @@ export class AuthController {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, '', invalidTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, '', invalidTokenCookieConfig);
 
-        return await this.authService.logout(userId);
+        await this.authService.logout(userId);
     }
 
     /**
@@ -138,17 +149,19 @@ export class AuthController {
      */
     @Public()
     @Post('register')
-    @ApiCreatedResponse({ type: AccessTokenResponseDto })
+    @ApiCreatedResponse({ description: 'User registered successfully.' })
     @ApiConflictResponse({ description: ExceptionConstants.USER_ALREADY_EXISTS })
     @HttpCode(HttpStatus.CREATED)
     async register(
         @Body() authRegisterRequestDto: AuthRegisterRequestDto,
         @Res({ passthrough: true }) response: Response,
-    ): Promise<AccessTokenResponseDto> {
-        const tokens = await this.authService.register(authRegisterRequestDto);
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, refreshTokenCookieConfig);
+    ): Promise<UserContextDto> {
+        const { tokens, userContext } = await this.authService.register(authRegisterRequestDto);
 
-        return new AccessTokenResponseDto(tokens.accessToken);
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        return userContext;
     }
 
     /**
@@ -164,19 +177,23 @@ export class AuthController {
     @Public()
     @Post('refresh')
     @ApiBearerAuth()
-    @ApiOkResponse({ type: AccessTokenResponseDto })
+    @ApiOkResponse({ type: UserContextDto })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(JwtRefreshGuard)
     @HttpCode(HttpStatus.OK)
     async refresh(
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
         @GetCurrentUser(DecoratorConstants.REFRESH_TOKEN) refreshToken: string,
-    ): Promise<AccessTokenResponseDto> {
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<UserContextDto> {
         if (!userId || !refreshToken) {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        return await this.authService.refresh(new AuthRefreshRequestDto(userId, refreshToken));
+        const { accessToken, userContext } = await this.authService.refresh({ userId, refreshToken });
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, accessToken, this.accessTokenCookieConfig);
+
+        return userContext;
     }
 
     /**

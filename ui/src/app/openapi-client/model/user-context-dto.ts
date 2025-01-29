@@ -11,10 +11,7 @@
  */
 
 
-export interface AccessTokenResponseDto { 
-    /**
-     * Access token
-     */
-    accessToken: string;
+export interface UserContextDto { 
+    sub: string;
 }
 
