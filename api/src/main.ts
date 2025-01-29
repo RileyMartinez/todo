@@ -9,7 +9,7 @@ import { swaggerConfig, corsConfig } from './common/configs';
 import { ConfigConstants } from './common/constants';
 import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-filters';
 import * as cookieParser from 'cookie-parser';
-import { OpenAPIService } from './common/services/openapi.service';
+import { OpenAPIClientUtil } from './common/utils/openapi.util';
 
 /**
  * Bootstraps the application.
@@ -38,7 +38,7 @@ async function bootstrap() {
     const configService = app.get(ConfigService);
     const port = configService.getOrThrow<number>(ConfigConstants.PORT);
 
-    const openApiService = app.get(OpenAPIService);
+    const openApiService = app.get(OpenAPIClientUtil);
     await openApiService.generateClient(document);
 
     app.enableCors(corsConfig);

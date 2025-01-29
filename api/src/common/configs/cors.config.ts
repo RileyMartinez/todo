@@ -14,6 +14,6 @@ if (!uiPort) {
 }
 
 export const corsConfig: CorsOptions = {
-    origin: `${basePath}:${uiPort}`,
+    origin: [`${basePath}:${uiPort}`],
     credentials: true,
 };

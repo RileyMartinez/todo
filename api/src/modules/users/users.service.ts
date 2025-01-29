@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ValidationService } from 'src/common/services/validaton.service';
+import { ValidationUtil } from '@/common/utils/validaton.util';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { formatLogMessage } from '@/common/utils/logger.util';
@@ -13,7 +13,7 @@ export class UserService {
     constructor(
         @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         @InjectRepository(User) private readonly userRepository: Repository<User>,
-        private readonly validationService: ValidationService,
+        private readonly validationService: ValidationUtil,
     ) {
         this.logger = logger;
         this.validationService = validationService;

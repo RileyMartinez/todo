@@ -1,6 +1,6 @@
 import { ForbiddenException, Inject, Injectable, LoggerService } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ConfigConstants, EventConstants, ExceptionConstants, PasswordResetEvent, ValidationService } from '@/common';
+import { ConfigConstants, EventConstants, ExceptionConstants, PasswordResetEvent, ValidationUtil } from '@/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { SESV2ClientFactory } from './sesv2-client.factory';
 import { SendEmailCommand } from '@aws-sdk/client-sesv2';
@@ -15,7 +15,7 @@ export class EmailService {
         @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         private readonly configService: ConfigService,
         private readonly sesv2ClientFactory: SESV2ClientFactory,
-        private readonly validationService: ValidationService,
+        private readonly validationService: ValidationUtil,
         private readonly jwtService: JwtService,
     ) {
         this.logger = logger;

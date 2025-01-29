@@ -6,7 +6,7 @@ import { TodoDto, TodoListDto } from './dto';
 import { Todo } from './entities';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ValidationService } from 'src/common/services/validaton.service';
+import { ValidationUtil } from '@/common/utils/validaton.util';
 import { formatLogMessage } from '@/common/utils/logger.util';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class TodoListService {
         @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         @InjectRepository(TodoList) private readonly todolistRepository: Repository<TodoList>,
         @InjectRepository(Todo) private readonly todoRepository: Repository<Todo>,
-        private readonly validationService: ValidationService,
+        private readonly validationService: ValidationUtil,
     ) {
         this.logger = logger;
         this.todolistRepository = todolistRepository;

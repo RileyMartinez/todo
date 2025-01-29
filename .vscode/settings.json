@@ -38,7 +38,8 @@
     "/ui/src/app/components/login-or-register",
     "/ui/src/app/components/login-or-register/register",
     "/ui/src/app/components/login-or-register/login",
-    "/api/src/common/events"
+    "/api/src/common/events",
+    "/api/src/common/utils"
   ]
 }
 

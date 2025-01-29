@@ -12,7 +12,7 @@ import { PathUtil } from 'src/common/utils/path.util';
 import { promisify } from 'util';
 
 @Injectable()
-export class OpenAPIService {
+export class OpenAPIClientUtil {
     private readonly execAsync: (
         command: string,
         options: ExecOptionsWithStringEncoding,
@@ -54,11 +54,11 @@ export class OpenAPIService {
         );
 
         if (stdout) {
-            this.logger.log(`Generating OpenAPI client: ${stdout}`, OpenAPIService.name);
+            this.logger.log(`Generating OpenAPI client: ${stdout}`, OpenAPIClientUtil.name);
         }
 
         if (stderr) {
-            this.logger.error(`Error generating OpenAPI client: ${stderr}`, OpenAPIService.name);
+            this.logger.error(`Error generating OpenAPI client: ${stderr}`, OpenAPIClientUtil.name);
         }
     }
 }

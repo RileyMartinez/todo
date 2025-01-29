@@ -12,9 +12,9 @@ import { AppController } from './app.controller';
 import { typeOrmConfig, throttlerConfig, automapperConfig, loggerConfig, eventEmitterConfig } from 'src/common/configs';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/guards';
-import { OpenAPIService } from 'src/common/services/openapi.service';
 import { EmailModule } from '../email/email.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { OpenAPIClientUtil } from '@/common';
 
 @Module({
     imports: [
@@ -40,7 +40,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
             useClass: ThrottlerGuard,
         },
         UserMappingProfile,
-        OpenAPIService,
+        OpenAPIClientUtil,
     ],
 })
 export class AppModule {}

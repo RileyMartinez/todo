@@ -22,13 +22,14 @@ import {
     RawRefreshTokenDto,
 } from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
-import { ValidationService } from 'src/common/services/validaton.service';
+import { ValidationUtil } from '@/common/utils/validaton.util';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EncryptionService, EventConstants, PasswordResetEvent } from '@/common';
+import { EventConstants, PasswordResetEvent } from '@/common';
 import { formatLogMessage } from '@/common/utils/logger.util';
 import { argon2HashConfig } from 'src/common/configs';
 import * as argon2 from 'argon2';
 import { randomInt } from 'crypto';
+import { EncryptionUtil } from '@/common/utils/encryption.util';
 
 @Injectable()
 export class AuthService {
@@ -37,16 +38,16 @@ export class AuthService {
         private readonly usersService: UserService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
-        private readonly validationService: ValidationService,
-        private readonly encryptionService: EncryptionService,
+        private readonly validationUtil: ValidationUtil,
+        private readonly encryptionUtil: EncryptionUtil,
         private readonly eventEmitter: EventEmitter2,
     ) {
         this.logger = logger;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
-        this.validationService = validationService;
-        this.encryptionService = encryptionService;
+        this.validationUtil = validationUtil;
+        this.encryptionUtil = encryptionUtil;
         this.eventEmitter = eventEmitter;
     }
 
@@ -60,7 +61,7 @@ export class AuthService {
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
     async login(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(login);
+        await this.validationUtil.validateObject(login);
 
         const user = await this.usersService.findUserByEmail(login.email);
 
@@ -99,7 +100,7 @@ export class AuthService {
      * @throws {ForbiddenException} If the user is not found, does not have a token, token is expired, or if the provided token does not match.
      */
     async oneTimeLogin(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(login);
+        await this.validationUtil.validateObject(login);
 
         const user = await this.usersService.findUserByEmail(login.email);
 
@@ -121,7 +122,7 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const decryptedToken = this.encryptionService.decrypt(user.token);
+        const decryptedToken = this.encryptionUtil.decrypt(user.token);
         let verifiedToken: RawOtpTokenDto;
 
         try {
@@ -162,7 +163,7 @@ export class AuthService {
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
     async register(registration: AuthRegisterRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(registration);
+        await this.validationUtil.validateObject(registration);
 
         const user = await this.usersService.findUserByEmail(registration.email);
 
@@ -200,7 +201,7 @@ export class AuthService {
      * @throws {ForbiddenException} - If the provided password does not match the stored password for an existing user.
      */
     async loginOrRegister(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(login);
+        await this.validationUtil.validateObject(login);
 
         let user = await this.usersService.findUserByEmail(login.email);
 
@@ -258,7 +259,7 @@ export class AuthService {
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
      */
     async refresh(authRefreshRequestDto: AuthRefreshRequestDto): Promise<AccessTokenResponseDto> {
-        await this.validationService.validateObject(authRefreshRequestDto);
+        await this.validationUtil.validateObject(authRefreshRequestDto);
 
         const user = await this.usersService.findUserById(authRefreshRequestDto.userId);
 
@@ -351,7 +352,7 @@ export class AuthService {
             },
         );
 
-        const encryptedToken = this.encryptionService.encrypt(token);
+        const encryptedToken = this.encryptionUtil.encrypt(token);
         await this.usersService.revokeUserToken(user.id);
         await this.usersService.updateUserToken(user.id, encryptedToken);
 
@@ -366,7 +367,7 @@ export class AuthService {
      * @throws {ValidationException} If the user ID or email is invalid.
      */
     private async issueTokens(user: User): Promise<AuthTokensDto> {
-        await this.validationService.validateObject(user);
+        await this.validationUtil.validateObject(user);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const refreshTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_REFRESH_SECRET);
@@ -405,7 +406,7 @@ export class AuthService {
      * @returns A promise that resolves to an AccessTokenResponseDto containing the generated access token.
      */
     private async issueAccessToken(user: User): Promise<AccessTokenResponseDto> {
-        await this.validationService.validateObject(user);
+        await this.validationUtil.validateObject(user);
 
         const accessTokenSecret = this.configService.getOrThrow(ConfigConstants.JWT_SECRET);
         const accessTokenExpiration = this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION);
@@ -431,7 +432,7 @@ export class AuthService {
      * @throws {ValidationException} If the user ID or refresh token is invalid.
      */
     private async updateUserRefreshToken(authRefreshRequestDto: AuthRefreshRequestDto): Promise<void> {
-        await this.validationService.validateObject(authRefreshRequestDto);
+        await this.validationUtil.validateObject(authRefreshRequestDto);
         await this.usersService.updateUserToken(authRefreshRequestDto.userId, authRefreshRequestDto.refreshToken);
     }
 }
