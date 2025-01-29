@@ -45,6 +45,10 @@ export class RegisterComponent implements OnInit {
         });
     }
 
+    onGoogleLogin(): void {
+        window.location.href = 'http://localhost:3000/auth/google/login';
+    }
+
     onSubmit(): void {
         if (this.registerForm.invalid) {
             return;

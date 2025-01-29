@@ -42,23 +42,16 @@
                         <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
                 </mat-form-field>
+                <mat-divider></mat-divider>
+                <div class="py-4">
+                    <button mat-raised-button color="primary" (click)="onGoogleLogin()">Sign up with Google</button>
+                </div>
             </mat-card-content>
             <mat-card-actions>
                 <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
                     Create
                 </button>
             </mat-card-actions>
-        </mat-card>
-
-        <div class="py-4 w-full">
-            <mat-divider></mat-divider>
-        </div>
-
-        <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
-            <mat-card-header class="mb-4">
-                <mat-card-title>SSO</mat-card-title>
-            </mat-card-header>
-            <mat-card-content> </mat-card-content>
         </mat-card>
     </div>
 </form>

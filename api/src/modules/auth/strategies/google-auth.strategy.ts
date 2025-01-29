@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-google-oauth20';
 import { AuthService } from '../auth.service';
-import { AuthLoginResultDto, AuthTokensDto } from '../dto';
+import { AuthLoginResultDto } from '../dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
