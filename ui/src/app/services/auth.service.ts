@@ -84,9 +84,9 @@ export class AuthService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((tokens) => {
+            .subscribe((userContext) => {
                 this.snackBarNotificationService.emit({ message: 'Login successful' });
-                this.setSessonAndRedirect(tokens.accessToken);
+                this.setSessonAndRedirect(userContext);
             });
 
         this.register$

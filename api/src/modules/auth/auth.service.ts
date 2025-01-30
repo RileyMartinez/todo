@@ -55,10 +55,10 @@ export class AuthService {
 
     /**
      * Authenticates a user by checking their email and password.
-     * If the user is authenticated, a JWT token is generated and returned.
+     * If the user is authenticated, JWT tokens are issued.
      *
      * @param {AuthLoginRequestDto} login - The email and password of the user.
-     * @returns {Promise<AuthLoginResultDto>} - A promise that resolves to the authentication tokens and context info for the authenticated user.
+     * @returns {Promise<AuthLoginResultDto>} - Auth tokens and user context.
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
@@ -90,23 +90,18 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return {
-            tokens,
-            userContext: {
-                sub: user.id,
-            },
-        };
+        return new AuthLoginResultDto(tokens, { sub: user.id });
     }
 
     /**
      * Performs a one-time login for the user.
      *
-     * @param login - The authentication login data transfer object.
-     * @returns A promise that resolves to an AuthTokenDto.
+     * @param login - The authentication login DTO.
+     * @returns {Promise<AuthLoginResultDto>} - Auth tokens and user context.
      * @throws {ValidationException} If the email or password is invalid.
      * @throws {ForbiddenException} If the user is not found, does not have a token, token is expired, or if the provided token does not match.
      */
-    async oneTimeLogin(login: AuthLoginRequestDto): Promise<AuthTokensDto> {
+    async oneTimeLogin(login: AuthLoginRequestDto): Promise<AuthLoginResultDto> {
         await this.validationUtil.validateObject(login);
 
         const user = await this.usersService.findUserByEmail(login.email);
@@ -158,7 +153,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return tokens;
+        return new AuthLoginResultDto(tokens, { sub: user.id });
     }
 
     /**
@@ -195,12 +190,7 @@ export class AuthService {
         const tokens = await this.issueTokens(newUser);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(newUser.id, tokens.refreshToken));
 
-        return {
-            tokens,
-            userContext: {
-                sub: newUser.id,
-            },
-        };
+        return new AuthRegisterResultDto(tokens, { sub: newUser.id });
     }
 
     /**
@@ -229,12 +219,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return {
-            tokens,
-            userContext: {
-                sub: user.id,
-            },
-        };
+        return new AuthLoginResultDto(tokens, { sub: user.id });
     }
 
     /**
@@ -318,12 +303,7 @@ export class AuthService {
 
         const token = await this.issueAccessToken(user);
 
-        return {
-            accessToken: token,
-            userContext: {
-                sub: user.id,
-            },
-        };
+        return new AuthRefreshResultDto(token, { sub: user.id });
     }
 
     /**

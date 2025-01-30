@@ -11,7 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { OtpGuard, JwtRefreshGuard, LocalGuard, GoogleAuthGuard } from './guards';
-import { AuthLoginRequestDto, AuthLoginResultDto, AuthTokensDto, PasswordResetRequestDto, UserContextDto } from './dto';
+import { AuthLoginRequestDto, AuthLoginResultDto, PasswordResetRequestDto, UserContextDto } from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
 import { ConfigConstants, DecoratorConstants, SwaggerConstants } from 'src/common/constants';
@@ -101,16 +101,18 @@ export class AuthController {
     @ApiOkResponse({ description: SwaggerConstants.USER_LOGIN_SUCCESS })
     @HttpCode(HttpStatus.OK)
     async oneTimeLogin(
-        @GetCurrentUser() tokens: AuthTokensDto,
+        @GetCurrentUser() result: AuthLoginResultDto,
         @Body() _: AuthLoginRequestDto,
         @Res({ passthrough: true }) response: Response,
-    ): Promise<void> {
-        if (!tokens) {
-            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
-        }
+    ): Promise<UserContextDto> {
+        this.validationUtil.validateObject(result);
+
+        const { tokens, userContext } = result;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        return userContext;
     }
 
     /**
