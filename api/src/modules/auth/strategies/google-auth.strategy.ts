@@ -23,16 +23,11 @@ export class GoogleAuthStrategy extends PassportStrategy(Strategy, AppConstants.
         } as StrategyOptions);
     }
 
-    async validate(accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {
+    async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {
         if (!profile.emails) {
             return null;
         }
 
-        const user = await this.authService.loginOrRegister({
-            email: profile.emails[0].value,
-            password: accessToken,
-        });
-
-        return user;
+        return await this.authService.passwordlessLoginOrRegister(profile.emails[0].value);
     }
 }

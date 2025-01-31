@@ -10,7 +10,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
-import { OtpGuard, JwtRefreshGuard, LocalGuard, GoogleAuthGuard } from './guards';
+import { OtpGuard, JwtRefreshGuard, LocalGuard, GoogleAuthGuard, AzureAdAuthGuard } from './guards';
 import { AuthLoginRequestDto, AuthLoginResultDto, PasswordResetRequestDto, UserContextDto } from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { GetCurrentUser, Public } from 'src/common/decorators';
@@ -65,6 +65,34 @@ export class AuthController {
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
         return userContext;
+    }
+
+    @Public()
+    @Get('azure-ad/login')
+    @UseGuards(AzureAdAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    azureAdLogin(): void {}
+
+    @Public()
+    @Post('azure-ad/redirect')
+    @ApiFoundResponse({ description: 'Redirect to client with user session' })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @UseGuards(AzureAdAuthGuard)
+    @HttpCode(HttpStatus.FOUND)
+    async azureAdRedirect(
+        @GetCurrentUser() result: AuthLoginResultDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        this.validationUtil.validateObject(result);
+
+        const { tokens, userContext } = result;
+        const basePath = this.configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
+        const uiPort = this.configService.getOrThrow<string>(ConfigConstants.UI_PORT);
+
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        response.redirect(`${basePath}:${uiPort}/auth/callback/${userContext.sub}`);
     }
 
     @Public()

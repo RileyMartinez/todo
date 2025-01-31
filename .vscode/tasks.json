@@ -17,10 +17,7 @@
     {
       "label": "docker compose down",
       "type": "shell",
-      "command": "docker compose down -v && docker image prune -f",
-      "windows": {
-        "command": "docker compose down -v; docker image prune -f"
-      }
+      "command": "docker compose down -v --remove-orphans --rmi all"
     },
     {
       "label": "build-api",

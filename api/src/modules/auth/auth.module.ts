@@ -6,7 +6,14 @@ import { UsersModule } from 'src/modules/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
-import { OtpStrategy, JwtAuthStrategy, JwtRefreshStrategy, LocalStrategy, GoogleAuthStrategy } from './strategies';
+import {
+    OtpStrategy,
+    JwtAuthStrategy,
+    JwtRefreshStrategy,
+    LocalStrategy,
+    GoogleAuthStrategy,
+    AzureAdAuthStrategy,
+} from './strategies';
 import { EncryptionUtil, ValidationUtil } from '@/common';
 
 @Module({
@@ -21,6 +28,7 @@ import { EncryptionUtil, ValidationUtil } from '@/common';
         JwtAuthStrategy,
         JwtRefreshStrategy,
         GoogleAuthStrategy,
+        AzureAdAuthStrategy,
     ],
 })
 export class AuthModule {}

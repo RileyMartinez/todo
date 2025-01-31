@@ -49,6 +49,10 @@ export class RegisterComponent implements OnInit {
         window.location.href = 'http://localhost:3000/auth/google/login';
     }
 
+    onAzureAdLogin(): void {
+        window.location.href = 'http://localhost:3000/auth/azure-ad/login';
+    }
+
     onSubmit(): void {
         if (this.registerForm.invalid) {
             return;

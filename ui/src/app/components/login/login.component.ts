@@ -70,6 +70,10 @@ export class LoginComponent implements OnInit, OnDestroy {
         window.location.href = 'http://localhost:3000/auth/google/login';
     }
 
+    onAzureAdLogin(): void {
+        window.location.href = 'http://localhost:3000/auth/azure-ad/login';
+    }
+
     openForgotPasswordDialog(): void {
         this.dialog
             .open(ForgotPasswordDialog)

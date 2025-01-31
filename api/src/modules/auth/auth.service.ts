@@ -76,6 +76,15 @@ export class AuthService {
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
+        if (!user.password) {
+            this.logger.error(
+                formatLogMessage('ASLog002', 'Password from db cannot be null or undefined', { userId: user.id }),
+                undefined,
+                AuthService.name,
+            );
+            throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
         const match = await argon2.verify(user.password, login.password);
 
         if (!match) {
@@ -195,24 +204,29 @@ export class AuthService {
 
     /**
      * Logs in an existing user or registers a new user if they do not exist.
-     * Primarily used for single-sign-on (SSO) scenarios.
+     * Primarily used for passwordless single-sign-on (SSO) scenarios.
      *
-     * @param {AuthLoginRequestDto} login - The login/registration data containing email and password.
+     * @param {string} email - The login/registration email.
      * @returns {Promise<AuthLoginResultDto>} - A promise that resolves to the authentication tokens for the user..
      * @throws {ValidationException} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the provided password does not match the stored password for an existing user.
      */
-    async loginOrRegister(login: AuthLoginRequestDto): Promise<AuthLoginResultDto> {
-        await this.validationUtil.validateObject(login);
+    async passwordlessLoginOrRegister(email: string): Promise<AuthLoginResultDto> {
+        if (!email) {
+            this.logger.error(
+                formatLogMessage('ASPLOR001', ExceptionConstants.INVALID_EMAIL, { email }),
+                undefined,
+                AuthService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
+        }
 
-        let user = await this.usersService.findUserByEmail(login.email);
+        let user = await this.usersService.findUserByEmail(email);
 
         if (!user) {
-            const hash = await argon2.hash(login.password, argon2HashConfig);
-
             user = await this.usersService.createUser({
-                email: login.email,
-                password: hash,
+                email: email,
+                password: '',
             });
         }
 

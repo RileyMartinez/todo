@@ -23,8 +23,8 @@ export class User {
     /**
      * User hashed password
      */
-    @Column()
-    password!: string;
+    @Column({ nullable: true })
+    password?: string;
 
     /**
      * User hashed token

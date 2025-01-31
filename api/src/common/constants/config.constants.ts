@@ -28,4 +28,9 @@ export class ConfigConstants {
     static readonly KDF_SALT = 'KDF_SALT';
     static readonly GOOGLE_OAUTH20_CLIENT_ID = 'GOOGLE_OAUTH20_CLIENT_ID';
     static readonly GOOGLE_OAUTH20_CLIENT_SECRET = 'GOOGLE_OAUTH20_CLIENT_SECRET';
+    static readonly AZURE_AD_TENANT_ID = 'AZURE_AD_TENANT_ID';
+    static readonly AZURE_AD_CLIENT_ID = 'AZURE_AD_CLIENT_ID';
+    static readonly AZURE_AD_CLIENT_SECRET = 'AZURE_AD_CLIENT_SECRET';
+    static readonly AZURE_AD_COOKIE_ENCRYPTION_KEY = 'AZURE_AD_COOKIE_ENCRYPTION_KEY';
+    static readonly AZURE_AD_COOKIE_IV = 'AZURE_AD_COOKIE_IV';
 }
