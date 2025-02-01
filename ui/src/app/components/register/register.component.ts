@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDivider } from '@angular/material/divider';
+import { MatRipple } from '@angular/material/core';
 
 @Component({
     selector: 'app-register',
@@ -23,6 +24,7 @@ import { MatDivider } from '@angular/material/divider';
         MatIcon,
         MatTooltipModule,
         MatDivider,
+        MatRipple,
     ],
     templateUrl: './register.component.html',
 })

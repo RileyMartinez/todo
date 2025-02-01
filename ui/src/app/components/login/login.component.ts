@@ -14,6 +14,7 @@ import { AuthService } from '../../services';
 import { RouteConstants } from '../../constants';
 import { ForgotPasswordDialog } from '../dialogs';
 import { MatDivider } from '@angular/material/divider';
+import { MatRipple } from '@angular/material/core';
 
 @Component({
     selector: 'app-login',
@@ -28,6 +29,7 @@ import { MatDivider } from '@angular/material/divider';
         MatIcon,
         MatTooltipModule,
         MatDivider,
+        MatRipple,
     ],
     templateUrl: './login.component.html',
 })

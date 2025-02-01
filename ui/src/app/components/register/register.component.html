@@ -9,45 +9,44 @@
                     <mat-label>Email</mat-label>
                     <input matInput type="email" [formControl]="emailFormControl" autocomplete="email" required />
                     @if (emailFormControl.hasError('email') && emailFormControl.hasError('required')) {
-                        <mat-error> Please enter a valid email address </mat-error>
+                    <mat-error> Please enter a valid email address </mat-error>
                     }
                     @if (emailFormControl.hasError('required')) {
-                        <mat-error> Email is required </mat-error>
+                    <mat-error> Email is required </mat-error>
                     }
                 </mat-form-field>
                 <mat-form-field appearance="fill" class="w-3/4">
                     <mat-label>Password</mat-label>
-                    <input
-                        matInput
-                        [formControl]="passwordFormControl"
-                        autocomplete="new-password"
-                        [type]="hide ? 'password' : 'text'"
-                        required
-                    />
+                    <input matInput [formControl]="passwordFormControl" autocomplete="new-password"
+                        [type]="hide ? 'password' : 'text'" required />
                     @if (passwordFormControl.hasError('required')) {
-                        <mat-error>Password is required </mat-error>
+                    <mat-error>Password is required </mat-error>
                     }
                     @if (passwordFormControl.hasError('minlength')) {
-                        <mat-error> Password must be at least 8 characters </mat-error>
+                    <mat-error> Password must be at least 8 characters </mat-error>
                     }
-                    <button
-                        type="button"
-                        mat-icon-button
-                        matSuffix
-                        matTooltip="Toggle password visibility"
-                        (click)="hide = !hide"
-                        [attr.aria-label]="'Hide password'"
-                        [attr.aria-pressed]="hide"
-                    >
+                    <button type="button" mat-icon-button matSuffix matTooltip="Toggle password visibility"
+                        (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                         <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
                 </mat-form-field>
                 <mat-divider></mat-divider>
-                <div class="py-4">
-                    <button mat-raised-button color="primary" (click)="onGoogleLogin()">Sign up with Google</button>
-                </div>
-                <div class="py-4">
-                    <button mat-raised-button color="primary" (click)="onAzureAdLogin()">Sign up with Microsoft</button>
+                <div class="py-4 flex space-x-4">
+                    <div matRipple>
+                        <button (click)="onGoogleLogin()"
+                            class="border-none bg-transparent p-0 transition-shadow duration-300 hover:shadow-md rounded-md"
+                            aria-label="Sign in with Google">
+                            <img src="assets/web_light_sq_SI.svg" alt="Sign in with Google" />
+                        </button>
+                    </div>
+                    <div matRipple>
+                        <button (click)="onAzureAdLogin()"
+                            class="border-none bg-transparent p-0 transition-shadow duration-300 hover:shadow-md rounded-md"
+                            aria-label="Sign in with Microsoft">
+                            <img src="assets/ms-symbollockup_signin_light.svg" alt="Sign in with Microsoft"
+                                class="h-10" />
+                        </button>
+                    </div>
                 </div>
             </mat-card-content>
             <mat-card-actions>
