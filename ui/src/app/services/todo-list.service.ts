@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { catchError, concatMap, delay, EMPTY, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, delay, EMPTY, mergeMap, Observable, Subject, switchMap } from 'rxjs';
 import { TodoList, TodoListClient } from '../openapi-client';
 import { LoadingService } from './loading.service';
 import { AddTodo, RemoveTodo } from '../interfaces/todo.interface';
@@ -67,7 +67,6 @@ export class TodoListService {
 
         this.todoAdded$
             .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
                     this.todoListClient
                         .todoListControllerFindTodoList(this.todoList()?.id || '')
@@ -76,7 +75,7 @@ export class TodoListService {
                 takeUntilDestroyed(),
             )
             .subscribe((todoList) => {
-                this.state.update((state) => ({ ...state, todoList, loaded: true }));
+                this.state.update((state) => ({ ...state, todoList }));
             });
 
         this.todoRemoved$

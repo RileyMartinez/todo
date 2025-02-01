@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -35,6 +35,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class AppComponent implements OnInit, OnDestroy {
     private readonly loadingService = inject(LoadingService);
     private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly snackBar = inject(MatSnackBar);
     private readonly destroy$ = new Subject<void>();
@@ -49,6 +50,10 @@ export class AppComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
 
     ngOnInit(): void {
+        if (this.userContext()) {
+            this.router.navigate([RouteConstants.TODO_LISTS]);
+        }
+
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
             this.snackBar.open(notification.message, notification.action, {
                 duration: notification.duration,

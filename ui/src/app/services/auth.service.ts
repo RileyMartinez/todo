@@ -55,7 +55,6 @@ export class AuthService {
         // reducers
         this.login$
             .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((authLoginDto) =>
                     this.authClient.authControllerLogin(authLoginDto).pipe(
                         catchError((error) => {
@@ -73,7 +72,6 @@ export class AuthService {
 
         this.otpLogin$
             .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((authLoginDto) =>
                     this.authClient.authControllerOneTimeLogin(authLoginDto).pipe(
                         catchError((error) => {
@@ -91,7 +89,6 @@ export class AuthService {
 
         this.register$
             .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((authRegisterDto) =>
                     this.authClient.authControllerRegister(authRegisterDto).pipe(
                         catchError((error) => {
@@ -109,7 +106,6 @@ export class AuthService {
 
         this.logout$
             .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
                     this.authClient.authControllerLogout().pipe(
                         catchError((error) => {
@@ -127,7 +123,6 @@ export class AuthService {
 
         this.requestPasswordReset$
             .pipe(
-                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap((passwordResetRequestDto) =>
                     this.authClient.authControllerSendPasswordResetRequest(passwordResetRequestDto).pipe(
                         catchError((error) => {
@@ -139,7 +134,6 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe(() => {
-                this.state.update((state) => ({ ...state, loaded: true }));
                 this.snackBarNotificationService.emit({ message: 'Password reset email sent' });
             });
 
@@ -173,7 +167,6 @@ export class AuthService {
         this.state.update((state) => ({
             ...state,
             userContext,
-            loaded: true,
         }));
         localStorage.setItem(USER_CONTEXT_KEY, this.userContext()?.sub.toString() || '');
     }
