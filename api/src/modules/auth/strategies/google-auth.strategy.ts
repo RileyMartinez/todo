@@ -9,18 +9,20 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class GoogleAuthStrategy extends PassportStrategy(Strategy, AppConstants.GOOGLE_STRATEGY_NAME) {
     constructor(
-        readonly configService: ConfigService,
-        readonly authService: AuthService,
+        private readonly configService: ConfigService,
+        private readonly authService: AuthService,
     ) {
-        const basePath = configService.getOrThrow(ConfigConstants.BASE_PATH);
-        const port = configService.getOrThrow(ConfigConstants.PORT);
+        const basePath = configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
+        const port = configService.getOrThrow<string>(ConfigConstants.PORT);
 
         super({
-            clientID: configService.getOrThrow(ConfigConstants.GOOGLE_OAUTH20_CLIENT_ID),
-            clientSecret: configService.getOrThrow(ConfigConstants.GOOGLE_OAUTH20_CLIENT_SECRET),
+            clientID: configService.getOrThrow<string>(ConfigConstants.GOOGLE_OAUTH20_CLIENT_ID),
+            clientSecret: configService.getOrThrow<string>(ConfigConstants.GOOGLE_OAUTH20_CLIENT_SECRET),
             callbackURL: `${basePath}:${port}/auth/google/redirect`,
             scope: ['email', 'profile'],
         } as StrategyOptions);
+
+        this.authService = authService;
     }
 
     async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {

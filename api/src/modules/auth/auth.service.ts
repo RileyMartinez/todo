@@ -226,7 +226,6 @@ export class AuthService {
         if (!user) {
             user = await this.usersService.createUser({
                 email: email,
-                password: '',
             });
         }
 

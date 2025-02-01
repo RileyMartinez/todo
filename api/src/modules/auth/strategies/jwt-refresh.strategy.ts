@@ -8,7 +8,7 @@ import { AppConstants } from 'src/common/constants';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, AppConstants.JWT_REFRESH_STRATEGY_NAME) {
-    constructor(readonly configService: ConfigService) {
+    constructor(private readonly configService: ConfigService) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 (req: Request) => req.cookies?.[ConfigConstants.REFRESH_TOKEN_COOKIE_NAME],
