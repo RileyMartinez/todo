@@ -3,11 +3,12 @@ import { WinstonModuleAsyncOptions } from 'nest-winston';
 import DailyRotateFile = require('winston-daily-rotate-file');
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConfigConstants } from 'src/common/constants/config.constants';
+import { AppConstants } from '../constants';
 
 export const loggerConfig: WinstonModuleAsyncOptions = {
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService): Promise<LoggerOptions> => {
-        const isProd = configService.getOrThrow(ConfigConstants.ENV) === 'prod';
+        const isProd = configService.getOrThrow(ConfigConstants.ENV) === AppConstants.PROD;
         const loggerLevel = configService.getOrThrow(ConfigConstants.LOGGER_LEVEL);
         const loggerDirectory = configService.getOrThrow(ConfigConstants.LOGGER_DIRECTORY);
         const loggerMaxSize = configService.getOrThrow(ConfigConstants.LOGGER_MAX_SIZE);

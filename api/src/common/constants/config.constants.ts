@@ -33,4 +33,5 @@ export class ConfigConstants {
     static readonly AZURE_AD_CLIENT_SECRET = 'AZURE_AD_CLIENT_SECRET';
     static readonly AZURE_AD_COOKIE_ENCRYPTION_KEY = 'AZURE_AD_COOKIE_ENCRYPTION_KEY';
     static readonly AZURE_AD_COOKIE_IV = 'AZURE_AD_COOKIE_IV';
+    static readonly OP_SERVICE_ACCOUNT_TOKEN = 'OP_SERVICE_ACCOUNT_TOKEN';
 }

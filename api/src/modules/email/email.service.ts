@@ -56,6 +56,8 @@ export class EmailService {
             throw new ForbiddenException(ExceptionConstants.INVALID_TOKEN);
         }
 
+        const templateName = '66af6bd3-b733-403a-8f2c-b4e7d0fc5446-password-reset';
+
         const command = new SendEmailCommand({
             FromEmailAddress: fromEmail,
             Destination: {
@@ -63,7 +65,7 @@ export class EmailService {
             },
             Content: {
                 Template: {
-                    TemplateName: '66af6bd3-b733-403a-8f2c-b4e7d0fc5446-password-reset',
+                    TemplateName: templateName,
                     TemplateData: JSON.stringify({
                         otp: verifiedToken.otp,
                         year: new Date().getFullYear().toString(),
@@ -73,5 +75,13 @@ export class EmailService {
         });
 
         await client.send(command);
+
+        this.logger.log(
+            formatLogMessage('ESSPRes002', 'Password reset email sent successfully.', {
+                email: verifiedToken.email,
+                templateName,
+            }),
+            EmailService.name,
+        );
     }
 }

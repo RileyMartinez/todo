@@ -2,6 +2,18 @@
 # yarn lockfile v1
 
 
+"@1password/sdk-core@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@1password/sdk-core/-/sdk-core-0.1.7.tgz#cad3acd5db90948b8561a25d6ec6c508f9e70235"
+  integrity sha512-Bwho5YYwmvJdC//FlNfV0PRqYCPy2esDtPU7baGj4LccRHJipHt/XkS/j+DteaxJocpBwRMT5Rq1zmOzewA8Mg==
+
+"@1password/sdk@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@1password/sdk/-/sdk-0.1.7.tgz#5bbd50b2668d0654345672ed3ef1c5a8c56b94fe"
+  integrity sha512-x8KnFCBNquoY+/b0QF4MG7lCcFtg3kLw1kTppIoOaJ6Qv1oKNy6F144I0iATb3yMbJPkyvsKVd6WfI2cJk8+2g==
+  dependencies:
+    "@1password/sdk-core" "0.1.7"
+
 "@ampproject/remapping@^2.2.0":
   version "2.3.0"
   resolved "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.3.0.tgz"

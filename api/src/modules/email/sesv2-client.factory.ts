@@ -30,6 +30,7 @@ export class SESV2ClientFactory {
         }
 
         this.logger.log(`Creating SES client for region: ${clientRegion}`, SESV2ClientFactory.name);
+
         this.client = new SESv2Client({
             region: clientRegion,
             credentials: fromSSO({

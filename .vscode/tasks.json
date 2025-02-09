@@ -4,7 +4,7 @@
     {
       "label": "docker compose up",
       "type": "shell",
-      "command": "docker compose up",
+      "command": "APP_ENV=dev op run --env-file='./.env' docker compose up",
       "runOptions": {
         "runOn": "folderOpen"
       }
@@ -12,12 +12,12 @@
     {
       "label": "docker compose up build",
       "type": "shell",
-      "command": "docker compose up --build"
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build"
     },
     {
       "label": "docker compose down",
       "type": "shell",
-      "command": "docker compose down -v --remove-orphans --rmi all"
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose down -v --remove-orphans --rmi all"
     },
     {
       "label": "build-api",
