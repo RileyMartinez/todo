@@ -15,6 +15,7 @@ import { RouteConstants } from '../../constants';
 import { ForgotPasswordDialog } from '../dialogs';
 import { MatDivider } from '@angular/material/divider';
 import { MatRipple } from '@angular/material/core';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-login',
@@ -69,11 +70,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     onGoogleLogin(): void {
-        window.location.href = 'http://localhost:3000/auth/google/login';
+        window.location.href = `${environment.apiUrl}/${RouteConstants.AUTH_GOOGLE_LOGIN}`;
     }
 
     onAzureAdLogin(): void {
-        window.location.href = 'http://localhost:3000/auth/azure-ad/login';
+        window.location.href = `${environment.apiUrl}/${RouteConstants.AUTH_AZURE_AD_LOGIN}`;
     }
 
     openForgotPasswordDialog(): void {
