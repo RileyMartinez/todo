@@ -1,0 +1,11 @@
+{
+  "filewatcher.commands": [
+    {
+      "match": "(api|ui)/src/.*",
+      "isAsync": true,
+      "vscodeTask": ["workbench.action.tasks.runTask", "build-ui"],
+      "event": "onFileChange"
+    }
+  ]
+}
+

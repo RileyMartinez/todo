@@ -7,27 +7,45 @@
       "command": "APP_ENV=dev op run --env-file='./.env' docker compose up",
       "runOptions": {
         "runOn": "folderOpen"
+      },
+      "presentation": {
+        "close": true
       }
     },
     {
       "label": "docker compose up build",
       "type": "shell",
-      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build"
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build",
+      "presentation": {
+        "close": true
+      }
     },
     {
       "label": "docker compose down",
       "type": "shell",
-      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose down -v --remove-orphans --rmi all"
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose down",
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
+        "close": true
+      }
+    },
+    {
+      "label": "docker compose down remove all",
+      "type": "shell",
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose down -v --remove-orphans --rmi all",
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
+        "close": true
+      }
     },
     {
       "label": "build-api",
       "type": "shell",
-      "command": "sleep 5 && cd ./api && yarn build && yarn generate:client",
+      "command": "cd ./api && yarn build && yarn generate:client:dev",
       "windows": {
-        "command": "start-sleep -seconds 5; cd ./api; yarn build; yarn generate:client;"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
+        "command": "start-sleep -seconds 5; cd ./api; yarn build; yarn generate:client:dev;"
       },
       "presentation": {
         "reveal": "silent",
@@ -41,9 +59,6 @@
       "command": "cd ./ui && yarn build",
       "windows": {
         "command": "cd ./ui; yarn build;"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
       },
       "group": {
         "kind": "build",
