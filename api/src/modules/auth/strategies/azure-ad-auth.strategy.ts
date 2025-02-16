@@ -1,10 +1,11 @@
-import { AppConstants, ConfigConstants } from '@/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { IOIDCStrategyOption, OIDCStrategy } from 'passport-azure-ad';
 import { AuthService } from '../auth.service';
-import { AuthLoginResultDto } from '../dto';
+import { AppConstants } from '@/common/constants/app.constants';
+import { ConfigConstants } from '@/common/constants/config.constants';
+import { AuthLoginResultDto } from '../dto/auth-login-result.dto';
 
 @Injectable()
 export class AzureAdAuthStrategy extends PassportStrategy(OIDCStrategy, AppConstants.AZURE_AD_STRATEGY_NAME) {

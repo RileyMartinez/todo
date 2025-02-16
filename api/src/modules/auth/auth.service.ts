@@ -13,25 +13,24 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import {
-    AuthLoginRequestDto,
-    AuthLoginResultDto,
-    AuthRefreshRequestDto,
-    AuthRefreshResultDto,
-    AuthRegisterResultDto,
-    AuthTokensDto,
-    RawOtpTokenDto,
-    RawRefreshTokenDto,
-} from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { ValidationUtil } from '@/common/utils/validaton.util';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventConstants, PasswordResetEvent } from '@/common';
 import { formatLogMessage } from '@/common/utils/logger.util';
-import { argon2HashConfig } from 'src/common/configs';
 import * as argon2 from 'argon2';
 import { randomInt } from 'crypto';
 import { EncryptionUtil } from '@/common/utils/encryption.util';
+import { argon2HashConfig } from '@/common/configs/argon2-hash.config';
+import { EventConstants } from '@/common/constants/event.constants';
+import { PasswordResetEvent } from '@/common/events/password-reset.event';
+import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
+import { AuthLoginResultDto } from './dto/auth-login-result.dto';
+import { AuthRefreshRequestDto } from './dto/auth-refresh-request.dto';
+import { AuthRefreshResultDto } from './dto/auth-refresh-result.dto';
+import { AuthRegisterResultDto } from './dto/auth-register-result.dto';
+import { AuthTokensDto } from './dto/auth-tokens.dto';
+import { RawOtpTokenDto } from './dto/raw-otp-token.dto';
+import { RawRefreshTokenDto } from './dto/raw-refresh-token.dto';
 
 @Injectable()
 export class AuthService {

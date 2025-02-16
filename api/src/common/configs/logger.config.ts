@@ -3,7 +3,7 @@ import { WinstonModuleAsyncOptions } from 'nest-winston';
 import DailyRotateFile = require('winston-daily-rotate-file');
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ConfigConstants } from 'src/common/constants/config.constants';
-import { AppConstants } from '../constants';
+import { AppConstants } from '../constants/app.constants';
 
 export const loggerConfig: WinstonModuleAsyncOptions = {
     imports: [ConfigModule],

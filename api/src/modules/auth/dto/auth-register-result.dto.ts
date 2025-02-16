@@ -1,5 +1,6 @@
 import { IsNotEmptyObject } from 'class-validator';
-import { AuthTokensDto, UserContextDto } from '.';
+import { AuthTokensDto } from './auth-tokens.dto';
+import { UserContextDto } from './user-context.dto';
 
 export class AuthRegisterResultDto {
     @IsNotEmptyObject()

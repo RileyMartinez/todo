@@ -10,15 +10,25 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
-import { OtpGuard, JwtRefreshGuard, LocalGuard, GoogleAuthGuard, AzureAdAuthGuard } from './guards';
-import { AuthLoginRequestDto, AuthLoginResultDto, PasswordResetRequestDto, UserContextDto } from './dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
-import { GetCurrentUser, Public } from 'src/common/decorators';
-import { ConfigConstants, DecoratorConstants, SwaggerConstants } from 'src/common/constants';
 import { CookieOptions, Response } from 'express';
-import { cookieConfigFactory, invalidTokenCookieConfig } from 'src/common/configs';
 import { ConfigService } from '@nestjs/config';
-import { ValidationUtil } from '@/common';
+import { cookieConfigFactory, invalidTokenCookieConfig } from '@/common/configs/cookie.config-factory';
+import { ConfigConstants } from '@/common/constants/config.constants';
+import { DecoratorConstants } from '@/common/constants/decorator.constants';
+import { SwaggerConstants } from '@/common/constants/swagger.constants';
+import { GetCurrentUser } from '@/common/decorators/get-current-user.decorator';
+import { Public } from '@/common/decorators/public.decorator';
+import { ValidationUtil } from '@/common/utils/validaton.util';
+import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
+import { AuthLoginResultDto } from './dto/auth-login-result.dto';
+import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
+import { UserContextDto } from './dto/user-context.dto';
+import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { LocalGuard } from './guards/local.guard';
+import { OtpGuard } from './guards/otp.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -230,7 +240,7 @@ export class AuthController {
      * [Public]
      * Handles the password reset request.
      *
-     * @param {string} email - The email of the user.
+     * @param {string} passwordResetRequestDto - Email to send the password reset request to.
      * @returns {Promise<void>} - A promise that resolves when the password reset request is sent.
      */
     @Public()

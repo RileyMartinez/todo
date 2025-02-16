@@ -3,10 +3,13 @@ import { TodoListService } from './todo-list.service';
 import { DeleteResult } from 'typeorm';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { DecoratorConstants, ExceptionConstants } from 'src/common/constants';
-import { GetCurrentUser } from 'src/common/decorators';
-import { Todo, TodoList } from './entities';
-import { TodoDto, TodoListDto } from './dto';
+import { DecoratorConstants } from '@/common/constants/decorator.constants';
+import { ExceptionConstants } from '@/common/constants/exception.constants';
+import { GetCurrentUser } from '@/common/decorators/get-current-user.decorator';
+import { TodoListDto } from './dto/todo-list.dto';
+import { TodoDto } from './dto/todo.dto';
+import { TodoList } from './entities/todo-list.entity';
+import { Todo } from './entities/todo.entity';
 
 @Controller('todo-list')
 @ApiTags('todo-list')

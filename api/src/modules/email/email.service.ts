@@ -1,13 +1,17 @@
 import { ForbiddenException, Inject, Injectable, LoggerService } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ConfigConstants, EventConstants, ExceptionConstants, PasswordResetEvent, ValidationUtil } from '@/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { SESV2ClientFactory } from './sesv2-client.factory';
 import { SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { RawOtpTokenDto } from '../auth';
 import { formatLogMessage } from '@/common/utils/logger.util';
+import { RawOtpTokenDto } from '../auth/dto/raw-otp-token.dto';
+import { ConfigConstants } from '@/common/constants/config.constants';
+import { EventConstants } from '@/common/constants/event.constants';
+import { ExceptionConstants } from '@/common/constants/exception.constants';
+import { PasswordResetEvent } from '@/common/events/password-reset.event';
+import { ValidationUtil } from '@/common/utils/validaton.util';
 
 @Injectable()
 export class EmailService {

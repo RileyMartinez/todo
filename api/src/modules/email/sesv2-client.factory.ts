@@ -1,9 +1,10 @@
+import { AppConstants } from '@/common/constants/app.constants';
+import { ConfigConstants } from '@/common/constants/config.constants';
 import { SESv2Client } from '@aws-sdk/client-sesv2';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { AppConstants, ConfigConstants } from 'src/common';
 
 @Injectable()
 export class SESV2ClientFactory {

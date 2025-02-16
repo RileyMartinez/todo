@@ -6,15 +6,14 @@ import { UsersModule } from 'src/modules/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
-import {
-    OtpStrategy,
-    JwtAuthStrategy,
-    JwtRefreshStrategy,
-    LocalStrategy,
-    GoogleAuthStrategy,
-    AzureAdAuthStrategy,
-} from './strategies';
-import { EncryptionUtil, ValidationUtil } from '@/common';
+import { EncryptionUtil } from '@/common/utils/encryption.util';
+import { ValidationUtil } from '@/common/utils/validaton.util';
+import { AzureAdAuthStrategy } from './strategies/azure-ad-auth.strategy';
+import { GoogleAuthStrategy } from './strategies/google-auth.strategy';
+import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
+import { OtpStrategy } from './strategies/otp.strategy';
 
 @Module({
     imports: [ConfigModule, PassportModule, JwtModule.registerAsync(jwtConfig), UsersModule],

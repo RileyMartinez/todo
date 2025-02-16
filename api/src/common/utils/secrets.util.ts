@@ -3,8 +3,8 @@ import { ClientConfiguration } from '@1password/sdk/dist/configuration';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ConfigConstants } from '../constants';
 import { name, version } from '../../../package.json';
+import { ConfigConstants } from '../constants/config.constants';
 
 @Injectable()
 export class SecretsUtil {

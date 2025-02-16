@@ -5,11 +5,11 @@ import { ExecOptionsWithStringEncoding, exec } from 'child_process';
 import { writeFile } from 'fs/promises';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { join } from 'path';
-import { getAdditionalPropertiesString } from 'src/common/configs';
 import { AppConstants } from 'src/common/constants/app.constants';
 import { ConfigConstants } from 'src/common/constants/config.constants';
 import { PathUtil } from 'src/common/utils/path.util';
 import { promisify } from 'util';
+import { getAdditionalPropertiesString } from '../configs/openapi-generator.config';
 
 @Injectable()
 export class OpenAPIClientUtil {

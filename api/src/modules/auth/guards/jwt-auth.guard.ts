@@ -1,8 +1,9 @@
+import { AppConstants } from '@/common/constants/app.constants';
+import { DecoratorConstants } from '@/common/constants/decorator.constants';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
-import { AppConstants, DecoratorConstants } from 'src/common/constants';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard(AppConstants.JWT_STRATEGY_NAME) {

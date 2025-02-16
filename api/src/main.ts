@@ -5,12 +5,14 @@ import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { swaggerConfig, corsConfigFactory } from './common/configs';
-import { ConfigConstants } from './common/constants';
-import { AllExceptionsFilter, HttpExceptionsFilter } from './common/exception-filters';
 import * as cookieParser from 'cookie-parser';
 import { OpenAPIClientUtil } from './common/utils/openapi.util';
 import { config } from 'dotenv';
+import { corsConfigFactory } from './common/configs/cors.config-factory';
+import { swaggerConfig } from './common/configs/swagger.config';
+import { ConfigConstants } from './common/constants/config.constants';
+import { AllExceptionsFilter } from './common/exception-filters/all-exceptions.filter';
+import { HttpExceptionsFilter } from './common/exception-filters/http-exceptions.filter';
 
 /**
  * Bootstraps the application.

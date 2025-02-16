@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { IStrategyOptions, Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
-import { AppConstants } from '@/common';
-import { AuthLoginResultDto } from '../dto';
+import { AppConstants } from '@/common/constants/app.constants';
+import { AuthLoginResultDto } from '../dto/auth-login-result.dto';
 
 @Injectable()
 export class OtpStrategy extends PassportStrategy(Strategy, AppConstants.OTP_STRATEGY_NAME) {

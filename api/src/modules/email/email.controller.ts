@@ -1,7 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { EmailService } from './email.service';
-import { ExceptionConstants, PasswordResetEvent } from '@/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ExceptionConstants } from '@/common/constants/exception.constants';
+import { PasswordResetEvent } from '@/common/events/password-reset.event';
 
 @Controller('email')
 @ApiTags('email')
