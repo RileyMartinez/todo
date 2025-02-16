@@ -9,6 +9,7 @@
     "**/docs/**",
     "**/*.spec.ts"
   ],
-  "plugin": ["typedoc-plugin-merge-modules"]
+  "plugin": ["typedoc-plugin-merge-modules"],
+  "mergeModulesMergeMode": "module"
 }
 
