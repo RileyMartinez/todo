@@ -43,7 +43,7 @@ export class OpenAPIClientUtil {
 
         const { stdout, stderr } = await this.execAsync(
             [
-                'yarn run openapi-generator-cli generate -g typescript-angular',
+                'pnpm openapi-generator-cli generate -g typescript-angular',
                 `-i ${inputPath}`,
                 `-o ${outputPath}`,
                 `--additional-properties=${additionalProperties}`,

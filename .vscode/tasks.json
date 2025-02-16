@@ -43,9 +43,9 @@
     {
       "label": "build-api",
       "type": "shell",
-      "command": "cd ./api && yarn build && yarn generate:client:dev",
+      "command": "cd ./api && pnpm build && pnpm generate:client:dev",
       "windows": {
-        "command": "start-sleep -seconds 5; cd ./api; yarn build; yarn generate:client:dev;"
+        "command": "start-sleep -seconds 5; cd ./api; pnpm build; pnpm generate:client:dev;"
       },
       "presentation": {
         "reveal": "silent",
@@ -56,9 +56,9 @@
     {
       "label": "build-ui",
       "type": "shell",
-      "command": "cd ./ui && yarn build",
+      "command": "cd ./ui && pnpm build",
       "windows": {
-        "command": "cd ./ui; yarn build;"
+        "command": "cd ./ui; pnpm build;"
       },
       "group": {
         "kind": "build",

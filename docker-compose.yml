@@ -42,7 +42,7 @@ services:
       - ./api/src:/app/src
       - openapi:/share/openapi-client
       - ~/.aws:/root/.aws
-    command: yarn start:debug
+    command: pnpm start:debug
 
   ui:
     build:

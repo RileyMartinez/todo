@@ -1,4 +1,4 @@
-function Run-YarnCommand {
+function Start-PnpmCommand {
     param (
         [Parameter(Mandatory=$true)]
         [string]$Directory,
@@ -8,7 +8,7 @@ function Run-YarnCommand {
 
     if (Test-Path $Directory) {
         try {
-            yarn --cwd $Directory $Command
+            pnpm --cwd $Directory $Command
         } catch {
             Write-Error "Failed to run '$Command' in $Directory. Error: $_"
             exit 1
@@ -18,13 +18,13 @@ function Run-YarnCommand {
     }
 }
 
-if (-not (Get-Command yarn -ErrorAction SilentlyContinue)) {
-    Write-Error "The 'yarn' command is not available. Please install it before running this script."
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+    Write-Error "The 'pnpm' command is not available. Please install it before running this script."
     exit 1
 }
 
 $directories = @("../../api", "../../ui")
 
 foreach ($dir in $directories) {
-    Run-YarnCommand -Directory $dir -Command "install"
+    Start-PnpmCommand -Directory $dir -Command "install"
 }

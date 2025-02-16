@@ -1,13 +1,15 @@
-FROM node:20.12.2-alpine
+FROM node:lts-alpine
 
 WORKDIR /app/
 
+RUN npm install -g pnpm
+
 COPY --from=1password/op:2 /usr/local/bin/op /usr/local/bin/op
 
-COPY yarn.lock package.json /app/
+COPY pnpm-lock.yaml package.json /app/
 
-RUN yarn install
+RUN pnpm install
 
 COPY . .
 
-CMD ["yarn", "run", "start:dev"]
+CMD ["pnpm", "run", "start:dev"]
