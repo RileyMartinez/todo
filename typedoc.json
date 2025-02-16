@@ -9,6 +9,6 @@
     "**/docs/**",
     "**/*.spec.ts"
   ],
-  "logLevel": "Verbose"
+  "plugin": ["typedoc-plugin-merge-modules"]
 }
 
