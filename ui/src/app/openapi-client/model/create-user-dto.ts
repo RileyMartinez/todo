@@ -19,6 +19,6 @@ export interface CreateUserDto {
     /**
      * User password
      */
-    password: string;
+    password?: string;
 }
 

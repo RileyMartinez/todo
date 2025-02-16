@@ -18,7 +18,8 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
-        "generate:client": "yarn ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
+        "generate:client:dev": "APP_ENV=dev op run --env-file='./.env' -- yarn ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
+        "generate:client:prod": "APP_ENV=prod op run --env-file='./.env' -- yarn ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
         "generate:docs": "typedoc"
     },
     "dependencies": {
