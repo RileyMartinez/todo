@@ -1,9 +1,10 @@
 import { catchError, concatMap, EMPTY, merge, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
-import { TodoList, TodoListClient } from '../openapi-client';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoadingService } from './loading.service';
 import { AddTodoList, RemoveTodoList } from '../interfaces/todo-list.interface';
+import { TodoListClient } from '../openapi-client/api/todo-list.client';
+import { TodoList } from '../openapi-client/model/todo-list';
 
 export interface TodoListsState {
     todoLists: TodoList[];

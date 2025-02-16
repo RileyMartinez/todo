@@ -10,12 +10,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services';
-import { RouteConstants } from '../../constants';
-import { ForgotPasswordDialog } from '../dialogs';
 import { MatDivider } from '@angular/material/divider';
 import { MatRipple } from '@angular/material/core';
 import { environment } from '../../../environments/environment';
+import { RouteConstants } from '../../constants/route.constants';
+import { AuthService } from '../../services/auth.service';
+import { ForgotPasswordDialog } from '../dialogs/forgot-password.dialog';
 
 @Component({
     selector: 'app-login',

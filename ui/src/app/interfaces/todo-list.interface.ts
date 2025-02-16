@@ -1,4 +1,4 @@
-import { TodoList } from '../openapi-client';
+import { TodoList } from "../openapi-client/model/todo-list";
 
 export type GetTodoList = Pick<TodoList, 'id'>;
 export type AddTodoList = Pick<TodoList, 'title'>;

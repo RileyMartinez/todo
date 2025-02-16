@@ -12,8 +12,9 @@ import { MatListModule } from '@angular/material/list';
 import { RouteConstants } from '../constants/route.constants';
 import { AuthService } from '../services/auth.service';
 import { LoadingService } from '../services/loading.service';
-import { SnackBarNotificationService, ViewPortService } from '../services';
 import { Subject, takeUntil } from 'rxjs';
+import { SnackBarNotificationService } from '../services/snack-bar.service';
+import { ViewPortService } from '../services/viewport.service';
 
 @Component({
     selector: 'app-root',

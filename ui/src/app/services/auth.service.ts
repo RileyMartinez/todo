@@ -1,17 +1,15 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import {
-    AuthClient,
-    AuthLoginRequestDto,
-    AuthRegisterRequestDto,
-    PasswordResetRequestDto,
-    UserContextDto,
-} from '../openapi-client';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoadingService } from './loading.service';
 import { RouteConstants } from '../constants/route.constants';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SnackBarNotificationService } from './snack-bar.service';
+import { AuthClient } from '../openapi-client/api/auth.client';
+import { AuthLoginRequestDto } from '../openapi-client/model/auth-login-request-dto';
+import { AuthRegisterRequestDto } from '../openapi-client/model/auth-register-request-dto';
+import { PasswordResetRequestDto } from '../openapi-client/model/password-reset-request-dto';
+import { UserContextDto } from '../openapi-client/model/user-context-dto';
 
 export interface AuthServiceState {
     userContext: UserContextDto | null;

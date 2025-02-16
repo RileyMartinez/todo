@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { TodoList } from '../../openapi-client';
 import { MatDialog } from '@angular/material/dialog';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
@@ -12,6 +11,7 @@ import { Router } from '@angular/router';
 import { RouteConstants } from '../../constants/route.constants';
 import { TodoListsService } from '../../services/todo-lists.service';
 import { Subject, takeUntil } from 'rxjs';
+import { TodoList } from '../../openapi-client/model/todo-list';
 
 @Component({
     selector: 'app-todo-lists',

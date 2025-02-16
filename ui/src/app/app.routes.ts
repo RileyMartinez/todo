@@ -5,7 +5,7 @@ import { RouteConstants } from './constants/route.constants';
 import { TodoListsComponent } from './components/todo-lists/todo-lists.component';
 import { authGuard } from './guards/auth.guard';
 import { OneTimeLoginComponent } from './components/one-time-login/one-time-login.component';
-import { OAuthCallbackComponent } from './components';
+import { OAuthCallbackComponent } from './components/oauth-callback.component';
 
 export const routes: Routes = [
     { path: RouteConstants.ROOT, redirectTo: RouteConstants.LOGIN_OR_REGISTER, pathMatch: 'full' },
