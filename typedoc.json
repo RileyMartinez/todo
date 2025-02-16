@@ -1,17 +1,14 @@
 {
   "entryPointStrategy": "expand",
   "entryPoints": ["api/src", "ui/src"],
-  "packageOptions": {
-    "includeVersion": true,
-    "exclude": [
-      "**/node_modules/**",
-      "**/test/**",
-      "**/dist/**",
-      "**/docs/**",
-      "**/*.spec.ts"
-    ],
-    "excludeExternals": true
-  },
+  "out": "./docs",
+  "exclude": [
+    "**/node_modules/**",
+    "**/test/**",
+    "**/dist/**",
+    "**/docs/**",
+    "**/*.spec.ts"
+  ],
   "logLevel": "Verbose"
 }
 

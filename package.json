@@ -1,10 +1,6 @@
 {
   "name": "todo",
   "version": "0.0.1",
-  "workspaces": [
-    "api/*",
-    "ui/*"
-  ],
   "private": true,
   "scripts": {
     "build": "tsc --build",
@@ -12,6 +8,7 @@
   },
   "devDependencies": {
     "typedoc": "^0.26.6",
+    "typedoc-plugin-merge-modules": "^6.1.0",
     "typescript": "^5.5.4"
   }
 }
