@@ -43,9 +43,9 @@
     {
       "label": "build-api",
       "type": "shell",
-      "command": "cd ./api && pnpm build && pnpm generate:client:dev",
+      "command": "cd ./apps/api && pnpm build && pnpm generate:client:dev",
       "windows": {
-        "command": "start-sleep -seconds 5; cd ./api; pnpm build; pnpm generate:client:dev;"
+        "command": "start-sleep -seconds 5; cd ./apps/api; pnpm build; pnpm generate:client:dev;"
       },
       "presentation": {
         "reveal": "silent",
@@ -56,9 +56,9 @@
     {
       "label": "build-web",
       "type": "shell",
-      "command": "cd ./web && pnpm build",
+      "command": "cd ./apps/web && pnpm build",
       "windows": {
-        "command": "cd ./web; pnpm build;"
+        "command": "cd ./apps/web; pnpm build;"
       },
       "group": {
         "kind": "build",

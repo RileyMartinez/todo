@@ -1,7 +1,13 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.organizeImports": "always",
+    "source.sortMembers": "always"
+  },
   "filewatcher.commands": [
     {
-      "match": "(api|web)/src/.*",
+      "match": "apps/(api|web)/src/.*",
       "isAsync": true,
       "vscodeTask": ["workbench.action.tasks.runTask", "build-web"],
       "event": "onFileChange"
