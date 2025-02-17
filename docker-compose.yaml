@@ -27,8 +27,9 @@ services:
 
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.${APP_ENV}
+      target: api
     container_name: api
     environment:
       - PORT=${API_PORT}
@@ -42,12 +43,12 @@ services:
       - ./apps/api/src:/app/src
       - openapi:/share/openapi-client
       - ~/.aws:/root/.aws
-    command: pnpm start:debug
 
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.${APP_ENV}
+      target: web
     container_name: web
     environment:
       - PORT=${WEB_PORT}

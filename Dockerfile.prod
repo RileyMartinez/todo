@@ -1,0 +1,25 @@
+FROM node:lts-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+FROM base AS build
+WORKDIR /app
+COPY . .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run -r build
+RUN pnpm --filter=api deploy --prod /tmp/api
+RUN pnpm --filter=web deploy --prod /tmp/web 
+
+FROM base AS api
+WORKDIR /app
+RUN apk add --no-cache \
+    openjdk17-jre-headless
+COPY --from=build /tmp/api .
+COPY --from=1password/op:2 /usr/local/bin/op /usr/local/bin/op
+CMD ["pnpm", "start:prod"]
+
+FROM base AS web
+WORKDIR /app
+COPY --from=build /tmp/web .
+CMD ["pnpm", "start"]
