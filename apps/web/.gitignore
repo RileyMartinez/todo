@@ -46,3 +46,6 @@ Thumbs.db
 /test/**/**-reports/
 /test/**/blob-report/
 /test/**/.cache/
+
+# OpenAPI Client Generator
+/openapi-client/
