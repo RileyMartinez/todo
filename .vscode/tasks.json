@@ -54,11 +54,11 @@
       }
     },
     {
-      "label": "build-ui",
+      "label": "build-web",
       "type": "shell",
-      "command": "cd ./ui && pnpm build",
+      "command": "cd ./web && pnpm build",
       "windows": {
-        "command": "cd ./ui; pnpm build;"
+        "command": "cd ./web; pnpm build;"
       },
       "group": {
         "kind": "build",

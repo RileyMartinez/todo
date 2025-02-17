@@ -96,12 +96,12 @@ export class AuthController {
 
         const { tokens, userContext } = result;
         const basePath = this.configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
-        const uiPort = this.configService.getOrThrow<string>(ConfigConstants.UI_PORT);
+        const webPort = this.configService.getOrThrow<string>(ConfigConstants.WEB_PORT);
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${basePath}:${uiPort}/auth/callback/${userContext.sub}`);
+        response.redirect(`${basePath}:${webPort}/auth/callback/${userContext.sub}`);
     }
 
     @Public()

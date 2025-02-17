@@ -50,7 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
     isMobile = this.viewportService.isMobile;
 
     loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
-    title = 'ui';
+    title = 'web';
     isAuthenticated = false;
 
     ngOnInit(): void {

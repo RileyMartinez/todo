@@ -2,7 +2,7 @@ export class ConfigConstants {
     static readonly ENV = 'ENV';
     static readonly BASE_PATH = 'BASE_PATH';
     static readonly PORT = 'PORT';
-    static readonly UI_PORT = 'UI_PORT';
+    static readonly WEB_PORT = 'WEB_PORT';
     static readonly DB_HOST = 'DB_HOST';
     static readonly DB_PORT = 'DB_PORT';
     static readonly DB_USERNAME = 'DB_USERNAME';

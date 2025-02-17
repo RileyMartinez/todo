@@ -10,7 +10,6 @@ Todo list web app built with Postgres, NestJS, Angular, and Node.
 
 1. Populate the following .env files (see .env.op at each path):
    - /.env
-   - /ui/.env
    - /api/.env
    - Note, .env.op files are using 1password cli inject syntax
 2. Recommend setting `DB_AUTOLOAD_ENTITIES` to true for local dev schema creation

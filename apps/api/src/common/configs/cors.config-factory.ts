@@ -4,10 +4,10 @@ import { ConfigConstants } from '../constants/config.constants';
 
 export const corsConfigFactory = (configService: ConfigService): CorsOptions => {
     const basePath = configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
-    const uiPort = configService.getOrThrow<string>(ConfigConstants.UI_PORT);
+    const webPort = configService.getOrThrow<string>(ConfigConstants.WEB_PORT);
 
     return {
-        origin: [`${basePath}:${uiPort}`],
+        origin: [`${basePath}:${webPort}`],
         credentials: true,
     };
 };

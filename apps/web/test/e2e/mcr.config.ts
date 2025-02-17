@@ -5,7 +5,7 @@ const coverageOptions: CoverageReportOptions = {
     reports: ['console-details', 'v8', 'lcovonly'],
     entryFilter: '**/main.js',
     sourceFilter: '**/src/**',
-    outputDir: './ui/test/e2e/coverage-reports',
+    outputDir: './web/test/e2e/coverage-reports',
 };
 
 export default coverageOptions;

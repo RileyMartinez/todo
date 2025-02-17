@@ -2,11 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "ui: launch",
+      "name": "web: launch",
       "request": "launch",
       "type": "chrome",
       "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/ui/"
+      "webRoot": "${workspaceFolder}/web/"
     },
     {
       "name": "api: attach",

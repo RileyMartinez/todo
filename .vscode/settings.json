@@ -1,9 +1,9 @@
 {
   "filewatcher.commands": [
     {
-      "match": "(api|ui)/src/.*",
+      "match": "(api|web)/src/.*",
       "isAsync": true,
-      "vscodeTask": ["workbench.action.tasks.runTask", "build-ui"],
+      "vscodeTask": ["workbench.action.tasks.runTask", "build-web"],
       "event": "onFileChange"
     }
   ]

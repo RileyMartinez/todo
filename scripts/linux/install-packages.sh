@@ -20,7 +20,7 @@ then
     exit 1
 fi
 
-directories=("../../api" "../../ui")
+directories=("../../api" "../../web")
 
 for dir in "${directories[@]}"; do
     run_pnpm_command "$dir" "install"

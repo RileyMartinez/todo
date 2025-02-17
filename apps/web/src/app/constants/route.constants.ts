@@ -1,5 +1,5 @@
 export class RouteConstants {
-    // UI routes
+    // Web routes
     static readonly ROOT = '';
     static readonly LOGIN_OR_REGISTER = 'login-or-register';
     static readonly OTP_LOGIN = 'otp-login';

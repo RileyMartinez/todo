@@ -25,7 +25,7 @@ fi
 declare -A paths=(
     ["../../.env.op"]="../../.env"
     ["../../api/.env.op"]="../../api/.env"
-    ["../../ui/.env.op"]="../../ui/.env"
+    ["../../web/.env.op"]="../../web/.env"
 )
 
 for input_file in "${!paths[@]}"; do

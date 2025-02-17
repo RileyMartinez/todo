@@ -28,7 +28,7 @@ const fetchPath = `${basePath}:${port}/api-json`;
 const fileName = 'openapi.json';
 const inputPath = `local/${fileName}`;
 const outputPath = 'local/openapi-client';
-const destinationPath = '../ui/src/app/openapi-client';
+const destinationPath = '../web/src/app/openapi-client';
 
 const writeFileAsync = promisify(writeFile);
 const execAsync = promisify(exec);
@@ -42,7 +42,7 @@ const generateOpenAPIClient = async (fetchPath: string) => {
         const spec = await fetchOpenApiSpec(fetchPath);
         await writeFileAsync(`./${fileName}`, spec);
         await generateClient();
-        await moveClientToUiProject();
+        await moveClientToWebProject();
     } catch (error) {
         console.error('Error generating OpenAPI client:', error);
     }
@@ -80,7 +80,7 @@ async function generateClient() {
     }
 }
 
-async function moveClientToUiProject() {
+async function moveClientToWebProject() {
     const sourcePath = './openapi-client';
 
     if (!isWindows) {
