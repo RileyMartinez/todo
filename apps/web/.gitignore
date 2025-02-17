@@ -48,4 +48,4 @@ Thumbs.db
 /test/**/.cache/
 
 # OpenAPI Client Generator
-/openapi-client/
+openapi-client/
