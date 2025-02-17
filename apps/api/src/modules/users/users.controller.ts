@@ -1,12 +1,10 @@
-import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, NotFoundException } from '@nestjs/common';
-import { UserService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { SafeUserDto } from './dto/safe-user.dto';
-import { MapInterceptor } from '@automapper/nestjs';
-import { User } from './entities/user.entity';
 import { ExceptionConstants } from 'src/common/constants/exception.constants';
 import { DeleteResult } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { SafeUserDto } from './dto/safe-user.dto';
+import { UserService } from './users.service';
 
 @Controller('user')
 @ApiTags('user')
@@ -21,9 +19,9 @@ export class UserController {
      */
     @Post()
     @ApiCreatedResponse({ type: SafeUserDto })
-    @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
-        return this.userService.createUser(createUserDto);
+        const user = await this.userService.createUser(createUserDto);
+        return new SafeUserDto(user);
     }
 
     /**
@@ -32,9 +30,9 @@ export class UserController {
     @Get(':id')
     @ApiOkResponse({ type: SafeUserDto })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneById(@Param('id') id: string): Promise<SafeUserDto> {
-        return await this.userService.findUserById(id);
+        const user = await this.userService.findUserById(id);
+        return new SafeUserDto(user);
     }
 
     /**
@@ -43,7 +41,6 @@ export class UserController {
     @Get('email/:email')
     @ApiOkResponse({ type: SafeUserDto })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    @UseInterceptors(MapInterceptor(User, SafeUserDto))
     async findOneByEmail(@Param('email') email: string): Promise<SafeUserDto | null> {
         const user = await this.userService.findUserByEmail(email);
 
@@ -51,7 +48,7 @@ export class UserController {
             throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
         }
 
-        return user;
+        return new SafeUserDto(user);
     }
 
     /**
