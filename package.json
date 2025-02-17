@@ -13,7 +13,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@nestjs/core",
-      "@openapitools/openapi-generator-cli"
+      "@openapitools/openapi-generator-cli",
+      "@scarf/scarf",
+      "argon2"
     ]
   }
 }

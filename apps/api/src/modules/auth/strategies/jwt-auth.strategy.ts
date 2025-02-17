@@ -1,10 +1,10 @@
+import { AppConstants } from '@/common/constants/app.constants';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
-import { ConfigConstants } from 'src/common/constants/config.constants';
 import { Request } from 'express';
-import { AppConstants } from '@/common/constants/app.constants';
+import { ExtractJwt, Strategy, StrategyOptionsWithRequest } from 'passport-jwt';
+import { ConfigConstants } from 'src/common/constants/config.constants';
 
 @Injectable()
 export class JwtAuthStrategy extends PassportStrategy(Strategy, AppConstants.JWT_STRATEGY_NAME) {
@@ -15,7 +15,7 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, AppConstants.JWT
             ]),
             secretOrKey: configService.get(ConfigConstants.JWT_SECRET),
             ignoreExpiration: false,
-        } as StrategyOptions);
+        } as StrategyOptionsWithRequest);
     }
 
     validate(payload: any) {
