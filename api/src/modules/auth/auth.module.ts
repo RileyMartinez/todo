@@ -8,7 +8,6 @@ import { jwtConfig } from '../../common/configs/jwt.config';
 import { ConfigModule } from '@nestjs/config';
 import { EncryptionUtil } from '@/common/utils/encryption.util';
 import { ValidationUtil } from '@/common/utils/validaton.util';
-import { AzureAdAuthStrategy } from './strategies/azure-ad-auth.strategy';
 import { GoogleAuthStrategy } from './strategies/google-auth.strategy';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
@@ -27,7 +26,6 @@ import { OtpStrategy } from './strategies/otp.strategy';
         JwtAuthStrategy,
         JwtRefreshStrategy,
         GoogleAuthStrategy,
-        AzureAdAuthStrategy,
     ],
 })
 export class AuthModule {}

@@ -10,5 +10,4 @@ export class RouteConstants {
 
     // API routes
     static readonly AUTH_GOOGLE_LOGIN = 'auth/google/login';
-    static readonly AUTH_AZURE_AD_LOGIN = 'auth/azure-ad/login';
 }

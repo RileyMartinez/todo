@@ -73,10 +73,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         window.location.href = `${environment.apiUrl}/${RouteConstants.AUTH_GOOGLE_LOGIN}`;
     }
 
-    onAzureAdLogin(): void {
-        window.location.href = `${environment.apiUrl}/${RouteConstants.AUTH_AZURE_AD_LOGIN}`;
-    }
-
     openForgotPasswordDialog(): void {
         this.dialog
             .open(ForgotPasswordDialog)

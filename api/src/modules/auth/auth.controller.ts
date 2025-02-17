@@ -24,7 +24,6 @@ import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
 import { AuthLoginResultDto } from './dto/auth-login-result.dto';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { UserContextDto } from './dto/user-context.dto';
-import { AzureAdAuthGuard } from './guards/azure-ad-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalGuard } from './guards/local.guard';
@@ -75,34 +74,6 @@ export class AuthController {
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
         return userContext;
-    }
-
-    @Public()
-    @Get('azure-ad/login')
-    @UseGuards(AzureAdAuthGuard)
-    @HttpCode(HttpStatus.OK)
-    azureAdLogin(): void {}
-
-    @Public()
-    @Post('azure-ad/redirect')
-    @ApiFoundResponse({ description: 'Redirect to client with user session' })
-    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
-    @UseGuards(AzureAdAuthGuard)
-    @HttpCode(HttpStatus.FOUND)
-    async azureAdRedirect(
-        @GetCurrentUser() result: AuthLoginResultDto,
-        @Res({ passthrough: true }) response: Response,
-    ): Promise<void> {
-        this.validationUtil.validateObject(result);
-
-        const { tokens, userContext } = result;
-        const basePath = this.configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
-        const uiPort = this.configService.getOrThrow<string>(ConfigConstants.UI_PORT);
-
-        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
-        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
-
-        response.redirect(`${basePath}:${uiPort}/auth/callback/${userContext.sub}`);
     }
 
     @Public()
