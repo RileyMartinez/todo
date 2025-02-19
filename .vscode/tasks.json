@@ -4,19 +4,20 @@
     {
       "label": "docker compose up",
       "type": "shell",
-      "command": "APP_ENV=dev op run --env-file='./.env' docker compose up",
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up -d",
       "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
         "close": true
       }
     },
     {
       "label": "docker compose up build",
       "type": "shell",
-      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build",
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build -d",
       "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
         "close": true
       }
     },
