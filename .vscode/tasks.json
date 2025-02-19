@@ -4,20 +4,16 @@
     {
       "label": "docker compose up",
       "type": "shell",
-      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up -d",
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up",
       "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem",
         "close": true
       }
     },
     {
       "label": "docker compose up build",
       "type": "shell",
-      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build -d",
+      "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose up --build",
       "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem",
         "close": true
       }
     },
@@ -26,8 +22,6 @@
       "type": "shell",
       "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose down",
       "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem",
         "close": true
       }
     },
@@ -36,8 +30,6 @@
       "type": "shell",
       "command": "APP_ENV=dev op run --env-file='./.env' -- docker compose down -v --remove-orphans --rmi all",
       "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem",
         "close": true
       }
     },
