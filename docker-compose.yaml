@@ -43,7 +43,6 @@ services:
       - db
     volumes:
       - ./apps/api/src:/app/src
-      - openapi:/share/openapi-client
       - ~/.aws:/root/.aws
 
   web:
@@ -61,12 +60,10 @@ services:
       - "${WEB_PORT}:4200"
     volumes:
       - ./apps/web/src:/app/src
-      - openapi:/app/src/app/openapi-client
     depends_on:
       - api
 
 volumes:
   pgdata:
   pgadmin:
-  openapi:
 

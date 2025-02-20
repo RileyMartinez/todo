@@ -1,18 +1,17 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { AppModule } from './modules/app/app.module';
 import { LoggerService, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SwaggerModule } from '@nestjs/swagger';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { OpenAPIClientUtil } from './common/utils/openapi.util';
 import { config } from 'dotenv';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { corsConfigFactory } from './common/configs/cors.config-factory';
 import { swaggerConfig } from './common/configs/swagger.config';
 import { ConfigConstants } from './common/constants/config.constants';
 import { AllExceptionsFilter } from './common/exception-filters/all-exceptions.filter';
 import { HttpExceptionsFilter } from './common/exception-filters/http-exceptions.filter';
+import { AppModule } from './modules/app/app.module';
 
 /**
  * Bootstraps the application.
@@ -42,9 +41,6 @@ async function bootstrap(): Promise<void> {
 
     const configService = app.get(ConfigService);
     const port = configService.getOrThrow<number>(ConfigConstants.PORT);
-
-    const openApiService = app.get(OpenAPIClientUtil);
-    await openApiService.generateClient(document);
 
     app.enableCors(corsConfigFactory(configService));
 

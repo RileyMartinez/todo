@@ -36,7 +36,7 @@
     {
       "label": "build-api",
       "type": "shell",
-      "command": "cd ./apps/api && pnpm build && pnpm generate:client:dev",
+      "command": "cd ./apps/api && pnpm build",
       "windows": {
         "command": "start-sleep -seconds 5; cd ./apps/api; pnpm build; pnpm generate:client:dev;"
       },

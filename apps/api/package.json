@@ -6,9 +6,8 @@
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
-        "build": "nest build",
+        "build": "nest start --entryFile=src/openapi.main.js",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/**/*.md\"",
-        "start": "nest start",
         "start:dev": "APP_ENV=dev op run --env-file='./.env' -- nest start --watch",
         "start:debug": "APP_ENV=dev op run --env-file='./.env' -- nest start --debug 0.0.0.0:9229 --watch",
         "start:prod": "APP_ENV=prod op run --env-file='./.env' node dist/main",
@@ -17,10 +16,7 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json",
-        "generate:client:dev": "APP_ENV=dev op run --env-file='./.env' -- pnpm ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
-        "generate:client:prod": "APP_ENV=prod op run --env-file='./.env' -- pnpm ts-node -r tsconfig-paths/register ./scripts/generate-openapi-client.ts",
-        "generate:docs": "typedoc"
+        "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
         "@1password/sdk": "^0.1.7",

@@ -8,7 +8,7 @@ export class PathUtil {
     /**
      * The relative root directory path.
      */
-    private static readonly rootDirectoryPath = Array(5).fill('..').join('/');
+    private static readonly rootDirectoryPath = Array(6).fill('..').join('/');
 
     /**
      * Get the root path.
@@ -22,7 +22,15 @@ export class PathUtil {
      * Get the share path.
      * @returns The share path.
      */
-    static getSharePath(): string {
-        return join(__dirname, this.rootDirectoryPath, AppConstants.SHARE_DIRECTORY);
+    static getPackagesPath(): string {
+        return join(__dirname, this.rootDirectoryPath, AppConstants.PACKAGES_DIRECTORY);
+    }
+
+    /**
+     * Get the openapi client generator src path.
+     * @returns The openapi client generator path.
+     */
+    static getOpenapiClientGeneratorPath(): string {
+        return join(this.getPackagesPath(), AppConstants.OPENAPI_CLIENT_GENERATOR_DIRECTORY, 'src');
     }
 }

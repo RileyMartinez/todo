@@ -2,7 +2,6 @@ import { eventEmitterConfig } from '@/common/configs/event-emitter.config';
 import { loggerConfig } from '@/common/configs/logger.config';
 import { throttlerConfig } from '@/common/configs/throttle.config';
 import { typeOrmConfig } from '@/common/configs/typeorm.config';
-import { OpenAPIClientUtil } from '@/common/utils/openapi.util';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -39,7 +38,6 @@ import { AppController } from './app.controller';
             provide: APP_GUARD,
             useClass: ThrottlerGuard,
         },
-        OpenAPIClientUtil,
     ],
 })
 export class AppModule {}

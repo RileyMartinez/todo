@@ -1,0 +1,21 @@
+{
+    "name": "@repo/openapi-client-generator",
+    "version": "1.0.0",
+    "private": true,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "clean": "rm -rf dist",
+        "dev": "tsc --watch",
+        "format": "prettier --write \"src/**/*.{ts,tsx,json}\""
+    },
+    "dependencies": {
+        "@openapitools/openapi-generator-cli": "^2.16.3"
+    },
+    "devDependencies": {
+        "@types/node": "^22.13.4",
+        "prettier": "^3.5.1",
+        "typescript": "^5.0.0"
+    }
+}

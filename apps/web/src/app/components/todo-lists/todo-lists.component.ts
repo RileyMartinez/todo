@@ -2,16 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { RouteConstants } from '../../constants/route.constants';
+import { TodoList } from '../../openapi-client';
+import { TodoListsService } from '../../services/todo-lists.service';
 import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
 import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
-import { Router } from '@angular/router';
-import { RouteConstants } from '../../constants/route.constants';
-import { TodoListsService } from '../../services/todo-lists.service';
-import { Subject, takeUntil } from 'rxjs';
-import { TodoList } from '../../openapi-client/model/todo-list';
 
 @Component({
     selector: 'app-todo-lists',
