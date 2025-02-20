@@ -12,7 +12,7 @@ This package generates a TypeScript Angular client from an OpenAPI specification
 ## Installation
 
 ```bash
-pnpm add @lib/openapi-client-generator
+pnpm add @repo/openapi-client-generator
 ```
 
 ## Usage
