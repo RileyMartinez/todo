@@ -23,10 +23,24 @@ ARG APP_ENV=prod
 WORKDIR /app
 COPY --from=build /tmp/api .
 COPY --from=1password/op:2 /usr/local/bin/op /usr/local/bin/op
-CMD [ "sh", "-c", "if [ \"$APP_ENV\" = \"prod\" ]; then pnpm start:prod; else pnpm start:debug; fi" ]
+CMD [ \
+    "sh", \
+    "-c", \
+    "if [ \"$APP_ENV\" = \"prod\" ]; \
+    then pnpm start:prod; \
+    else pnpm start:debug; \
+    fi" \
+    ]
 
 FROM base AS web
 ARG APP_ENV=prod
 WORKDIR /app
 COPY --from=build /tmp/web .
-CMD [ "sh", "-c", "if [ \"$APP_ENV\" = \"prod\" ]; then pnpm start; else pnpm start:dev; fi" ]
+CMD [ \
+    "sh", \
+    "-c", \
+    "if [ \"$APP_ENV\" = \"prod\" ]; \
+    then pnpm start; \
+    else pnpm start:dev; \
+    fi" \
+    ]
