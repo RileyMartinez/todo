@@ -53,9 +53,6 @@ services:
       args:
         - APP_ENV=${APP_ENV}
     container_name: web
-    environment:
-      - PORT=${WEB_PORT}
-      - OP_SERVICE_ACCOUNT_TOKEN=${OP_SERVICE_ACCOUNT_TOKEN}
     ports:
       - "${WEB_PORT}:4200"
     volumes:

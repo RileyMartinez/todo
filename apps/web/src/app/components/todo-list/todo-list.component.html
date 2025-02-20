@@ -1,40 +1,37 @@
 <div class="flex justify-center p-14">
     @if (todoList(); as list) {
-        <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
-            <mat-card-header>
-                <mat-card-title>{{ list.title }}</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-                <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
-                    <div class="flex items-center space-x-2 pt-4">
-                        <mat-form-field class="grow">
-                            <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
-                        </mat-form-field>
-                        <button mat-icon-button color="primary" type="submit" [disabled]="todoForm.invalid">
-                            <mat-icon>add</mat-icon>
-                        </button>
-                    </div>
-                </form>
-                @if (list.todos.length === 0) {
-                    <p>No todo items to complete.</p>
+    <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
+        <mat-card-header>
+            <mat-card-title>{{ list.title }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
+                <div class="flex items-center space-x-2 pt-4">
+                    <mat-form-field class="flex-grow">
+                        <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
+                    </mat-form-field>
+                    <button mat-icon-button color="primary" type="submit" [disabled]="todoForm.invalid">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+            </form>
+            @if (list.todos.length === 0) {
+            <p>No todo items to complete.</p>
+            }
+            <mat-selection-list [multiple]="true">
+                @for (item of list.todos; track item.id) {
+                <mat-list-option [togglePosition]="'before'" (click)="removeTodoItem(item.id)"
+                    (keydown.enter)="removeTodoItem(item.id)">
+                    {{ item.title }}
+                </mat-list-option>
                 }
-                <mat-selection-list [multiple]="true">
-                    @for (item of list.todos; track item.id) {
-                        <mat-list-option
-                            [togglePosition]="'before'"
-                            (click)="removeTodoItem(item.id)"
-                            (keydown.enter)="removeTodoItem(item.id)"
-                        >
-                            {{ item.title }}
-                        </mat-list-option>
-                    }
-                </mat-selection-list>
-            </mat-card-content>
-            <mat-card-actions>
-                <button mat-icon-button color="primary" (click)="goBack()">
-                    <mat-icon>arrow_back</mat-icon>
-                </button>
-            </mat-card-actions>
-        </mat-card>
+            </mat-selection-list>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-icon-button color="primary" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </mat-card-actions>
+    </mat-card>
     }
 </div>

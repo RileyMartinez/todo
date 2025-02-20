@@ -6,7 +6,7 @@
         </button>
         }
         <span>Todo</span>
-        <span class="grow"></span>
+        <span class="flex-grow"></span>
         @if (!isMobile() && userContext()) {
         <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>account_circle</mat-icon>
@@ -24,7 +24,7 @@
     } @else {
     <mat-progress-bar mode="determinate" [value]="0"></mat-progress-bar>
     }
-    <mat-sidenav-container class="grow">
+    <mat-sidenav-container class="flex-grow">
         <mat-sidenav class="min-w-48" #sidenav mode="push">
             <mat-nav-list>
                 @if (userContext()) {
