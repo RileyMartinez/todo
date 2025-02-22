@@ -1,0 +1,715 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_redirectToApiDocumentation",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "" },
+          "302": { "description": "Redirects to /api" }
+        },
+        "summary": "Redirects to the Open API documentation.",
+        "tags": ["App"]
+      }
+    },
+    "/todo-list": {
+      "post": {
+        "operationId": "TodoListController_saveTodoList",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TodoListDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TodoList" }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TodoList" }
+              }
+            }
+          },
+          "400": {
+            "description": "User ID must be greater than 0 | Validation failed"
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create a new todo list, or update an existing one.",
+        "tags": ["todo-list"]
+      },
+      "get": {
+        "operationId": "TodoListController_findTodoLists",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TodoList" }
+                }
+              }
+            }
+          },
+          "400": { "description": "User ID must be greater than 0" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get all todo lists for a given user.",
+        "tags": ["todo-list"]
+      }
+    },
+    "/todo-list/item": {
+      "post": {
+        "operationId": "TodoListController_saveTodoListItem",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TodoDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Todo" }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Todo" }
+              }
+            }
+          },
+          "400": { "description": "Validation failed" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create a new todo list item, or update an existing one.",
+        "tags": ["todo-list"]
+      }
+    },
+    "/todo-list/{id}": {
+      "get": {
+        "operationId": "TodoListController_findTodoList",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TodoList" }
+              }
+            }
+          },
+          "400": { "description": "Todo list ID must be greater than 0" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get a todo list by its ID.",
+        "tags": ["todo-list"]
+      },
+      "delete": {
+        "operationId": "TodoListController_removeTodoList",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteResult" }
+              }
+            }
+          },
+          "400": { "description": "Todo list ID must be greater than 0" },
+          "404": { "description": "Todo list not found" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Remove a todo list by its ID.",
+        "tags": ["todo-list"]
+      }
+    },
+    "/todo-list/item/{id}": {
+      "delete": {
+        "operationId": "TodoListController_removeTodoListItem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteResult" }
+              }
+            }
+          },
+          "400": { "description": "Todo item ID must be greater than 0" },
+          "404": { "description": "Todo item not found" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Remove a todo list item by its ID.",
+        "tags": ["todo-list"]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthLoginRequestDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserContextDto" }
+              }
+            }
+          },
+          "403": { "description": "Invalid credentials" }
+        },
+        "summary": "[Public]\nHandles the login request.",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/google/login": {
+      "get": {
+        "operationId": "AuthController_googleLogin",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/google/redirect": {
+      "get": {
+        "operationId": "AuthController_googleRedirect",
+        "parameters": [],
+        "responses": {
+          "302": { "description": "Redirect to client with user session" },
+          "403": { "description": "Invalid credentials" }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/one-time-login": {
+      "post": {
+        "operationId": "AuthController_oneTimeLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthLoginRequestDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User logged in successfully" }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "User logged out successfully." },
+          "403": { "description": "Invalid credentials" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Handles the logout request.",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRegisterRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered successfully." },
+          "409": { "description": "User already exists" }
+        },
+        "summary": "[Public]\nHandles the registration request.",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "description": "Needs [Public] decorator to bypass the JwtAuthGuard and use JwtRefreshGuard instead.",
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserContextDto" }
+              }
+            }
+          },
+          "403": { "description": "Invalid credentials" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Handles the refresh request.",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/send-password-reset": {
+      "post": {
+        "operationId": "AuthController_sendPasswordResetRequest",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset request sent successfully." }
+        },
+        "summary": "[Public]\nHandles the password reset request.",
+        "tags": ["auth"]
+      }
+    },
+    "/user": {
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SafeUserDto" }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create a new user.",
+        "tags": ["user"]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "UserController_findOneById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SafeUserDto" }
+              }
+            }
+          },
+          "404": { "description": "User not found" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Find a user by their ID.",
+        "tags": ["user"]
+      },
+      "delete": {
+        "operationId": "UserController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number of users deleted",
+            "content": {
+              "application/json": { "schema": { "type": "number" } }
+            }
+          },
+          "404": { "description": "User not found" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Remove a user by their ID.",
+        "tags": ["user"]
+      }
+    },
+    "/user/email/{email}": {
+      "get": {
+        "operationId": "UserController_findOneByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SafeUserDto" }
+              }
+            }
+          },
+          "404": { "description": "User not found" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Find a user by their email.",
+        "tags": ["user"]
+      }
+    },
+    "/email/send-password-reset": {
+      "post": {
+        "operationId": "EmailController_sendPasswordReset",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PasswordResetEvent" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset email sent successfully" },
+          "400": { "description": "Validation failed" }
+        },
+        "security": [{ "bearer": [] }],
+        "tags": ["email"]
+      }
+    }
+  },
+  "info": {
+    "title": "Todo API",
+    "description": "Todo List API with NestJS, TypeORM, and PostgreSQL",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Local Development" },
+    { "url": "https://todo-api.rileymartinez.com", "description": "Production" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
+    },
+    "schemas": {
+      "TodoListDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Todo list id",
+            "example": "a1b2c3d4-1234-5678-90ab-cdef12345678"
+          },
+          "title": {
+            "type": "string",
+            "description": "Todo list title",
+            "example": "Grocery list",
+            "default": ""
+          }
+        },
+        "required": ["title"]
+      },
+      "TodoList": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Todo list id",
+            "example": "a1b2c3d4-1234-5678-90ab-cdef12345678"
+          },
+          "title": {
+            "type": "string",
+            "description": "Todo list title",
+            "example": "Grocery list"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User id",
+            "example": "1"
+          },
+          "todos": {
+            "description": "Todo list items",
+            "example": "[{ title: \"Buy milk\", description: \"2% milk\", completed: false, dueDate: \"2021-12-31T23:59:59.999Z\", order: 1 }]",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Todo" }
+          }
+        },
+        "required": ["id", "title", "userId", "todos"]
+      },
+      "Todo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Todo item id",
+            "example": "a1b2c3d4-1234-5678-90ab-cdef12345678"
+          },
+          "title": {
+            "type": "string",
+            "description": "Todo item title",
+            "example": "Buy milk"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Todo item description",
+            "example": "2% milk",
+            "default": null
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Todo item completion status",
+            "example": false,
+            "default": false
+          },
+          "dueDate": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "Todo item due date",
+            "example": "2021-12-31T23:59:59.999Z",
+            "default": null
+          },
+          "order": {
+            "type": "number",
+            "description": "Todo item order",
+            "example": 1
+          },
+          "todoListId": {
+            "type": "string",
+            "description": "Todo list id",
+            "example": "a1b2c3d4-1234-5678-90ab-cdef12345678"
+          },
+          "todoList": { "$ref": "#/components/schemas/TodoList" }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "completed",
+          "dueDate",
+          "order",
+          "todoListId",
+          "todoList"
+        ]
+      },
+      "TodoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Todo item id",
+            "example": "a1b2c3d4-1234-5678-90ab-cdef12345678"
+          },
+          "title": {
+            "type": "string",
+            "description": "Todo item title",
+            "example": "Buy milk",
+            "default": ""
+          },
+          "description": {
+            "type": "string",
+            "description": "Todo item description",
+            "example": "2% milk"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Todo item completion status",
+            "example": false,
+            "default": false
+          },
+          "dueDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Todo item due date",
+            "example": "2021-12-31T23:59:59.999Z"
+          },
+          "order": {
+            "type": "number",
+            "description": "Todo item order",
+            "example": 1,
+            "default": 0,
+            "minimum": 1
+          },
+          "todoListId": {
+            "type": "string",
+            "description": "Todo list id",
+            "example": "1",
+            "default": ""
+          }
+        },
+        "required": ["title", "completed", "order", "todoListId"]
+      },
+      "DeleteResult": { "type": "object", "properties": {} },
+      "AuthLoginRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Login email address",
+            "example": "foo.bar@foobar.com",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "description": "Login password",
+            "example": "fooBar123!",
+            "default": ""
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "UserContextDto": {
+        "type": "object",
+        "properties": { "sub": { "type": "string" } },
+        "required": ["sub"]
+      },
+      "AuthRegisterRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Registration email address",
+            "example": "foo.bar@foobar.com",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "description": "Registration password",
+            "example": "fooBar123!",
+            "default": ""
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "PasswordResetRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email of the user.",
+            "example": "foo.bar@foobar.com",
+            "default": "",
+            "format": "email"
+          }
+        },
+        "required": ["email"]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "foo.bar@foobar.com",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "example": "fooBar123!"
+          }
+        },
+        "required": ["email"]
+      },
+      "SafeUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User id",
+            "example": "a1b2c3d4-1234-5678-90ab-cdef12345678",
+            "default": ""
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "foo.bar@foobar.com",
+            "default": ""
+          }
+        },
+        "required": ["id", "email"]
+      },
+      "PasswordResetEvent": { "type": "object", "properties": {} }
+    }
+  }
+}

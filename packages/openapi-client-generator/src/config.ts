@@ -16,7 +16,7 @@ export interface OpenAPIGeneratorConfig {
     modelSuffix?: string;
     ngPackagrVersion?: string;
     ngVersion?: string;
-    npmName: string; // Required
+    npmName?: string;
     npmRepository?: string;
     npmVersion?: string;
     nullSafeAdditionalProps?: boolean;
@@ -38,19 +38,12 @@ export interface OpenAPIGeneratorConfig {
     useSquareBracketsInArrayNames?: boolean;
     withInterfaces?: boolean;
     zonejsVersion?: string;
+    postProcessingEnabled?: boolean;
+    outputDir: string;
 }
 
-export const openAPIGeneratorConfig: OpenAPIGeneratorConfig = {
-    npmName: '@repo/openapi-client',
-    ngVersion: '19.0.0',
-    fileNaming: 'kebab-case',
-    serviceSuffix: 'Client',
-    serviceFileSuffix: '.client',
-    supportsES6: true,
-};
-
-export function getAdditionalPropertiesString(): string {
-    return Object.entries(openAPIGeneratorConfig)
+export function getAdditionalPropertiesString(config: OpenAPIGeneratorConfig): string {
+    return Object.entries(config)
         .map(([key, value]) => `${key}=${value}`)
         .join(',');
 }

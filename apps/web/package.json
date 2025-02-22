@@ -5,7 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "start:dev": "ng serve --host 0.0.0.0 --port 4200 --poll 1000",
-        "generate:client": "node -e \"require('@repo/openapi-client-generator').generateClient()\"",
+        "generate:client": "tsx scripts/generate-client.ts",
         "prebuild": "pnpm run generate:client",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
@@ -15,7 +15,6 @@
     },
     "private": true,
     "dependencies": {
-        "@repo/openapi-client-generator": "workspace:*",
         "@angular/animations": "^19.1.7",
         "@angular/cdk": "^19.1.5",
         "@angular/common": "^19.1.7",
@@ -35,6 +34,7 @@
         "@angular/cli": "^19.1.8",
         "@angular/compiler-cli": "^19.1.7",
         "@playwright/test": "^1.50.1",
+        "@repo/openapi-client-generator": "workspace:*",
         "@types/jasmine": "~5.1.6",
         "@types/node": "^22.13.4",
         "@typescript-eslint/eslint-plugin": "^8.24.1",
@@ -53,6 +53,7 @@
         "postcss": "^8.5.3",
         "prettier": "^3.5.1",
         "tailwindcss": "^3.4.17",
+        "tsx": "^4.19.3",
         "typescript": "~5.7.3",
         "v8-to-istanbul": "^9.3.0"
     }

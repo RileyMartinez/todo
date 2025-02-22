@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm --filter api build && pnpm --filter @repo/openapi-client-generator build && pnpm --filter web build",
+    "build": "pnpm --filter api build && pnpm --filter web build",
+    "build:packages": "pnpm --filter @repo/openapi-client-generator build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
