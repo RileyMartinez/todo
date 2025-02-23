@@ -4,7 +4,6 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { config } from 'dotenv';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { corsConfigFactory } from './common/configs/cors.config-factory';
 import { swaggerConfig } from './common/configs/swagger.config';
@@ -25,8 +24,6 @@ import { AppModule } from './modules/app/app.module';
  * @returns {Promise<void>} A promise that resolves when the application is successfully started.
  */
 async function bootstrap(): Promise<void> {
-    config();
-
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const logger = app.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
     app.useLogger(logger);

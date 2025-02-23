@@ -12,4 +12,10 @@ export class AppConstants {
     static readonly AZURE_AD_STRATEGY_NAME = 'azure-ad';
     static readonly DEFAULT_AWS_REGION = 'us-east-1';
     static readonly DEFAULT_AWS_PROFILE = 'default';
+    static readonly BASE_PATH = process.env.BASE_PATH || 'http://localhost';
+    static readonly PORT = process.env.PORT || 3000;
+    static readonly SERVER_URL =
+        process.env.APP_ENV === AppConstants.DEV
+            ? `${AppConstants.BASE_PATH}:${AppConstants.PORT}`
+            : AppConstants.BASE_PATH;
 }

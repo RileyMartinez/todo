@@ -30,10 +30,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: api
-      args:
-        - APP_ENV=${APP_ENV}
     container_name: api
     environment:
+      - APP_ENV=${APP_ENV}
       - PORT=${API_PORT}
       - OP_SERVICE_ACCOUNT_TOKEN=${OP_SERVICE_ACCOUNT_TOKEN}
     ports:
@@ -42,7 +41,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./apps/api/src:/app/src
+      - ./apps/api/src:/prod/api/src
       - ~/.aws:/root/.aws
 
   web:
@@ -50,13 +49,13 @@ services:
       context: .
       dockerfile: Dockerfile
       target: web
-      args:
-        - APP_ENV=${APP_ENV}
     container_name: web
+    environment:
+      - APP_ENV=${APP_ENV}
     ports:
       - "${WEB_PORT}:4200"
     volumes:
-      - ./apps/web/src:/app/src
+      - ./apps/web/src:/prod/web/src
     depends_on:
       - api
 

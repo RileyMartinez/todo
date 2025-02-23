@@ -1,7 +1,7 @@
-import { Environment } from "../app/interfaces/environment.interface";
+import { Environment } from '../app/interfaces/environment.interface';
 
 export const environment: Environment = {
     production: false,
-    url: 'http://localhost:4200',
-    apiUrl: 'http://localhost:3000',
+    BASE_PATH: 'http://localhost:4200',
+    API_BASE_PATH: 'http://localhost:3000',
 };

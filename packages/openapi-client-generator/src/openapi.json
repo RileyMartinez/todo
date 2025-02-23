@@ -463,8 +463,7 @@
   },
   "tags": [],
   "servers": [
-    { "url": "http://localhost:3000", "description": "Local Development" },
-    { "url": "https://todo-api.rileymartinez.com", "description": "Production" }
+    { "url": "todo.rileymartinez.com/api", "description": "Todo API Server" }
   ],
   "components": {
     "securitySchemes": {

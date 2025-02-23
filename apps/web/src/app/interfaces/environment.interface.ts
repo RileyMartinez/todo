@@ -1,5 +1,5 @@
 export interface Environment {
     production: boolean;
-    url: string;
-    apiUrl: string;
+    BASE_PATH: string;
+    API_BASE_PATH: string;
 }
