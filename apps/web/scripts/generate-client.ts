@@ -8,6 +8,7 @@ const config: OpenAPIGeneratorConfig = {
     supportsES6: true,
     postProcessingEnabled: true,
     outputDir: 'src/app/shared/openapi-client',
+    inputPath: 'openapi.json',
 };
 
 generateClient(config);

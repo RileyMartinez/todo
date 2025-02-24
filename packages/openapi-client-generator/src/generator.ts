@@ -1,12 +1,15 @@
 import { exec } from 'child_process';
-import { rm } from 'fs/promises';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import { promisify } from 'util';
 import { getAdditionalPropertiesString, OpenAPIGeneratorConfig } from './config';
 
 const execAsync = promisify(exec);
 
 export async function generateClient(config: OpenAPIGeneratorConfig): Promise<void> {
+    if (!config.inputPath) {
+        throw new Error('inputPath is required');
+    }
+
     if (!config.outputDir) {
         throw new Error('outputDir is required');
     }
@@ -15,18 +18,16 @@ export async function generateClient(config: OpenAPIGeneratorConfig): Promise<vo
         process.env.TS_POST_PROCESS_FILE = 'prettier --write';
     }
 
-    const inputPath = join(dirname(__filename), 'openapi.json');
-    const outputPath = join(process.cwd(), config.outputDir);
+    const inputPath = join(process.cwd(), config.inputPath);
+    const outputDir = join(process.cwd(), config.outputDir);
 
     try {
-        await rm(outputPath, { recursive: true, force: true });
-
         const { stdout, stderr } = await execAsync(
             [
                 'pnpm dlx @openapitools/openapi-generator-cli generate -g typescript-angular',
                 `--enable-post-process-file`,
                 `-i ${inputPath}`,
-                `-o ${outputPath}`,
+                `-o ${outputDir}`,
                 `--additional-properties=${getAdditionalPropertiesString(config)}`,
             ].join(' '),
             { encoding: 'utf-8' },

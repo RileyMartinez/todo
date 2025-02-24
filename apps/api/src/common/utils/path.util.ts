@@ -5,32 +5,30 @@ import { AppConstants } from 'src/common/constants/app.constants';
  * Utility class for working with file paths.
  */
 export class PathUtil {
-    /**
-     * The relative root directory path.
-     */
     private static readonly rootDirectoryPath = Array(6).fill('..').join('/');
+    private static readonly appsDirectoryPath = Array(5).fill('..').join('/');
 
     /**
      * Get the root path.
-     * @returns The root path.
+     * @returns Root directory path.
      */
     static getRootPath(): string {
         return join(__dirname, this.rootDirectoryPath);
     }
 
     /**
-     * Get the share path.
-     * @returns The share path.
+     * Get the apps workspace path.
+     * @returns Apps directory path.
      */
-    static getPackagesPath(): string {
-        return join(__dirname, this.rootDirectoryPath, AppConstants.PACKAGES_DIRECTORY);
+    static getAppsPath(): string {
+        return join(__dirname, this.appsDirectoryPath);
     }
 
     /**
-     * Get the openapi client generator src path.
-     * @returns The openapi client generator path.
+     * Get the path to the web directory.
+     * @returns Web directory path.
      */
-    static getOpenapiClientGeneratorPath(): string {
-        return join(this.getPackagesPath(), AppConstants.OPENAPI_CLIENT_GENERATOR_DIRECTORY, 'src');
+    static getWebPath(): string {
+        return join(this.getAppsPath(), AppConstants.WEB_DIRECTORY);
     }
 }

@@ -39,6 +39,7 @@ export interface OpenAPIGeneratorConfig {
     withInterfaces?: boolean;
     zonejsVersion?: string;
     postProcessingEnabled?: boolean;
+    inputPath: string;
     outputDir: string;
 }
 

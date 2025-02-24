@@ -25,7 +25,7 @@ async function bootstrap(): Promise<void> {
         parser: 'json',
     } as prettier.Options);
 
-    const inputPath = join(PathUtil.getOpenapiClientGeneratorPath(), 'openapi.json');
+    const inputPath = join(PathUtil.getWebPath(), 'openapi.json');
     await writeFile(inputPath, formattedDocument, { encoding: 'utf-8' });
 }
 
