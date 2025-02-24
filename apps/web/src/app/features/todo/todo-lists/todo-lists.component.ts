@@ -7,8 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { RouteConstants } from '../../core/constants/route.constants';
-import { TodoList } from '../../shared/openapi-client';
+import { RouteConstants } from '../../../core/constants/route.constants';
+import { TodoList } from '../../../shared/openapi-client';
 import { TodoListCreateDialog } from './todo-list-create.dialog';
 import { TodoListDeleteDialog } from './todo-list-delete.dialog';
 import { TodoListsService } from './todo-lists.service';
@@ -56,7 +56,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     }
 
     openEditPage(todoList: TodoList): void {
-        this.router.navigate([RouteConstants.TODO_LIST, todoList.id]);
+        this.router.navigate([RouteConstants.TODO, RouteConstants.LIST, todoList.id]);
     }
 
     openDeleteDialog(todoList: TodoList): void {

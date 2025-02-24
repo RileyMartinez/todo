@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RouteConstants } from '../../core/constants/route.constants';
+import { RouteConstants } from '../../../core/constants/route.constants';
 import { TodoListService } from './todo-list.service';
 
 @Component({
@@ -60,6 +60,6 @@ export class TodoListComponent implements OnInit {
     }
 
     goBack(): void {
-        this.router.navigate([RouteConstants.TODO_LISTS]);
+        this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
     }
 }

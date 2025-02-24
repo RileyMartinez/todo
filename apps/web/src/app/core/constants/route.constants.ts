@@ -1,11 +1,13 @@
 export class RouteConstants {
     // Web routes
     static readonly ROOT = '';
-    static readonly LOGIN_OR_REGISTER = 'login-or-register';
+    static readonly AUTH = 'auth';
+    static readonly TODO = 'todo';
+    static readonly LOGIN = 'login';
     static readonly OTP_LOGIN = 'otp-login';
-    static readonly OAUTH_CALLBACK = 'auth/callback/:sub';
-    static readonly TODO_LISTS = 'todo-lists';
-    static readonly TODO_LIST = 'todo-list';
+    static readonly OAUTH_CALLBACK = 'callback/:sub';
+    static readonly LISTS = 'lists';
+    static readonly LIST = 'list';
     static readonly WILDCARD = '**';
 
     // API routes

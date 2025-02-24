@@ -49,13 +49,13 @@ export class AppComponent implements OnInit, OnDestroy {
     userContext = this.authService.userContext;
     isMobile = this.viewportService.isMobile;
 
-    loginOrRegisterRoute = RouteConstants.LOGIN_OR_REGISTER;
+    loginOrRegisterRoute = RouteConstants.LOGIN;
     title = 'web';
     isAuthenticated = false;
 
     ngOnInit(): void {
         if (this.userContext()) {
-            this.router.navigate([RouteConstants.TODO_LISTS]);
+            this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
         }
 
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
