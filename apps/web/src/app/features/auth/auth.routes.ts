@@ -5,6 +5,7 @@ import { LoginOrRegisterComponent } from './login-or-register/login-or-register.
 import { OneTimeLoginComponent } from './one-time-login/one-time-login.component';
 
 export const AUTH_ROUTES: Routes = [
+    { path: RouteConstants.ROOT, redirectTo: RouteConstants.LOGIN, pathMatch: 'full' },
     { path: RouteConstants.LOGIN, component: LoginOrRegisterComponent },
     { path: RouteConstants.OTP_LOGIN, component: OneTimeLoginComponent },
     { path: RouteConstants.OAUTH_CALLBACK, component: OAuthCallbackComponent },
