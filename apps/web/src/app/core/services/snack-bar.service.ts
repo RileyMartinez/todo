@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { SnackBarNotification } from '../interfaces/snack-bar-notification.interface';
+import { SnackBarNotification } from '../models/snack-bar-notification.model';
 
 @Injectable({
     providedIn: 'root',

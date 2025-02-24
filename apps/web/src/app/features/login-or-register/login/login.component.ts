@@ -12,10 +12,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { RouteConstants } from '../../constants/route.constants';
-import { AuthService } from '../../services/auth.service';
-import { ForgotPasswordDialog } from '../dialogs/forgot-password.dialog';
+import { environment } from '../../../../environments/environment';
+import { RouteConstants } from '../../../core/constants/route.constants';
+import { AuthService } from '../../../core/services/auth.service';
+import { ForgotPasswordDialog } from './forgot-password.dialog';
 
 @Component({
     selector: 'app-login',

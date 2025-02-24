@@ -24,6 +24,7 @@
     } @else {
     <mat-progress-bar mode="determinate" [value]="0"></mat-progress-bar>
     }
+
     <mat-sidenav-container class="flex-grow">
         <mat-sidenav class="min-w-48" #sidenav mode="push">
             <mat-nav-list>
@@ -32,11 +33,12 @@
                 }
             </mat-nav-list>
         </mat-sidenav>
-        <mat-sidenav-content>
-            <router-outlet></router-outlet>
-        </mat-sidenav-content>
     </mat-sidenav-container>
+    <main>
+        <router-outlet></router-outlet>
+    </main>
+
     <footer class="mt-auto bg-app-secondary text-center py-4">
-        <span>&copy; 2024 <a href="https://rileymartinez.dev">rileymartinez.dev</a>. All rights reserved.</span>
+        <span>&copy; 2024 <a href="https://rileymartinez.com">rileymartinez.com</a>. All rights reserved.</span>
     </footer>
 </div>

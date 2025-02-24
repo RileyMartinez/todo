@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { LoginOrRegisterComponent } from './components/login-or-register/login-or-register.component';
-import { TodoListComponent } from './components/todo-list/todo-list.component';
-import { RouteConstants } from './constants/route.constants';
-import { TodoListsComponent } from './components/todo-lists/todo-lists.component';
-import { authGuard } from './guards/auth.guard';
-import { OneTimeLoginComponent } from './components/one-time-login/one-time-login.component';
-import { OAuthCallbackComponent } from './components/oauth-callback.component';
+import { authGuard } from './core/auth/auth.guard';
+import { OAuthCallbackComponent } from './core/auth/oauth-callback.component';
+import { RouteConstants } from './core/constants/route.constants';
+import { LoginOrRegisterComponent } from './features/login-or-register/login-or-register.component';
+import { OneTimeLoginComponent } from './features/login-or-register/one-time-login/one-time-login.component';
+import { TodoListComponent } from './features/todo-list/todo-list.component';
+import { TodoListsComponent } from './features/todo-lists/todo-lists.component';
 
 export const routes: Routes = [
     { path: RouteConstants.ROOT, redirectTo: RouteConstants.LOGIN_OR_REGISTER, pathMatch: 'full' },

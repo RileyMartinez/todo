@@ -1,4 +1,4 @@
-import { OpenAPIGeneratorConfig, generateClient } from '@repo/openapi-client-generator';
+import { generateClient, OpenAPIGeneratorConfig } from '@repo/openapi-client-generator';
 
 const config: OpenAPIGeneratorConfig = {
     ngVersion: '19.0.0',
@@ -7,7 +7,7 @@ const config: OpenAPIGeneratorConfig = {
     serviceFileSuffix: '.client',
     supportsES6: true,
     postProcessingEnabled: true,
-    outputDir: 'src/app/openapi-client',
+    outputDir: 'src/app/shared/openapi-client',
 };
 
 generateClient(config);

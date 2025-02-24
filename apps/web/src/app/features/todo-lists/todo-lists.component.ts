@@ -7,11 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { RouteConstants } from '../../constants/route.constants';
-import { TodoList } from '../../openapi-client';
-import { TodoListsService } from '../../services/todo-lists.service';
-import { TodoListCreateDialog } from '../dialogs/todo-list-create.dialog';
-import { TodoListDeleteDialog } from '../dialogs/todo-list-delete.dialog';
+import { RouteConstants } from '../../core/constants/route.constants';
+import { TodoList } from '../../shared/openapi-client';
+import { TodoListCreateDialog } from './todo-list-create.dialog';
+import { TodoListDeleteDialog } from './todo-list-delete.dialog';
+import { TodoListsService } from './todo-lists.service';
 
 @Component({
     selector: 'app-todo-lists',

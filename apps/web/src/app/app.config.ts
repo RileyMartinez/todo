@@ -4,8 +4,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter } from '@angular/router';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
-import { authInterceptor } from './interceptors/auth.interceptor';
-import { BASE_PATH } from './openapi-client';
+import { authInterceptor } from './core/auth/auth.interceptor';
+import { BASE_PATH } from './shared/openapi-client';
 
 export const appConfig: ApplicationConfig = {
     providers: [

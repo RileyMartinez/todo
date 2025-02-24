@@ -1,20 +1,20 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
-import { MatIcon } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { RouteConstants } from '../constants/route.constants';
-import { AuthService } from '../services/auth.service';
-import { LoadingService } from '../services/loading.service';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { SnackBarNotificationService } from '../services/snack-bar.service';
-import { ViewPortService } from '../services/viewport.service';
+import { RouteConstants } from './core/constants/route.constants';
+import { AuthService } from './core/services/auth.service';
+import { LoadingService } from './core/services/loading.service';
+import { SnackBarNotificationService } from './core/services/snack-bar.service';
+import { ViewPortService } from './core/services/viewport.service';
 
 @Component({
     selector: 'app-root',

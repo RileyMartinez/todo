@@ -2,12 +2,12 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { AuthClient } from '../../shared/openapi-client/api/auth.client';
+import { AuthLoginRequestDto } from '../../shared/openapi-client/model/auth-login-request-dto';
+import { AuthRegisterRequestDto } from '../../shared/openapi-client/model/auth-register-request-dto';
+import { PasswordResetRequestDto } from '../../shared/openapi-client/model/password-reset-request-dto';
+import { UserContextDto } from '../../shared/openapi-client/model/user-context-dto';
 import { RouteConstants } from '../constants/route.constants';
-import { AuthClient } from '../openapi-client/api/auth.client';
-import { AuthLoginRequestDto } from '../openapi-client/model/auth-login-request-dto';
-import { AuthRegisterRequestDto } from '../openapi-client/model/auth-register-request-dto';
-import { PasswordResetRequestDto } from '../openapi-client/model/password-reset-request-dto';
-import { UserContextDto } from '../openapi-client/model/user-context-dto';
 import { LoadingService } from './loading.service';
 import { SnackBarNotificationService } from './snack-bar.service';
 
