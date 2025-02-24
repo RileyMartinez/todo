@@ -1,16 +1,25 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 
 @Component({
     selector: 'todo-list-create-dialog',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, MatInputModule, FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule],
+    imports: [
+        FormsModule,
+        MatInput,
+        MatFormField,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogTitle,
+        MatButton,
+        MatDialogClose,
+        MatLabel,
+    ],
     template: `
         <h2 mat-dialog-title>Create Todo List</h2>
         <mat-dialog-content>

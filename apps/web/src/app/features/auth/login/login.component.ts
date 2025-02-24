@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                 }
 
                 this.authService.requestPasswordReset$.next({ email });
-                this.router.navigate([`/${RouteConstants.OTP_LOGIN}`], { queryParams: { email } });
+                this.router.navigate([RouteConstants.AUTH, RouteConstants.OTP_LOGIN], { queryParams: { email } });
             });
     }
 }

@@ -1,23 +1,24 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 
 @Component({
     selector: 'forgot-password-dialog',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CommonModule,
-        MatInputModule,
-        FormsModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatFormFieldModule,
         ReactiveFormsModule,
+        MatInput,
+        MatDialogTitle,
+        MatDialogActions,
+        MatDialogContent,
+        MatDialogClose,
+        MatButton,
+        MatFormField,
+        MatLabel,
     ],
     template: `
         <form [formGroup]="passwordResetForm">
