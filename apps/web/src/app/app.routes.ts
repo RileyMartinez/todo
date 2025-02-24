@@ -3,7 +3,7 @@ import { authGuard } from './core/auth/auth.guard';
 import { RouteConstants } from './core/constants/route.constants';
 
 export const routes: Routes = [
-    { path: RouteConstants.ROOT, redirectTo: RouteConstants.LOGIN, pathMatch: 'full' },
+    { path: RouteConstants.ROOT, redirectTo: `${RouteConstants.AUTH}/${RouteConstants.LOGIN}`, pathMatch: 'full' },
     { path: RouteConstants.AUTH, loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES) },
     {
         path: RouteConstants.TODO,

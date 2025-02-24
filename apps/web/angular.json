@@ -29,11 +29,12 @@
                     },
                     "configurations": {
                         "production": {
+                            "optimization": true,
                             "budgets": [
                                 {
                                     "type": "initial",
                                     "maximumWarning": "1mb",
-                                    "maximumError": "2mb"
+                                    "maximumError": "1.5mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",

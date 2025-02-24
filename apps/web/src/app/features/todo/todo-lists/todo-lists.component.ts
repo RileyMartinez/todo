@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
+import { MatIcon } from '@angular/material/icon';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteConstants } from '../../../core/constants/route.constants';
@@ -16,7 +16,18 @@ import { TodoListsService } from './todo-lists.service';
 @Component({
     selector: 'app-todo-lists',
     standalone: true,
-    imports: [CommonModule, MatCardModule, MatButtonModule, MatListModule, MatIconModule, MatListModule],
+    imports: [
+        CommonModule,
+        MatCard,
+        MatCardHeader,
+        MatCardTitle,
+        MatCardContent,
+        MatCardActions,
+        MatIconButton,
+        MatIcon,
+        MatSelectionList,
+        MatListOption,
+    ],
     templateUrl: './todo-lists.component.html',
 })
 export class TodoListsComponent implements OnInit, OnDestroy {

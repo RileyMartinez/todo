@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatListItem, MatNavList } from '@angular/material/list';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { MatToolbar } from '@angular/material/toolbar';
+import { Router, RouterOutlet } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteConstants } from './core/constants/route.constants';
 import { AuthService } from './core/services/auth.service';
@@ -20,16 +20,19 @@ import { ViewPortService } from './core/services/viewport.service';
     selector: 'app-root',
     standalone: true,
     imports: [
-        RouterOutlet,
-        MatToolbarModule,
-        MatButtonModule,
-        MatIcon,
-        RouterLink,
-        MatProgressBarModule,
         CommonModule,
-        MatMenuModule,
-        MatSidenavModule,
-        MatListModule,
+        RouterOutlet,
+        MatToolbar,
+        MatIconButton,
+        MatIcon,
+        MatProgressBar,
+        MatMenu,
+        MatMenuItem,
+        MatSidenav,
+        MatSidenavContainer,
+        MatSidenavContent,
+        MatNavList,
+        MatListItem,
         MatMenuTrigger,
     ],
     templateUrl: './app.component.html',
@@ -49,7 +52,6 @@ export class AppComponent implements OnInit, OnDestroy {
     userContext = this.authService.userContext;
     isMobile = this.viewportService.isMobile;
 
-    loginOrRegisterRoute = RouteConstants.LOGIN;
     title = 'web';
     isAuthenticated = false;
 

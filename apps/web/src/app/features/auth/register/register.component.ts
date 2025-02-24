@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatRipple } from '@angular/material/core';
 import { MatDivider } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatInput } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -16,13 +16,21 @@ import { AuthService } from '../../../core/services/auth.service';
     standalone: true,
     imports: [
         CommonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatCardModule,
-        MatButtonModule,
         ReactiveFormsModule,
+        MatCard,
+        MatCardHeader,
+        MatCardTitle,
+        MatCardContent,
+        MatCardActions,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatError,
+        MatButton,
+        MatIconButton,
         MatIcon,
-        MatTooltipModule,
+        MatSuffix,
+        MatTooltip,
         MatDivider,
         MatRipple,
     ],

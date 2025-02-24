@@ -158,7 +158,7 @@ export class AuthService {
 
     public clearSessionAndRedirect(): void {
         this.clearTokenAndUserIdentity();
-        this.router.navigate([RouteConstants.LOGIN]);
+        this.router.navigate([RouteConstants.AUTH, RouteConstants.LOGIN]);
     }
 
     private setTokenAndUserIdentity(userContext: UserContextDto): void {

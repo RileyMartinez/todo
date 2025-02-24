@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatLineModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
+import { MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatFormField } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouteConstants } from '../../../core/constants/route.constants';
 import { TodoListService } from './todo-list.service';
@@ -17,15 +16,18 @@ import { TodoListService } from './todo-list.service';
     standalone: true,
     imports: [
         CommonModule,
-        MatCardModule,
-        MatButtonModule,
-        MatLineModule,
-        MatListModule,
-        MatIconModule,
-        MatListModule,
-        MatInputModule,
-        MatFormFieldModule,
         ReactiveFormsModule,
+        MatCard,
+        MatCardHeader,
+        MatCardTitle,
+        MatCardContent,
+        MatCardActions,
+        MatIconButton,
+        MatIcon,
+        MatSelectionList,
+        MatListOption,
+        MatInput,
+        MatFormField,
     ],
     templateUrl: './todo-list.component.html',
 })

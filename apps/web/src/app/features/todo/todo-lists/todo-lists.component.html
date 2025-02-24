@@ -6,11 +6,11 @@
         <mat-card-content>
             <mat-selection-list #todoListSelections [multiple]="false">
                 @for (list of todoLists(); track list.id) {
-                    <mat-list-option [value]="list">{{ list.title }}</mat-list-option>
+                <mat-list-option [value]="list">{{ list.title }}</mat-list-option>
                 }
             </mat-selection-list>
             @if (todoLists().length === 0) {
-                <p>No lists found. Create a new list to get started.</p>
+            <p>No lists found. Create a new list to get started.</p>
             }
         </mat-card-content>
         <div class="flex justify-between items-center">
@@ -20,24 +20,16 @@
                 </button>
             </mat-card-actions>
             @if (todoListSelections.selectedOptions.selected.length) {
-                <mat-card-actions [align]="'end'">
-                    <a
-                        mat-icon-button
-                        color="accent"
-                        aria-label="Edit selected list"
-                        (click)="openEditPage(todoListSelections.selectedOptions.selected[0].value)"
-                    >
-                        <mat-icon>edit_note</mat-icon>
-                    </a>
-                    <button
-                        mat-icon-button
-                        color="warn"
-                        aria-label="Delete selected list"
-                        (click)="openDeleteDialog(todoListSelections.selectedOptions.selected[0].value)"
-                    >
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </mat-card-actions>
+            <mat-card-actions [align]="'end'">
+                <button mat-icon-button color="accent" aria-label="Edit selected list"
+                    (click)="openEditPage(todoListSelections.selectedOptions.selected[0].value)">
+                    <mat-icon>edit_note</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" aria-label="Delete selected list"
+                    (click)="openDeleteDialog(todoListSelections.selectedOptions.selected[0].value)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-card-actions>
             }
         </div>
     </mat-card>
