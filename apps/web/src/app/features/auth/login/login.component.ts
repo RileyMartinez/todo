@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
@@ -28,7 +28,6 @@ import { ForgotPasswordDialog } from './forgot-password.dialog';
         MatCardHeader,
         MatCardTitle,
         MatCardContent,
-        MatCardActions,
         MatFormField,
         MatInput,
         MatLabel,

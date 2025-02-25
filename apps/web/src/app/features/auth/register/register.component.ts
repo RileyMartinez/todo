@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatDivider } from '@angular/material/divider';
 import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -25,7 +25,6 @@ import { AuthService } from '../../../core/services/auth.service';
         MatCardHeader,
         MatCardTitle,
         MatCardContent,
-        MatCardActions,
         MatFormField,
         MatInput,
         MatLabel,

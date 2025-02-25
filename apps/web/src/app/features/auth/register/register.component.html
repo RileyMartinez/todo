@@ -30,8 +30,13 @@
                         <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
                 </mat-form-field>
+                <div class="pb-6">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
+                        <mat-icon>person_add</mat-icon>Create
+                    </button>
+                </div>
                 <mat-divider></mat-divider>
-                <div class="py-4 flex space-x-4">
+                <div class="pt-6 flex space-x-4">
                     <button mat-raised-button color="accent" type="button" (click)="onGoogleLogin()">
                         <fa-icon [icon]="faGoogle"></fa-icon>
                         Google
@@ -46,11 +51,6 @@
                     </button>
                 </div>
             </mat-card-content>
-            <mat-card-actions>
-                <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
-                    Create
-                </button>
-            </mat-card-actions>
         </mat-card>
     </div>
 </form>

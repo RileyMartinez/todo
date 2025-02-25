@@ -27,9 +27,15 @@
                         <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
                 </mat-form-field>
+                <div class="pb-6 flex flex-row items-center">
+                    <button mat-raised-button color="primary" type="submit"
+                        [disabled]="loginForm.invalid"><mat-icon>login</mat-icon>Login</button>
+                    <button mat-button color="accent" (click)="openForgotPasswordDialog()" class="ml-4">Forgot
+                        Password?</button>
+                </div>
                 <mat-divider></mat-divider>
-                <div class="py-4 flex space-x-4">
-                    <button mat-raised-button color="accent" type="button" (click)="onGoogleLogin()">
+                <div class="pt-6 flex space-x-4">
+                    <button mat-raised-button type="button" (click)="onGoogleLogin()">
                         <fa-icon [icon]="faGoogle"></fa-icon>
                         Google
                     </button>
@@ -43,12 +49,6 @@
                     </button>
                 </div>
             </mat-card-content>
-
-            <mat-card-actions>
-                <button mat-button color="primary" type="submit" [disabled]="loginForm.invalid">Login</button>
-                <button mat-button color="accent" (click)="openForgotPasswordDialog()" class="ml-4">Forgot
-                    Password?</button>
-            </mat-card-actions>
         </mat-card>
     </div>
 </form>
