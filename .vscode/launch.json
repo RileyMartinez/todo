@@ -15,7 +15,7 @@
       "port": 9229,
       "address": "0.0.0.0",
       "restart": true,
-      "remoteRoot": "/app",
+      "remoteRoot": "/prod/api",
       "localRoot": "${workspaceFolder}/apps/api/",
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true

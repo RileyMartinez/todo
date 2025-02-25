@@ -32,13 +32,18 @@
                 </mat-form-field>
                 <mat-divider></mat-divider>
                 <div class="py-4 flex space-x-4">
-                    <div matRipple>
-                        <button type="button" (click)="onGoogleLogin()"
-                            class="border-none bg-transparent p-0 transition-shadow duration-300 hover:shadow-md rounded-md"
-                            aria-label="Sign in with Google">
-                            <img src="assets/web_light_sq_SU.svg" alt="Sign in with Google" />
-                        </button>
-                    </div>
+                    <button mat-raised-button color="accent" type="button" (click)="onGoogleLogin()">
+                        <fa-icon [icon]="faGoogle"></fa-icon>
+                        Google
+                    </button>
+                    <button mat-raised-button color="secondary" type="button" (click)="onGithubLogin()">
+                        <fa-icon [icon]="faGithub"></fa-icon>
+                        GitHub
+                    </button>
+                    <button mat-raised-button color="primary" type="button" (click)="onDiscordLogin()">
+                        <fa-icon [icon]="faDiscord"></fa-icon>
+                        Discord
+                    </button>
                 </div>
             </mat-card-content>
             <mat-card-actions>

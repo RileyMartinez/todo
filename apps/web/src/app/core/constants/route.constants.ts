@@ -12,4 +12,6 @@ export class RouteConstants {
 
     // API routes
     static readonly AUTH_GOOGLE_LOGIN = 'auth/google/login';
+    static readonly AUTH_GITHUB_LOGIN = 'auth/github/login';
+    static readonly AUTH_DISCORD_LOGIN = 'auth/discord/login';
 }

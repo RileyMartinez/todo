@@ -8,7 +8,8 @@ export class AppConstants {
     static readonly LOCAL_STRATEGY_NAME = 'local';
     static readonly OTP_STRATEGY_NAME = 'otp';
     static readonly GOOGLE_STRATEGY_NAME = 'google';
-    static readonly AZURE_AD_STRATEGY_NAME = 'azure-ad';
+    static readonly GITHUB_STRATEGY_NAME = 'github';
+    static readonly DISCORD_STRATEGY_NAME = 'discord';
     static readonly DEFAULT_AWS_REGION = 'us-east-1';
     static readonly DEFAULT_AWS_PROFILE = 'default';
     static readonly BASE_PATH = process.env.BASE_PATH || 'http://localhost';

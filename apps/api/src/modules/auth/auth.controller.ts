@@ -1,5 +1,13 @@
+import { cookieConfigFactory, invalidTokenCookieConfig } from '@/common/configs/cookie.config-factory';
+import { ConfigConstants } from '@/common/constants/config.constants';
+import { DecoratorConstants } from '@/common/constants/decorator.constants';
+import { SwaggerConstants } from '@/common/constants/swagger.constants';
+import { GetCurrentUser } from '@/common/decorators/get-current-user.decorator';
+import { Public } from '@/common/decorators/public.decorator';
+import { UrlUtil } from '@/common/utils/url.util';
+import { ValidationUtil } from '@/common/utils/validaton.util';
 import { Body, Controller, ForbiddenException, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 import {
     ApiBearerAuth,
     ApiConflictResponse,
@@ -9,21 +17,16 @@ import {
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { ExceptionConstants } from 'src/common/constants/exception.constants';
-import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { CookieOptions, Response } from 'express';
-import { ConfigService } from '@nestjs/config';
-import { cookieConfigFactory, invalidTokenCookieConfig } from '@/common/configs/cookie.config-factory';
-import { ConfigConstants } from '@/common/constants/config.constants';
-import { DecoratorConstants } from '@/common/constants/decorator.constants';
-import { SwaggerConstants } from '@/common/constants/swagger.constants';
-import { GetCurrentUser } from '@/common/decorators/get-current-user.decorator';
-import { Public } from '@/common/decorators/public.decorator';
-import { ValidationUtil } from '@/common/utils/validaton.util';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
+import { AuthService } from './auth.service';
 import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
 import { AuthLoginResultDto } from './dto/auth-login-result.dto';
+import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { UserContextDto } from './dto/user-context.dto';
+import { DiscordAuthGuard } from './guards/discord-auth.guard';
+import { GitHubAuthGuard } from './guards/github-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalGuard } from './guards/local.guard';
@@ -39,10 +42,12 @@ export class AuthController {
         private readonly authService: AuthService,
         private readonly configService: ConfigService,
         private readonly validationUtil: ValidationUtil,
+        private readonly urlUtil: UrlUtil,
     ) {
         this.authService = authService;
         this.configService = configService;
         this.validationUtil = validationUtil;
+        this.urlUtil = urlUtil;
         this.accessTokenCookieConfig = cookieConfigFactory(this.configService, ConfigConstants.JWT_EXPIRATION);
         this.refreshTokenCookieConfig = cookieConfigFactory(this.configService, ConfigConstants.JWT_REFRESH_EXPIRATION);
     }
@@ -95,13 +100,63 @@ export class AuthController {
         this.validationUtil.validateObject(result);
 
         const { tokens, userContext } = result;
-        const basePath = this.configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
-        const webPort = this.configService.getOrThrow<string>(ConfigConstants.WEB_PORT);
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${basePath}:${webPort}/auth/callback/${userContext.sub}`);
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+    }
+
+    @Public()
+    @Get('github/login')
+    @UseGuards(GitHubAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    githubLogin(): void {}
+
+    @Public()
+    @Get('github/redirect')
+    @ApiFoundResponse({ description: 'Redirect to client with user session' })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @UseGuards(GitHubAuthGuard)
+    @HttpCode(HttpStatus.FOUND)
+    async githubRedirect(
+        @GetCurrentUser() result: AuthLoginResultDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        this.validationUtil.validateObject(result);
+
+        const { tokens, userContext } = result;
+
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+    }
+
+    @Public()
+    @Get('discord/login')
+    @UseGuards(DiscordAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    discordLogin(): void {}
+
+    @Public()
+    @Get('discord/redirect')
+    @ApiFoundResponse({ description: 'Redirect to client with user session' })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @UseGuards(DiscordAuthGuard)
+    @HttpCode(HttpStatus.FOUND)
+    async discordRedirect(
+        @GetCurrentUser() result: AuthLoginResultDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        this.validationUtil.validateObject(result);
+
+        const { tokens, userContext } = result;
+
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
     }
 
     @Public()
