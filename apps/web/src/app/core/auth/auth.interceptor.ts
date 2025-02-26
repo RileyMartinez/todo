@@ -7,12 +7,14 @@ import {
     HttpStatusCode,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
 import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 let isRefreshing = false;
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+    const authService = inject(AuthService);
+
     req = req.clone({ withCredentials: true });
 
     return next(req).pipe(
@@ -24,28 +26,27 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
             ) {
                 return handleRefresh(req, next);
             }
+
             return throwError(() => error);
         }),
     );
-};
 
-function handleRefresh(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
-    const authService = inject(AuthService);
-
-    if (isRefreshing) {
-        return next(req);
-    }
-
-    isRefreshing = true;
-
-    return authService.refresh().pipe(
-        switchMap(() => {
-            isRefreshing = false;
+    function handleRefresh(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
+        if (isRefreshing) {
             return next(req);
-        }),
-        catchError((error) => {
-            isRefreshing = false;
-            return throwError(() => error);
-        }),
-    );
-}
+        }
+
+        isRefreshing = true;
+
+        return authService.refresh().pipe(
+            switchMap(() => {
+                isRefreshing = false;
+                return next(req);
+            }),
+            catchError((error) => {
+                isRefreshing = false;
+                return throwError(() => error);
+            }),
+        );
+    }
+};
