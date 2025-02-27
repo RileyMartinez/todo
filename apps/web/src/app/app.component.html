@@ -1,13 +1,14 @@
 <div class="flex flex-col min-h-screen">
     <mat-toolbar color="primary">
+        <mat-icon>add_task</mat-icon>
+        <span class="px-1">Todo</span>
+        <span class="flex-grow"></span>
         @if (isMobile() && userContext()) {
         <button mat-icon-button (click)="sidenav?.toggle()" class="mr-4">
             <mat-icon>menu</mat-icon>
         </button>
         }
-        <span>Todo</span>
-        <span class="flex-grow"></span>
-        @if (!isMobile() && userContext()) {
+        @else if (!isMobile() && userContext()) {
         <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>account_circle</mat-icon>
         </button>
