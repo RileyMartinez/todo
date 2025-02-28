@@ -10,6 +10,7 @@ import { jwtConfig } from '../../common/configs/jwt.config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DiscordAuthStrategy } from './strategies/discord-auth.strategy';
+import { FacebookAuthStrategy } from './strategies/facebook-auth.strategy';
 import { GitHubAuthStrategy } from './strategies/github-auth.strategy';
 import { GoogleAuthStrategy } from './strategies/google-auth.strategy';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
@@ -32,6 +33,7 @@ import { OtpStrategy } from './strategies/otp.strategy';
         GoogleAuthStrategy,
         GitHubAuthStrategy,
         DiscordAuthStrategy,
+        FacebookAuthStrategy,
     ],
 })
 export class AuthModule {}

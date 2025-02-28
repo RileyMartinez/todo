@@ -26,6 +26,7 @@ import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { UserContextDto } from './dto/user-context.dto';
 import { DiscordAuthGuard } from './guards/discord-auth.guard';
+import { FacebookAuthGuard } from './guards/facebook-auth.guard';
 import { GitHubAuthGuard } from './guards/github-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
@@ -146,6 +147,32 @@ export class AuthController {
     @UseGuards(DiscordAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async discordRedirect(
+        @GetCurrentUser() result: AuthLoginResultDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        this.validationUtil.validateObject(result);
+
+        const { tokens, userContext } = result;
+
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+    }
+
+    @Public()
+    @Get('facebook/login')
+    @UseGuards(FacebookAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    facebookLogin(): void {}
+
+    @Public()
+    @Get('facebook/redirect')
+    @ApiFoundResponse({ description: 'Redirect to client with user session' })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @UseGuards(FacebookAuthGuard)
+    @HttpCode(HttpStatus.FOUND)
+    async facebookRedirect(
         @GetCurrentUser() result: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {

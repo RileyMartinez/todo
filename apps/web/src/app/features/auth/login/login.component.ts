@@ -10,7 +10,7 @@ import { MatError, MatFormField, MatInput, MatLabel, MatSuffix } from '@angular/
 import { MatTooltip } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { faDiscord, faGithub, faGoogle, IconDefinition } from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faFacebook, faGithub, faGoogle, IconDefinition } from '@fortawesome/free-brands-svg-icons';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RouteConstants } from '../../../core/constants/route.constants';
@@ -52,6 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     readonly faGithub: IconDefinition = faGithub;
     readonly faGoogle: IconDefinition = faGoogle;
     readonly faDiscord: IconDefinition = faDiscord;
+    readonly faFacebook: IconDefinition = faFacebook;
 
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
