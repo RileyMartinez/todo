@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
+import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatListItem, MatNavList } from '@angular/material/list';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
@@ -34,6 +35,7 @@ import { ViewPortService } from './core/services/viewport.service';
         MatNavList,
         MatListItem,
         MatMenuTrigger,
+        MatDivider,
     ],
     templateUrl: './app.component.html',
 })

@@ -108,6 +108,9 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(winston@3.17.0)
     devDependencies:
+      '@aws-sdk/types':
+        specifier: ^3.734.0
+        version: 3.734.0
       '@nestjs/cli':
         specifier: ^11.0.3
         version: 11.0.3(@types/node@22.13.4)

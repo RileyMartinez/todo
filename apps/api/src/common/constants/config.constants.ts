@@ -1,5 +1,4 @@
 export class ConfigConstants {
-    static readonly ENV = 'ENV';
     static readonly BASE_PATH = 'BASE_PATH';
     static readonly PORT = 'PORT';
     static readonly WEB_PORT = 'WEB_PORT';

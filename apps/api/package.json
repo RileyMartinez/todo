@@ -17,7 +17,9 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "create:email:template": "aws sesv2 create-email-template --cli-input-json",
+        "delete:email:template": "aws sesv2 delete-email-template --template-name"
     },
     "dependencies": {
         "@1password/sdk": "^0.1.7",
@@ -54,6 +56,7 @@
         "winston-daily-rotate-file": "^5.0.0"
     },
     "devDependencies": {
+        "@aws-sdk/types": "^3.734.0",
         "@nestjs/cli": "^11.0.3",
         "@nestjs/schematics": "^11.0.1",
         "@nestjs/testing": "^11.0.10",

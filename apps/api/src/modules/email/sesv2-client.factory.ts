@@ -1,7 +1,8 @@
 import { AppConstants } from '@/common/constants/app.constants';
 import { ConfigConstants } from '@/common/constants/config.constants';
 import { SESv2Client } from '@aws-sdk/client-sesv2';
-import { fromSSO } from '@aws-sdk/credential-providers';
+import { fromContainerMetadata, fromSSO } from '@aws-sdk/credential-providers';
+import { AwsCredentialIdentityProvider } from '@aws-sdk/types';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -10,6 +11,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 export class SESV2ClientFactory {
     private readonly region: string;
     private readonly profile: string;
+    private readonly credentialProvider: AwsCredentialIdentityProvider;
     private client: SESv2Client;
 
     constructor(
@@ -20,6 +22,15 @@ export class SESV2ClientFactory {
         this.configService = configService;
         this.region = this.configService.get(ConfigConstants.AWS_REGION) || AppConstants.DEFAULT_AWS_REGION;
         this.profile = this.configService.get(ConfigConstants.AWS_PROFILE) || AppConstants.DEFAULT_AWS_PROFILE;
+
+        if (process.env.APP_ENV === AppConstants.DEV) {
+            this.credentialProvider = fromSSO({
+                profile: this.profile,
+            });
+        } else {
+            this.credentialProvider = fromContainerMetadata();
+        }
+
         this.client = this.createClient();
     }
 
@@ -34,9 +45,7 @@ export class SESV2ClientFactory {
 
         this.client = new SESv2Client({
             region: clientRegion,
-            credentials: fromSSO({
-                profile: this.profile,
-            }),
+            credentials: this.credentialProvider,
         });
 
         return this.client;

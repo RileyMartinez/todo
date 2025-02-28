@@ -1,17 +1,17 @@
-import { ForbiddenException, Inject, Injectable, LoggerService } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { SESV2ClientFactory } from './sesv2-client.factory';
-import { SendEmailCommand } from '@aws-sdk/client-sesv2';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { formatLogMessage } from '@/common/utils/logger.util';
-import { RawOtpTokenDto } from '../auth/dto/raw-otp-token.dto';
 import { ConfigConstants } from '@/common/constants/config.constants';
 import { EventConstants } from '@/common/constants/event.constants';
 import { ExceptionConstants } from '@/common/constants/exception.constants';
 import { PasswordResetEvent } from '@/common/events/password-reset.event';
+import { formatLogMessage } from '@/common/utils/logger.util';
 import { ValidationUtil } from '@/common/utils/validaton.util';
+import { SendEmailCommand } from '@aws-sdk/client-sesv2';
+import { ForbiddenException, Inject, Injectable, LoggerService } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { OnEvent } from '@nestjs/event-emitter';
+import { JwtService } from '@nestjs/jwt';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { RawOtpTokenDto } from '../auth/dto/raw-otp-token.dto';
+import { SESV2ClientFactory } from './sesv2-client.factory';
 
 @Injectable()
 export class EmailService {
@@ -60,7 +60,7 @@ export class EmailService {
             throw new ForbiddenException(ExceptionConstants.INVALID_TOKEN);
         }
 
-        const templateName = '66af6bd3-b733-403a-8f2c-b4e7d0fc5446-password-reset';
+        const templateName = 'password-reset';
 
         const command = new SendEmailCommand({
             FromEmailAddress: fromEmail,
