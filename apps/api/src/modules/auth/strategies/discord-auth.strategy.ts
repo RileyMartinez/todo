@@ -4,7 +4,7 @@ import { UrlUtil } from '@/common/utils/url.util';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy } from 'passport-discord';
+import { Profile, Strategy, StrategyOptions } from 'passport-discord';
 import { AuthService } from '../auth.service';
 import { AuthLoginResultDto } from '../dto/auth-login-result.dto';
 
@@ -20,7 +20,7 @@ export class DiscordAuthStrategy extends PassportStrategy(Strategy, AppConstants
             clientSecret: configService.getOrThrow<string>(ConfigConstants.DISCORD_OAUTH20_CLIENT_SECRET),
             callbackURL: `${urlUtil.getServerUrl()}/auth/discord/redirect`,
             scope: ['identify', 'email'],
-        });
+        } as StrategyOptions);
     }
 
     async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {

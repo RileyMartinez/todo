@@ -11,6 +11,7 @@ export class AppConstants {
     static readonly GITHUB_STRATEGY_NAME = 'github';
     static readonly DISCORD_STRATEGY_NAME = 'discord';
     static readonly FACEBOOK_STRATEGY_NAME = 'facebook';
+    static readonly MICROSOFT_STRATEGY_NAME = 'microsoft';
     static readonly DEFAULT_AWS_REGION = 'us-east-1';
     static readonly DEFAULT_AWS_PROFILE = 'default';
     static readonly BASE_PATH = process.env.BASE_PATH || 'http://localhost';

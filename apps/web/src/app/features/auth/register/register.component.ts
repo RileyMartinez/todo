@@ -9,7 +9,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
 import { FaIconComponent, IconDefinition } from '@fortawesome/angular-fontawesome';
-import { faDiscord, faFacebook, faGithub, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faFacebook, faGithub, faGoogle, faMicrosoft } from '@fortawesome/free-brands-svg-icons';
 import { environment } from '../../../../environments/environment';
 import { RouteConstants } from '../../../core/constants/route.constants';
 import { AuthService } from '../../../core/services/auth.service';
@@ -47,6 +47,7 @@ export class RegisterComponent implements OnInit {
     readonly faGoogle: IconDefinition = faGoogle;
     readonly faDiscord: IconDefinition = faDiscord;
     readonly faFacebook: IconDefinition = faFacebook;
+    readonly faMicrosoft: IconDefinition = faMicrosoft;
 
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;

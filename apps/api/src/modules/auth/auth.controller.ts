@@ -31,6 +31,7 @@ import { GitHubAuthGuard } from './guards/github-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LocalGuard } from './guards/local.guard';
+import { MicrosoftAuthGuard } from './guards/microsoft-auth.guard';
 import { OtpGuard } from './guards/otp.guard';
 
 @Controller('auth')
@@ -95,6 +96,32 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async googleRedirect(
+        @GetCurrentUser() result: AuthLoginResultDto,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        this.validationUtil.validateObject(result);
+
+        const { tokens, userContext } = result;
+
+        response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
+        response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
+
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+    }
+
+    @Public()
+    @Get('microsoft/login')
+    @UseGuards(MicrosoftAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    microsoftLogin(): void {}
+
+    @Public()
+    @Get('microsoft/redirect')
+    @ApiFoundResponse({ description: 'Redirect to client with user session' })
+    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @UseGuards(MicrosoftAuthGuard)
+    @HttpCode(HttpStatus.FOUND)
+    async microsoftRedirect(
         @GetCurrentUser() result: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {

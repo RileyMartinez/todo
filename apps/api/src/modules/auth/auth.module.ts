@@ -16,6 +16,7 @@ import { GoogleAuthStrategy } from './strategies/google-auth.strategy';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { MicrosoftAuthStrategy } from './strategies/microsoft-auth.strategy';
 import { OtpStrategy } from './strategies/otp.strategy';
 
 @Module({
@@ -31,6 +32,7 @@ import { OtpStrategy } from './strategies/otp.strategy';
         JwtAuthStrategy,
         JwtRefreshStrategy,
         GoogleAuthStrategy,
+        MicrosoftAuthStrategy,
         GitHubAuthStrategy,
         DiscordAuthStrategy,
         FacebookAuthStrategy,
