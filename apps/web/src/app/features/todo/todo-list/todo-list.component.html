@@ -10,7 +10,7 @@
                     <mat-form-field class="flex-grow">
                         <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
                     </mat-form-field>
-                    <button mat-icon-button color="primary" type="submit" [disabled]="todoForm.invalid">
+                    <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
                         <mat-icon>add</mat-icon>
                     </button>
                 </div>
@@ -28,7 +28,7 @@
             </mat-selection-list>
         </mat-card-content>
         <mat-card-actions>
-            <button mat-icon-button color="primary" (click)="goBack()">
+            <button mat-icon-button (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
         </mat-card-actions>

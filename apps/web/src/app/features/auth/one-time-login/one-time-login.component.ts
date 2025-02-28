@@ -1,13 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatDivider } from '@angular/material/divider';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'app-one-time-login',
@@ -25,6 +27,9 @@ import { AuthService } from '../../../core/services/auth.service';
         MatLabel,
         MatError,
         MatButton,
+        MatIconButton,
+        MatIcon,
+        RouterLink,
     ],
     templateUrl: './one-time-login.component.html',
 })

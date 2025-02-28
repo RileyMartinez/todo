@@ -42,13 +42,15 @@ export class RegisterComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
     private readonly authService = inject(AuthService);
 
+    readonly routes = RouteConstants;
+    readonly faGithub: IconDefinition = faGithub;
+    readonly faGoogle: IconDefinition = faGoogle;
+    readonly faDiscord: IconDefinition = faDiscord;
+
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
     registerForm!: FormGroup;
     hide = true;
-    faGithub: IconDefinition = faGithub;
-    faGoogle: IconDefinition = faGoogle;
-    faDiscord: IconDefinition = faDiscord;
 
     ngOnInit(): void {
         this.emailFormControl = new FormControl('', [Validators.email, Validators.required]);
@@ -60,16 +62,8 @@ export class RegisterComponent implements OnInit {
         });
     }
 
-    onGoogleLogin(): void {
-        window.location.href = `${environment.API_BASE_PATH}/${RouteConstants.AUTH_GOOGLE_LOGIN}`;
-    }
-
-    onGithubLogin(): void {
-        window.location.href = `${environment.API_BASE_PATH}/${RouteConstants.AUTH_GITHUB_LOGIN}`;
-    }
-
-    onDiscordLogin(): void {
-        window.location.href = `${environment.API_BASE_PATH}/${RouteConstants.AUTH_DISCORD_LOGIN}`;
+    onSocialLogin(route: string): void {
+        window.location.href = `${environment.API_BASE_PATH}/${route}`;
     }
 
     onSubmit(): void {

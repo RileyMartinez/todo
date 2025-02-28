@@ -32,12 +32,7 @@ import { MatInput } from '@angular/material/input';
             </mat-dialog-content>
             <mat-dialog-actions>
                 <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-                <button
-                    mat-button
-                    color="primary"
-                    [mat-dialog-close]="emailFormControl.value"
-                    [disabled]="passwordResetForm.invalid"
-                >
+                <button mat-button [mat-dialog-close]="emailFormControl.value" [disabled]="passwordResetForm.invalid">
                     Send
                 </button>
             </mat-dialog-actions>

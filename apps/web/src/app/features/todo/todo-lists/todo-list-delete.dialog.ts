@@ -14,7 +14,7 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } fr
         </mat-dialog-content>
         <mat-dialog-actions>
             <button mat-button [mat-dialog-close]="false">Cancel</button>
-            <button mat-button color="primary" [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
+            <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
         </mat-dialog-actions>
     `,
 })

@@ -31,7 +31,7 @@ import { MatInput } from '@angular/material/input';
         </mat-dialog-content>
         <mat-dialog-actions>
             <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-            <button mat-button color="primary" [mat-dialog-close]="title" cdkFocusInitial>Create</button>
+            <button mat-button [mat-dialog-close]="title" cdkFocusInitial>Create</button>
         </mat-dialog-actions>
     `,
 })

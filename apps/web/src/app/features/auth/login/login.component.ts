@@ -48,13 +48,15 @@ export class LoginComponent implements OnInit, OnDestroy {
     private readonly router = inject(Router);
     private readonly destroy$ = new Subject<void>();
 
+    readonly routes = RouteConstants;
+    readonly faGithub: IconDefinition = faGithub;
+    readonly faGoogle: IconDefinition = faGoogle;
+    readonly faDiscord: IconDefinition = faDiscord;
+
     emailFormControl!: FormControl;
     passwordFormControl!: FormControl;
     loginForm!: FormGroup;
     hide = true;
-    faGithub: IconDefinition = faGithub;
-    faGoogle: IconDefinition = faGoogle;
-    faDiscord: IconDefinition = faDiscord;
 
     ngOnInit(): void {
         this.emailFormControl = new FormControl('', [Validators.email, Validators.required]);
@@ -79,16 +81,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.authService.login$.next({ email: this.emailFormControl.value, password: this.passwordFormControl.value });
     }
 
-    onGoogleLogin(): void {
-        window.location.href = `${environment.API_BASE_PATH}/${RouteConstants.AUTH_GOOGLE_LOGIN}`;
-    }
-
-    onGithubLogin(): void {
-        window.location.href = `${environment.API_BASE_PATH}/${RouteConstants.AUTH_GITHUB_LOGIN}`;
-    }
-
-    onDiscordLogin(): void {
-        window.location.href = `${environment.API_BASE_PATH}/${RouteConstants.AUTH_DISCORD_LOGIN}`;
+    onSocialLogin(route: string): void {
+        window.location.href = `${environment.API_BASE_PATH}/${route}`;
     }
 
     openForgotPasswordDialog(): void {
@@ -102,7 +96,9 @@ export class LoginComponent implements OnInit, OnDestroy {
                 }
 
                 this.authService.requestPasswordReset$.next({ email });
-                this.router.navigate([RouteConstants.AUTH, RouteConstants.OTP_LOGIN], { queryParams: { email } });
+                this.router.navigate([RouteConstants.AUTH, RouteConstants.LOGIN, RouteConstants.OTP], {
+                    queryParams: { email },
+                });
             });
     }
 }

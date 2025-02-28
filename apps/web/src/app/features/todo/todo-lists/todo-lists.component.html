@@ -15,17 +15,17 @@
         </mat-card-content>
         <div class="flex justify-between items-center">
             <mat-card-actions [align]="'start'">
-                <button mat-icon-button color="primary" aria-label="Create new list" (click)="openCreateDialog()">
+                <button mat-icon-button aria-label="Create new list" (click)="openCreateDialog()">
                     <mat-icon>add</mat-icon>
                 </button>
             </mat-card-actions>
             @if (todoListSelections.selectedOptions.selected.length) {
             <mat-card-actions [align]="'end'">
-                <button mat-icon-button color="accent" aria-label="Edit selected list"
+                <button mat-icon-button aria-label="Edit selected list"
                     (click)="openEditPage(todoListSelections.selectedOptions.selected[0].value)">
                     <mat-icon>edit_note</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" aria-label="Delete selected list"
+                <button mat-icon-button aria-label="Delete selected list"
                     (click)="openDeleteDialog(todoListSelections.selectedOptions.selected[0].value)">
                     <mat-icon>delete</mat-icon>
                 </button>

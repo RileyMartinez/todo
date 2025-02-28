@@ -31,21 +31,21 @@
                     </button>
                 </mat-form-field>
                 <div class="pb-6">
-                    <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
+                    <button mat-raised-button type="submit" [disabled]="registerForm.invalid">
                         <mat-icon>person_add</mat-icon>Create
                     </button>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="pt-6 flex space-x-4">
-                    <button mat-raised-button color="accent" type="button" (click)="onGoogleLogin()">
+                    <button mat-raised-button type="button" (click)="onSocialLogin(routes.AUTH_GOOGLE_LOGIN)">
                         <fa-icon [icon]="faGoogle"></fa-icon>
                         Google
                     </button>
-                    <button mat-raised-button color="secondary" type="button" (click)="onGithubLogin()">
+                    <button mat-raised-button type="button" (click)="onSocialLogin(routes.AUTH_GITHUB_LOGIN)">
                         <fa-icon [icon]="faGithub"></fa-icon>
                         GitHub
                     </button>
-                    <button mat-raised-button color="primary" type="button" (click)="onDiscordLogin()">
+                    <button mat-raised-button type="button" (click)="onSocialLogin(routes.AUTH_DISCORD_LOGIN)">
                         <fa-icon [icon]="faDiscord"></fa-icon>
                         Discord
                     </button>

@@ -9,20 +9,23 @@
                     <mat-label>Code</mat-label>
                     <input matInput [formControl]="otpFormControl" autocomplete="current-password" required />
                     @if (otpFormControl.hasError('required')) {
-                        <mat-error>One-time password code is required </mat-error>
+                    <mat-error>One-time password code is required </mat-error>
                     }
                 </mat-form-field>
+                <div class="py-2 flex flex-row items-center">
+                    <button mat-raised-button type="submit" [disabled]="otpLoginForm.invalid">Login</button>
+                    <div [matTooltip]="!email ? 'Resending is currently unavailable. Try again from the Login page.' : ''"
+                        [matTooltipDisabled]="email">
+                        <button mat-button type="button" (click)="resendOtp()" class="ml-4" [disabled]="!email">
+                            Resend Code
+                        </button>
+                    </div>
+                </div>
             </mat-card-content>
             <mat-card-actions>
-                <button mat-raised-button color="primary" type="submit" [disabled]="otpLoginForm.invalid">Login</button>
-                <div
-                    [matTooltip]="!email ? 'Resending is currently unavailable. Try again from the Login page.' : ''"
-                    [matTooltipDisabled]="email"
-                >
-                    <button mat-button color="accent" (click)="resendOtp()" class="ml-4" [disabled]="!email">
-                        Resend Code
-                    </button>
-                </div>
+                <button mat-icon-button type="button" routerLink="/auth/login">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
             </mat-card-actions>
         </mat-card>
     </div>

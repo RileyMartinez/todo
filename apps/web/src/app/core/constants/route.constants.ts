@@ -4,7 +4,7 @@ export class RouteConstants {
     static readonly AUTH = 'auth';
     static readonly TODO = 'todo';
     static readonly LOGIN = 'login';
-    static readonly OTP_LOGIN = 'otp-login';
+    static readonly OTP = 'otp';
     static readonly OAUTH_CALLBACK = 'callback/:sub';
     static readonly LISTS = 'lists';
     static readonly LIST = 'list';
