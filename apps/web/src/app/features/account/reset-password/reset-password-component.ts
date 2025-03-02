@@ -72,7 +72,7 @@ import { matchValidator } from '../../../core/validators/match.validator';
                     </mat-card-content>
                     <mat-card-actions>
                         <div matTooltip="Return to {{ routes.TODO }} {{ routes.LISTS }}">
-                            <button mat-icon-button [routerLink]="[routes.TODO, routes.LISTS]">
+                            <button mat-icon-button type="button" [routerLink]="['/', routes.TODO, routes.LISTS]">
                                 <mat-icon>arrow_back</mat-icon>
                             </button>
                         </div>
