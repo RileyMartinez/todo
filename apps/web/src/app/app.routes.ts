@@ -10,5 +10,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/todo/todo.routes').then((m) => m.TODO_ROUTES),
         canActivate: [authGuard],
     },
+    {
+        path: RouteConstants.ACCOUNT, 
+        loadChildren: () => import('./features/account/account.routes').then((m) => m.ACCOUNT_ROUTES),
+        canActivate: [authGuard],
+    },
     { path: RouteConstants.WILDCARD, redirectTo: `${RouteConstants.AUTH}/${RouteConstants.LOGIN}` },
 ];

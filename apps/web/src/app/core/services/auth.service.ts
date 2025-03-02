@@ -2,6 +2,7 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { UpdatePasswordDto, UserClient } from '../../shared/openapi-client';
 import { AuthClient } from '../../shared/openapi-client/api/auth.client';
 import { AuthLoginRequestDto } from '../../shared/openapi-client/model/auth-login-request-dto';
 import { AuthRegisterRequestDto } from '../../shared/openapi-client/model/auth-register-request-dto';
@@ -24,6 +25,7 @@ export const USER_CONTEXT_KEY: string = 'todo.sub';
 })
 export class AuthService {
     private readonly authClient = inject(AuthClient);
+    private readonly userClient = inject(UserClient);
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
@@ -46,6 +48,7 @@ export class AuthService {
     readonly register$ = new Subject<AuthRegisterRequestDto>();
     readonly logout$ = new Subject<void>();
     readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
+    readonly resetPassword$ = new Subject<UpdatePasswordDto>();
 
     constructor() {
         this.initUserSession();
@@ -82,7 +85,8 @@ export class AuthService {
             )
             .subscribe((userContext) => {
                 this.snackBarNotificationService.emit({ message: 'Login successful' });
-                this.setSessonAndRedirect(userContext);
+                this.setTokenAndUserIdentity(userContext);
+                this.router.navigate([RouteConstants.ACCOUNT, RouteConstants.RESET_PASSWORD]);
             });
 
         this.register$
@@ -135,7 +139,24 @@ export class AuthService {
                 this.snackBarNotificationService.emit({ message: 'Password reset email sent' });
             });
 
-        effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
+        this.resetPassword$
+            .pipe(
+                switchMap((updatePasswordDto) =>
+                    this.userClient.userControllerUpdatePassword(updatePasswordDto).pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Password reset failed' });
+                            return this.handleError(error);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe(() => {
+                this.snackBarNotificationService.emit({ message: 'Password reset successful' });
+                this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
+            });
+
+        effect(() => this.loadingService.setLoading(!this.loaded()));
     }
 
     public refresh(): Observable<UserContextDto | null> {

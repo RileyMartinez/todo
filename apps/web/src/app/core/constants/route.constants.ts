@@ -1,14 +1,23 @@
 export class RouteConstants {
-    // Web routes
+    // Parent routes
     static readonly ROOT = '';
     static readonly AUTH = 'auth';
     static readonly TODO = 'todo';
+    static readonly ACCOUNT = 'account';
+    static readonly WILDCARD = '**';
+
+    // Auth routes
     static readonly LOGIN = 'login';
     static readonly OTP = 'otp';
     static readonly OAUTH_CALLBACK = 'callback/:sub';
+
+    // Todo routes
     static readonly LISTS = 'lists';
     static readonly LIST = 'list';
-    static readonly WILDCARD = '**';
+
+    // Account routes
+    static readonly PROFILE = 'profile';
+    static readonly RESET_PASSWORD = 'reset-password';
 
     // API routes
     static readonly AUTH_GOOGLE_LOGIN = 'auth/google/login';

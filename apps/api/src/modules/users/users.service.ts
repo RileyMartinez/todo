@@ -1,12 +1,15 @@
-import { BadRequestException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
-import { ExceptionConstants } from 'src/common/constants/exception.constants';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ValidationUtil } from '@/common/utils/validaton.util';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { formatLogMessage } from '@/common/utils/logger.util';
+import { ValidationUtil } from '@/common/utils/validaton.util';
+import { BadRequestException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as argon2 from 'argon2';
+import { validate } from 'class-validator';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { ExceptionConstants } from 'src/common/constants/exception.constants';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -132,6 +135,43 @@ export class UserService {
         if (!result.affected) {
             this.logger.error(
                 formatLogMessage('USDUTok002', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
+     * Updates the password of a user.
+     * @param id - The ID of the user.
+     * @param updatePasswordDto - The new password.
+     * @returns A promise that resolves to an UpdateResult object.
+     * @throws {BadRequestException} If the user ID is invalid.
+     */
+    async updateUserPassword(id: string, updatePasswordDto: UpdatePasswordDto): Promise<UpdateResult> {
+        await validate(updatePasswordDto);
+
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USUUPas001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        const hash = await argon2.hash(updatePasswordDto.password);
+
+        const result = await this.userRepository.update(id, {
+            password: hash,
+        });
+
+        if (!result.affected) {
+            this.logger.error(
+                formatLogMessage('USUUPas002', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
                 undefined,
                 UserService.name,
             );

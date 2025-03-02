@@ -72,7 +72,7 @@ export class TodoListsService {
                 })),
             );
 
-        effect(() => this.loadingService.setLoading(!this.loaded()), { allowSignalWrites: true });
+        effect(() => this.loadingService.setLoading(!this.loaded()));
     }
 
     private handleError(error: any): Observable<never> {
