@@ -296,6 +296,7 @@ export class AuthService {
                 stack,
                 AuthService.name,
             );
+
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -355,8 +356,8 @@ export class AuthService {
         );
 
         const encryptedToken = this.encryptionUtil.encrypt(token);
-        await this.usersService.revokeUserToken(user.id);
         await this.usersService.updateUserToken(user.id, encryptedToken);
+        await this.usersService.revokeUserToken(user.id);
 
         await this.emailService.sendPasswordReset(new PasswordResetEmailRequestDto(user.email, otp));
     }
