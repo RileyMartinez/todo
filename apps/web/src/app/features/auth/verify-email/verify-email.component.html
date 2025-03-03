@@ -1,0 +1,29 @@
+<form [formGroup]="verifyEmailForm" (ngSubmit)="onSubmit()">
+    <div class="flex justify-center p-14">
+        <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
+            <mat-card-header class="mb-4">
+                <mat-card-title>Verify Email</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-form-field appearance="fill" class="w-3/4">
+                    <mat-label>Code</mat-label>
+                    <input matInput [formControl]="verificationCodeFormControl" autocomplete="one-time-code" required />
+                    @if (verificationCodeFormControl.hasError('required')) {
+                    <mat-error>Verification code is required </mat-error>
+                    }
+                </mat-form-field>
+                <div class="py-2 flex flex-row items-center">
+                    <button mat-raised-button type="submit" [disabled]="verifyEmailForm.invalid">Verify</button>
+                    <button mat-button type="button" (click)="resendVerificationCode()" class="ml-4">
+                        Resend Code
+                    </button>
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-icon-button type="button" [routerLink]="['/', routes.AUTH, routes.LOGIN]">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</form>

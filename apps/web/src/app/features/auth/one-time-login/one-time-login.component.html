@@ -7,7 +7,7 @@
             <mat-card-content>
                 <mat-form-field appearance="fill" class="w-3/4">
                     <mat-label>Code</mat-label>
-                    <input matInput [formControl]="otpFormControl" autocomplete="current-password" required />
+                    <input matInput [formControl]="otpFormControl" autocomplete="one-time-code" required />
                     @if (otpFormControl.hasError('required')) {
                     <mat-error>One-time password code is required </mat-error>
                     }
