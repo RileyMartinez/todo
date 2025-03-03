@@ -76,7 +76,7 @@ export class TodoListsService {
     }
 
     private handleError(error: any): Observable<never> {
-        this.state.update((state) => ({ ...state, error }));
+        this.state.update((state) => ({ ...state, error, loaded: true }));
         return EMPTY;
     }
 }

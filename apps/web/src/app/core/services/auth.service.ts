@@ -166,8 +166,8 @@ export class AuthService {
             tap((userContext) => {
                 this.setTokenAndUserIdentity(userContext);
             }),
-            catchError(() => {
-                this.clearSessionAndRedirect();
+            catchError((error) => {
+                this.handleError(error);
                 return of(null);
             }),
         );
@@ -208,7 +208,7 @@ export class AuthService {
     }
 
     private handleError(error: any): Observable<never> {
-        this.state.update((state) => ({ ...state, error }));
+        this.state.update((state) => ({ ...state, error, loaded: true }));
         this.clearSessionAndRedirect();
         return EMPTY;
     }
