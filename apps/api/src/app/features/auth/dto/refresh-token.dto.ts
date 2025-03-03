@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
-export class RawRefreshTokenDto {
+export class RefreshTokenDto {
     @IsString()
     @IsNotEmpty()
     sub: string;

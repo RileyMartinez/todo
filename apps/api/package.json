@@ -19,6 +19,7 @@
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
         "create:email:template": "aws sesv2 create-email-template --cli-input-json",
+        "update:email:template": "aws sesv2 update-email-template --cli-input-json",
         "delete:email:template": "aws sesv2 delete-email-template --template-name"
     },
     "dependencies": {

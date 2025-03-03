@@ -1,11 +1,9 @@
-import { eventEmitterConfig } from '@/app/core/configs/event-emitter.config';
 import { loggerConfig } from '@/app/core/configs/logger.config';
 import { throttlerConfig } from '@/app/core/configs/throttle.config';
 import { typeOrmConfig } from '@/app/core/configs/typeorm.config';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
@@ -22,7 +20,6 @@ import { UsersModule } from './features/users/users.module';
         TypeOrmModule.forRootAsync(typeOrmConfig),
         ThrottlerModule.forRootAsync(throttlerConfig),
         WinstonModule.forRootAsync(loggerConfig),
-        EventEmitterModule.forRoot(eventEmitterConfig),
         TodoListModule,
         AuthModule,
         UsersModule,

@@ -8,5 +8,6 @@ import { SESV2ClientFactory } from './sesv2-client.factory';
 @Module({
     controllers: [EmailController],
     providers: [EmailService, ConfigService, SESV2ClientFactory, JwtService],
+    exports: [EmailService],
 })
 export class EmailModule {}
