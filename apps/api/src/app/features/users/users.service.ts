@@ -95,7 +95,7 @@ export class UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_TOKEN);
         }
 
-        const result = await this.userRepository.update(id, { token });
+        const result = await this.userRepository.update(id, { token, tokenVersion: () => 'tokenVersion + 1' });
 
         if (!result.affected) {
             this.logger.error(

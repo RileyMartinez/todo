@@ -347,7 +347,7 @@ export class AuthService {
         const otp = randomInt(100000, 999999);
         const token = await this.jwtService.signAsync(
             {
-                otp: otp,
+                otp,
             },
             {
                 secret: this.configService.getOrThrow(ConfigConstants.JWT_SECRET),
@@ -357,7 +357,6 @@ export class AuthService {
 
         const encryptedToken = this.encryptionUtil.encrypt(token);
         await this.usersService.updateUserToken(user.id, encryptedToken);
-        await this.usersService.revokeUserToken(user.id);
 
         await this.emailService.sendPasswordReset(new PasswordResetEmailRequestDto(user.email, otp));
     }
