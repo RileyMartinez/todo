@@ -127,7 +127,10 @@ export class UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        const result = await this.userRepository.update(id, { token: null, tokenVersion: () => 'tokenVersion + 1' });
+        const result = await this.userRepository.update(id, {
+            token: null,
+            tokenVersion: () => 'tokenVersion + 1',
+        });
 
         if (!result.affected) {
             this.logger.error(
@@ -169,6 +172,64 @@ export class UserService {
         if (!result.affected) {
             this.logger.error(
                 formatLogMessage('USUUPas002', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
+     * Marks a user as verified.
+     *
+     * @param id - The ID of the user to verify.
+     * @returns A promise that resolves to an UpdateResult object.
+     */
+    async verifyUser(id: string, verificationCode: number): Promise<UpdateResult> {
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USUVUse001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (!verificationCode) {
+            this.logger.error(
+                formatLogMessage('USUVUse002', ExceptionConstants.INVALID_VERIFICATION_CODE, {
+                    userId: id,
+                    verificationCode,
+                }),
+                undefined,
+                UserService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_VERIFICATION_CODE);
+        }
+
+        const user = await this.userRepository.findOneByOrFail({ id });
+
+        if (user.verificationCode !== verificationCode) {
+            this.logger.error(
+                formatLogMessage('USUVUse003', ExceptionConstants.INVALID_VERIFICATION_CODE, {
+                    userId: id,
+                    verificationCode,
+                }),
+                undefined,
+                UserService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_VERIFICATION_CODE);
+        }
+
+        const result = await this.userRepository.update(id, {
+            isVerified: true,
+        });
+
+        if (!result.affected) {
+            this.logger.error(
+                formatLogMessage('USUVUse004', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
                 undefined,
                 UserService.name,
             );

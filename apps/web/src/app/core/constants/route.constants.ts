@@ -9,7 +9,7 @@ export class RouteConstants {
     // Auth routes
     static readonly LOGIN = 'login';
     static readonly OTP = 'otp';
-    static readonly OAUTH_CALLBACK = 'callback/:sub';
+    static readonly OAUTH_CALLBACK = 'callback/:sub/:isVerified';
 
     // Todo routes
     static readonly LISTS = 'lists';
@@ -18,6 +18,7 @@ export class RouteConstants {
     // Account routes
     static readonly PROFILE = 'profile';
     static readonly RESET_PASSWORD = 'reset-password';
+    static readonly VERIFY = 'verify';
 
     // API routes
     static readonly AUTH_GOOGLE_LOGIN = 'auth/google/login';

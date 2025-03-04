@@ -6,8 +6,8 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { validateOrReject } from 'class-validator';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { PasswordResetEmailRequestDto } from './dto/password-reset-email-request.dto';
-import { VerifyEmailRequestDto } from './dto/verify-email-request.dto';
+import { AccountVerificationEmailDto } from './dto/account-verification-email.dto';
+import { PasswordResetEmailDto } from './dto/password-reset-email.dto';
 import { SESV2ClientFactory } from './sesv2-client.factory';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class EmailService {
      * @returns A promise that resolves when the email is sent successfully.
      * @throws {ValidationError} If the password reset email request dto is invalid.
      */
-    async sendPasswordReset(passwordResetEmailRequest: PasswordResetEmailRequestDto): Promise<void> {
+    async sendPasswordReset(passwordResetEmailRequest: PasswordResetEmailDto): Promise<void> {
         await validateOrReject(passwordResetEmailRequest);
 
         const { email, otp } = passwordResetEmailRequest;
@@ -68,20 +68,20 @@ export class EmailService {
     }
 
     /**
-     * Sends an email verification email.
+     * Sends an account verification email.
      *
      * @param verifyEmailRequest - The dto containing the email and confirmation pin.
      * @returns A promise that resolves when the email is sent successfully.
-     * @throws {ValidationError} If the verify email request dto is invalid.
+     * @throws {ValidationError} If the account verification dto is invalid.
      */
-    async sendEmailVerification(verifyEmailRequest: VerifyEmailRequestDto): Promise<void> {
+    async sendAccountVerification(verifyEmailRequest: AccountVerificationEmailDto): Promise<void> {
         await validateOrReject(verifyEmailRequest);
 
         const { email, confirmationPin } = verifyEmailRequest;
         const client = this.sesv2ClientFactory.createClient();
         const fromEmail = this.configService.getOrThrow<string>(ConfigConstants.AWS_SES_FROM_EMAIL);
 
-        const templateName = 'email-verification-v1';
+        const templateName = 'account-verification-v1';
 
         const command = new SendEmailCommand({
             FromEmailAddress: fromEmail,
@@ -102,7 +102,7 @@ export class EmailService {
         await client.send(command);
 
         this.logger.log(
-            formatLogMessage('ESSEVer001', 'Email verification email sent successfully.', {
+            formatLogMessage('ESSEVer001', 'Account verification email sent successfully.', {
                 email: email,
                 templateName,
             }),

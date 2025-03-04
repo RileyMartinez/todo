@@ -12,6 +12,7 @@ import {
     Inject,
     Injectable,
     LoggerService,
+    NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -19,7 +20,8 @@ import * as argon2 from 'argon2';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { randomInt } from 'crypto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { PasswordResetEmailRequestDto } from '../email/dto/password-reset-email-request.dto';
+import { AccountVerificationEmailDto } from '../email/dto/account-verification-email.dto';
+import { PasswordResetEmailDto } from '../email/dto/password-reset-email.dto';
 import { EmailService } from '../email/email.service';
 import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
 import { AuthLoginResultDto } from './dto/auth-login-result.dto';
@@ -95,7 +97,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return new AuthLoginResultDto(tokens, { sub: user.id });
+        return new AuthLoginResultDto(tokens, { sub: user.id, isVerified: user.isVerified });
     }
 
     /**
@@ -158,7 +160,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return new AuthLoginResultDto(tokens, { sub: user.id });
+        return new AuthLoginResultDto(tokens, { sub: user.id, isVerified: user.isVerified });
     }
 
     /**
@@ -195,7 +197,7 @@ export class AuthService {
         const tokens = await this.issueTokens(newUser);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(newUser.id, tokens.refreshToken));
 
-        return new AuthRegisterResultDto(tokens, { sub: newUser.id });
+        return new AuthRegisterResultDto(tokens, { sub: newUser.id, isVerified: newUser.isVerified });
     }
 
     /**
@@ -228,7 +230,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return new AuthLoginResultDto(tokens, { sub: user.id });
+        return new AuthLoginResultDto(tokens, { sub: user.id, isVerified: user.isVerified });
     }
 
     /**
@@ -313,7 +315,7 @@ export class AuthService {
 
         const token = await this.issueAccessToken(user);
 
-        return new AuthRefreshResultDto(token, { sub: user.id });
+        return new AuthRefreshResultDto(token, { sub: user.id, isVerified: user.isVerified });
     }
 
     /**
@@ -324,7 +326,7 @@ export class AuthService {
      * @param email - The email of the user.
      * @returns A promise that resolves to void.
      */
-    async sendPasswordResetEvent(email: string): Promise<void> {
+    async sendPasswordResetMessage(email: string): Promise<void> {
         if (!email) {
             this.logger.error(
                 formatLogMessage('ASSPREve001', ExceptionConstants.INVALID_EMAIL, { email }),
@@ -358,7 +360,38 @@ export class AuthService {
         const encryptedToken = this.encryptionUtil.encrypt(token);
         await this.usersService.updateUserToken(user.id, encryptedToken);
 
-        await this.emailService.sendPasswordReset(new PasswordResetEmailRequestDto(user.email, otp));
+        await this.emailService.sendPasswordReset(new PasswordResetEmailDto(user.email, otp));
+    }
+
+    /**
+     * Sends an account verification confirmation message for the given email.
+     *
+     * @param email - The email of the user.
+     * @throws {BadRequestException} If the email is not provided.
+     * @throws {NotFoundException} If the user is not found.
+     */
+    async sendAccountVerificationMessage(userId: string): Promise<void> {
+        if (!userId) {
+            this.logger.error(
+                formatLogMessage('ASSAVMe001', ExceptionConstants.INVALID_USER_ID, { userId }),
+                undefined,
+                AuthService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        const user = await this.usersService.findUserById(userId);
+
+        if (!user) {
+            this.logger.error(
+                formatLogMessage('ASSAVMe002', ExceptionConstants.USER_NOT_FOUND, { userId }),
+                AuthService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        const confirmationPin = randomInt(100000, 999999);
+        await this.emailService.sendAccountVerification(new AccountVerificationEmailDto(user.email, confirmationPin));
     }
 
     /**
@@ -389,7 +422,6 @@ export class AuthService {
             await this.jwtService.signAsync(
                 {
                     sub: user.id,
-                    version: user.tokenVersion,
                 },
                 {
                     secret: refreshTokenSecret,
