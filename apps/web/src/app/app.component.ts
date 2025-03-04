@@ -9,9 +9,8 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter, Subject, takeUntil } from 'rxjs';
-import { RouteConstants } from './core/constants/route.constants';
+import { Router, RouterOutlet } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { LoadingService } from './core/services/loading.service';
 import { SnackBarNotificationService } from './core/services/snack-bar.service';
@@ -58,6 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
 
     ngOnInit(): void {
+        /*
         this.router.events
             .pipe(
                 filter((event) => event instanceof NavigationEnd),
@@ -68,6 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
                     this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
                 }
             });
+            */
 
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
             this.snackBar.open(notification.message, notification.action, {

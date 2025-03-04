@@ -14,6 +14,7 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SafeUserDto } from './dto/safe-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { VerifyUserRequestDto } from './dto/verify-user-request.dto';
 import { UserService } from './users.service';
 
 @Controller('user')
@@ -81,5 +82,15 @@ export class UserController {
         @Body() updatePasswordDto: UpdatePasswordDto,
     ): Promise<UpdateResult> {
         return await this.userService.updateUserPassword(userId, updatePasswordDto);
+    }
+
+    @Post('verify')
+    @ApiOkResponse({ description: 'User verified successfully.' })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    async verifyUser(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: string,
+        @Body() verifyUserRequest: VerifyUserRequestDto,
+    ): Promise<UpdateResult> {
+        return await this.userService.verifyUser(userId, verifyUserRequest.verificationCode);
     }
 }

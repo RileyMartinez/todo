@@ -13,8 +13,10 @@ export class OAuthCallbackComponent implements OnInit {
 
     ngOnInit() {
         this.route.params.subscribe((params) => {
-            if (params['sub']) {
-                this.authService.setSessonAndRedirect(params['sub']);
+            const sub = params['sub'];
+            if (sub) {
+                const isVerified = params['isVerified'] === 'true';
+                this.authService.setSessonAndRedirect({ sub, isVerified });
             } else {
                 this.authService.clearSessionAndRedirect();
             }

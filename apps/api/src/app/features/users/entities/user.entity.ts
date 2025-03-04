@@ -20,8 +20,11 @@ export class User {
     /**
      * User hashed password
      */
-    @Column({ nullable: true })
-    password?: string;
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
+    password: string | null = null;
 
     /**
      * User hashed token
@@ -36,4 +39,15 @@ export class User {
         default: 1,
     })
     tokenVersion: number = 1;
+
+    @Column({
+        default: false,
+    })
+    isVerified: boolean = false;
+
+    @Column({
+        type: 'int',
+        nullable: true,
+    })
+    verificationCode: number | null = null;
 }
