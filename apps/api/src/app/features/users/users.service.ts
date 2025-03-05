@@ -6,6 +6,7 @@ import * as argon2 from 'argon2';
 import { validate, validateOrReject } from 'class-validator';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { UserContextDto } from '../auth/dto/user-context.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
@@ -182,12 +183,57 @@ export class UserService {
     }
 
     /**
+     * Updates the verification code of a user for account verification.
+     *
+     * @param id - The ID of the user.
+     * @param verificationCode - The verification code to update.
+     * @returns - A promise that resolves to an UpdateResult object.
+     */
+    async updateUserVerificationCode(id: string, verificationCode: number): Promise<UpdateResult> {
+        if (!id) {
+            this.logger.error(
+                formatLogMessage('USUUVCo001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (!verificationCode) {
+            this.logger.error(
+                formatLogMessage('USUUVCo002', ExceptionConstants.INVALID_VERIFICATION_CODE, {
+                    userId: id,
+                    verificationCode,
+                }),
+                undefined,
+                UserService.name,
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_VERIFICATION_CODE);
+        }
+
+        const result = await this.userRepository.update(id, {
+            verificationCode,
+        });
+
+        if (!result.affected) {
+            this.logger.error(
+                formatLogMessage('USUUVCo003', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
+                undefined,
+                UserService.name,
+            );
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
      * Marks a user as verified.
      *
      * @param id - The ID of the user to verify.
      * @returns A promise that resolves to an UpdateResult object.
      */
-    async verifyUser(id: string, verificationCode: number): Promise<UpdateResult> {
+    async verifyUser(id: string, verificationCode: number): Promise<UserContextDto> {
         if (!id) {
             this.logger.error(
                 formatLogMessage('USUVUse001', ExceptionConstants.INVALID_USER_ID, { userId: id }),
@@ -223,20 +269,10 @@ export class UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_VERIFICATION_CODE);
         }
 
-        const result = await this.userRepository.update(id, {
-            isVerified: true,
-        });
+        user.isVerified = true;
+        const updatedUser = await this.userRepository.save(user);
 
-        if (!result.affected) {
-            this.logger.error(
-                formatLogMessage('USUVUse004', ExceptionConstants.USER_NOT_FOUND, { userId: id }),
-                undefined,
-                UserService.name,
-            );
-            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
-        }
-
-        return result;
+        return new UserContextDto(updatedUser.id, updatedUser.isVerified);
     }
 
     /**

@@ -189,9 +189,9 @@ export class AuthService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe(() => {
+            .subscribe((userContext) => {
                 this.snackBarNotificationService.emit({ message: 'Account verification successful' });
-                this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
+                this.setSessonAndRedirect(userContext);
             });
 
         effect(() => this.loadingService.setLoading(!this.loaded()));
@@ -216,6 +216,7 @@ export class AuthService {
         if (userContext.isVerified) {
             this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
         } else {
+            this.requestAccountVerification$.next();
             this.router.navigate([RouteConstants.ACCOUNT, RouteConstants.VERIFY]);
         }
     }

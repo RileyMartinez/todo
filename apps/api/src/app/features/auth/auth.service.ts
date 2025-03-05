@@ -391,7 +391,11 @@ export class AuthService {
         }
 
         const confirmationPin = randomInt(100000, 999999);
-        await this.emailService.sendAccountVerification(new AccountVerificationEmailDto(user.email, confirmationPin));
+
+        await Promise.all([
+            this.usersService.updateUserVerificationCode(user.id, confirmationPin),
+            this.emailService.sendAccountVerification(new AccountVerificationEmailDto(user.email, confirmationPin)),
+        ]);
     }
 
     /**

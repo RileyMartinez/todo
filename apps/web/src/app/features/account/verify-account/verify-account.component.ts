@@ -58,7 +58,7 @@ export class VerifyAccountComponent implements OnInit {
         }
 
         this.authService.verifyAccount$.next({
-            verificationCode: this.verificationCodeFormControl.value,
+            verificationCode: parseInt(this.verificationCodeFormControl.value),
         });
     }
 

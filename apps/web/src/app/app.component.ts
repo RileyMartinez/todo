@@ -57,19 +57,6 @@ export class AppComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
 
     ngOnInit(): void {
-        /*
-        this.router.events
-            .pipe(
-                filter((event) => event instanceof NavigationEnd),
-                takeUntil(this.destroy$),
-            )
-            .subscribe(() => {
-                if (this.userContext() && this.router.url.startsWith(`/${RouteConstants.AUTH}`)) {
-                    this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
-                }
-            });
-            */
-
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
             this.snackBar.open(notification.message, notification.action, {
                 duration: notification.duration,
