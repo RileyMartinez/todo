@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { verificationGuard } from './core/auth/verification.guard';
 import { RouteConstants } from './core/constants/route.constants';
 
 export const routes: Routes = [
@@ -8,10 +9,10 @@ export const routes: Routes = [
     {
         path: RouteConstants.TODO,
         loadChildren: () => import('./features/todo/todo.routes').then((m) => m.TODO_ROUTES),
-        canActivate: [authGuard],
+        canActivate: [authGuard, verificationGuard],
     },
     {
-        path: RouteConstants.ACCOUNT, 
+        path: RouteConstants.ACCOUNT,
         loadChildren: () => import('./features/account/account.routes').then((m) => m.ACCOUNT_ROUTES),
         canActivate: [authGuard],
     },

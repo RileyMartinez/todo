@@ -2,7 +2,7 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
-import { UpdatePasswordDto, UserClient } from '../../shared/openapi-client';
+import { UpdatePasswordDto, UserClient, VerifyUserRequestDto } from '../../shared/openapi-client';
 import { AuthClient } from '../../shared/openapi-client/api/auth.client';
 import { AuthLoginRequestDto } from '../../shared/openapi-client/model/auth-login-request-dto';
 import { AuthRegisterRequestDto } from '../../shared/openapi-client/model/auth-register-request-dto';
@@ -19,7 +19,7 @@ export interface AuthServiceState {
 }
 
 export const USER_CONTEXT_KEY: string = 'todo.sub';
-export const USER_VERIFIED_KEY = 'todo.verified';
+export const USER_VERIFIED_KEY: string = 'todo.verified';
 
 @Injectable({
     providedIn: 'root',
@@ -50,6 +50,8 @@ export class AuthService {
     readonly logout$ = new Subject<void>();
     readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
     readonly resetPassword$ = new Subject<UpdatePasswordDto>();
+    readonly requestAccountVerification$ = new Subject<void>();
+    readonly verifyAccount$ = new Subject<VerifyUserRequestDto>();
 
     constructor() {
         this.initUserSession();
@@ -157,6 +159,41 @@ export class AuthService {
                 this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
             });
 
+        this.requestAccountVerification$
+            .pipe(
+                switchMap(() =>
+                    this.authClient.authControllerSendAccountVerification().pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({
+                                message: 'Account verification email send failed',
+                            });
+                            return this.handleError(error);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe(() => {
+                this.snackBarNotificationService.emit({ message: 'Account verification email sent' });
+            });
+
+        this.verifyAccount$
+            .pipe(
+                switchMap((verifyUserRequestDto) =>
+                    this.userClient.userControllerVerifyUser(verifyUserRequestDto).pipe(
+                        catchError((error) => {
+                            this.snackBarNotificationService.emit({ message: 'Account verification failed' });
+                            return this.handleError(error);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((userContext) => {
+                this.snackBarNotificationService.emit({ message: 'Account verification successful' });
+                this.setSessonAndRedirect(userContext);
+            });
+
         effect(() => this.loadingService.setLoading(!this.loaded()));
     }
 
@@ -175,7 +212,13 @@ export class AuthService {
 
     public setSessonAndRedirect(userContext: UserContextDto): void {
         this.setTokenAndUserIdentity(userContext);
-        this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
+
+        if (userContext.isVerified) {
+            this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
+        } else {
+            this.requestAccountVerification$.next();
+            this.router.navigate([RouteConstants.ACCOUNT, RouteConstants.VERIFY]);
+        }
     }
 
     public clearSessionAndRedirect(): void {
@@ -189,22 +232,25 @@ export class AuthService {
             userContext,
         }));
         localStorage.setItem(USER_CONTEXT_KEY, this.userContext()?.sub.toString() || '');
+        localStorage.setItem(USER_VERIFIED_KEY, this.userContext()?.isVerified.toString() || '');
     }
 
     private clearTokenAndUserIdentity(): void {
         this.state.update((state) => ({ ...state, userContext: null, loaded: true }));
         localStorage.removeItem(USER_CONTEXT_KEY);
+        localStorage.removeItem(USER_VERIFIED_KEY);
     }
 
     private initUserSession(): void {
         const userId = localStorage.getItem(USER_CONTEXT_KEY);
+        const isVerified = localStorage.getItem(USER_VERIFIED_KEY) === 'true';
 
         if (!userId) {
             this.clearTokenAndUserIdentity();
             return;
         }
 
-        this.state.update((state) => ({ ...state, userContext: { sub: userId }, loaded: true }));
+        this.state.update((state) => ({ ...state, userContext: { sub: userId, isVerified }, loaded: true }));
     }
 
     private handleError(error: any): Observable<never> {

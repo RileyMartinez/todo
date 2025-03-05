@@ -10,7 +10,7 @@ import { RouteConstants } from '../../../core/constants/route.constants';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
-    selector: 'app-verify-email',
+    selector: 'app-verify-account',
     imports: [
         ReactiveFormsModule,
         MatCard,
@@ -27,14 +27,15 @@ import { AuthService } from '../../../core/services/auth.service';
         MatIcon,
         RouterLink,
     ],
-    templateUrl: './verify-email.component.html',
+    templateUrl: './verify-account.component.html',
 })
-export class VerifyEmailComponent implements OnInit {
+export class VerifyAccountComponent implements OnInit {
     private readonly authService = inject(AuthService);
     private readonly formBuilder = inject(FormBuilder);
 
     readonly routes = RouteConstants;
 
+    userContext = this.authService.userContext;
     verifyEmailForm!: FormGroup;
     verificationCodeFormControl!: FormControl;
 
@@ -56,10 +57,12 @@ export class VerifyEmailComponent implements OnInit {
             return;
         }
 
-        /// this.authService.verifyEmail(this.verificationCodeFormControl.value);
+        this.authService.verifyAccount$.next({
+            verificationCode: parseInt(this.verificationCodeFormControl.value),
+        });
     }
 
     resendVerificationCode(): void {
-        /// this.authService.resendVerificationCode();
+        this.authService.requestAccountVerification$.next();
     }
 }

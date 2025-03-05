@@ -2,9 +2,10 @@
     <div class="flex justify-center p-14">
         <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
             <mat-card-header class="mb-4">
-                <mat-card-title>Verify Email</mat-card-title>
+                <mat-card-title>Verify Account</mat-card-title>
             </mat-card-header>
             <mat-card-content>
+                <p>Enter the verification code sent to your email.</p>
                 <mat-form-field appearance="fill" class="w-3/4">
                     <mat-label>Code</mat-label>
                     <input matInput [formControl]="verificationCodeFormControl" autocomplete="one-time-code" required />

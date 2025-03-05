@@ -1,11 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
     selector: 'app-oauth-callback',
-    template: '<div>Processing login...</div>',
     standalone: true,
+    imports: [MatProgressSpinner],
+    template: '<mat-spinner></mat-spinner>',
 })
 export class OAuthCallbackComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
@@ -13,8 +15,10 @@ export class OAuthCallbackComponent implements OnInit {
 
     ngOnInit() {
         this.route.params.subscribe((params) => {
-            if (params['sub']) {
-                this.authService.setSessonAndRedirect(params['sub']);
+            const sub = params['sub'];
+            if (sub) {
+                const isVerified = params['isVerified'] === 'true';
+                this.authService.setSessonAndRedirect({ sub, isVerified });
             } else {
                 this.authService.clearSessionAndRedirect();
             }

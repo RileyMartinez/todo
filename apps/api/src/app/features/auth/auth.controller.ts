@@ -9,14 +9,17 @@ import { UrlUtil } from '@/app/core/utils/url.util';
 import { Body, Controller, ForbiddenException, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+    ApiBadRequestResponse,
     ApiBearerAuth,
     ApiConflictResponse,
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiFoundResponse,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { validateOrReject } from 'class-validator';
 import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -104,7 +107,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
     }
 
     @Public()
@@ -130,7 +133,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
     }
 
     @Public()
@@ -156,7 +159,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
     }
 
     @Public()
@@ -182,7 +185,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
     }
 
     @Public()
@@ -208,7 +211,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}`);
+        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
     }
 
     @Public()
@@ -318,14 +321,29 @@ export class AuthController {
      * [Public]
      * Handles the password reset request.
      *
-     * @param {string} passwordResetRequestDto - Email to send the password reset request to.
-     * @returns {Promise<void>} - A promise that resolves when the password reset request is sent.
+     * @param {string} passwordResetRequest - Email to send the password reset request to.
      */
     @Public()
     @Post('send-password-reset')
     @ApiOkResponse({ description: 'Password reset request sent successfully.' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_EMAIL })
     @HttpCode(HttpStatus.OK)
-    async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
-        return await this.authService.sendPasswordResetEvent(passwordResetRequestDto.email);
+    async sendPasswordResetRequest(@Body() passwordResetRequest: PasswordResetRequestDto): Promise<void> {
+        return await this.authService.sendPasswordResetMessage(passwordResetRequest.email);
+    }
+
+    /**
+     *  Handles the account verification request.
+     *
+     * @param accountVerificationRequest - The email to send the account verification request to.
+     */
+    @Post('send-account-verification')
+    @ApiOkResponse({ description: 'Account verification request sent successfully.' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
+    async sendAccountVerification(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<void> {
+        return await this.authService.sendAccountVerificationMessage(userId);
     }
 }

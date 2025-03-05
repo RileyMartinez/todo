@@ -21,7 +21,10 @@ export class Todo {
      * Todo item description
      * @example '2% milk'
      */
-    @Column({ type: 'text', nullable: true })
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
     description: string | null = null;
 
     /**
@@ -35,7 +38,10 @@ export class Todo {
      * Todo item due date
      * @example 2021-12-31T23:59:59.999Z
      */
-    @Column({ type: 'timestamp', nullable: true })
+    @Column({
+        type: 'timestamp',
+        nullable: true,
+    })
     dueDate: Date | null = null;
 
     /**

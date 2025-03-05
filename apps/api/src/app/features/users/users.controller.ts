@@ -3,17 +3,19 @@ import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { GetCurrentUser } from '@/app/core/decorators/get-current-user.decorator';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, Post } from '@nestjs/common';
 import {
+    ApiBadRequestResponse,
     ApiBearerAuth,
     ApiCreatedResponse,
-    ApiForbiddenResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult } from 'typeorm';
+import { UserContextDto } from '../auth/dto/user-context.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SafeUserDto } from './dto/safe-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { VerifyUserRequestDto } from './dto/verify-user-request.dto';
 import { UserService } from './users.service';
 
 @Controller('user')
@@ -71,15 +73,33 @@ export class UserController {
         return await this.userService.deleteUser(id);
     }
 
+    /**
+     * Update a user's password.
+     */
     @Post('password')
-    @ApiBearerAuth()
     @ApiOkResponse({ description: 'Password updated successfully.' })
-    @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     @HttpCode(HttpStatus.OK)
     async updatePassword(
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
         @Body() updatePasswordDto: UpdatePasswordDto,
-    ): Promise<UpdateResult> {
-        return await this.userService.updateUserPassword(userId, updatePasswordDto);
+    ): Promise<void> {
+        await this.userService.updateUserPassword(userId, updatePasswordDto);
+    }
+
+    /**
+     * Verify a user's email.
+     */
+    @Post('verify')
+    @ApiOkResponse({ type: UserContextDto })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_VERIFICATION_CODE })
+    @HttpCode(HttpStatus.OK)
+    async verifyUser(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: string,
+        @Body() verifyUserRequest: VerifyUserRequestDto,
+    ): Promise<UserContextDto> {
+        return await this.userService.verifyUser(userId, verifyUserRequest.verificationCode);
     }
 }
