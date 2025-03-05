@@ -12,7 +12,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         username: configService.getOrThrow(ConfigConstants.DB_USERNAME),
         password: configService.getOrThrow(ConfigConstants.DB_PASSWORD),
         database: configService.getOrThrow(ConfigConstants.DB_NAME),
-        synchronize: process.env.APP_ENV === AppConstants.DEV,
+        synchronize: configService.getOrThrow(ConfigConstants.APP_ENV) === AppConstants.DEV,
         autoLoadEntities: configService.getOrThrow<boolean>(ConfigConstants.DB_AUTOLOAD_ENTITIES),
     }),
     inject: [ConfigService],

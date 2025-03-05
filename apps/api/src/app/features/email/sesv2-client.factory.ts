@@ -22,8 +22,9 @@ export class SESV2ClientFactory {
         this.configService = configService;
         this.region = this.configService.get(ConfigConstants.AWS_REGION) || AppConstants.DEFAULT_AWS_REGION;
         this.profile = this.configService.get(ConfigConstants.AWS_PROFILE) || AppConstants.DEFAULT_AWS_PROFILE;
+        const env = this.configService.getOrThrow(ConfigConstants.APP_ENV);
 
-        if (process.env.APP_ENV === AppConstants.DEV) {
+        if (env === AppConstants.DEV) {
             this.credentialProvider = fromSSO({
                 profile: this.profile,
             });

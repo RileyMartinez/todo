@@ -1,10 +1,7 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, LoggerService } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CipherGCMTypes, createCipheriv, createDecipheriv, Encoding, randomBytes, scryptSync } from 'crypto';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { formatLogMessage } from './logger.util';
 import { ConfigConstants } from '../constants/config.constants';
-import { ExceptionConstants } from '../constants/exception.constants';
 
 const HEX_ENCODING: Encoding = 'hex';
 const UTF8_ENCODING: Encoding = 'utf8';
@@ -12,14 +9,11 @@ const AES_256_GCM: CipherGCMTypes = 'aes-256-gcm';
 
 @Injectable()
 export class EncryptionUtil {
+    private readonly logger = new Logger(EncryptionUtil.name);
     private encryptionKey: Buffer | undefined;
 
-    constructor(
-        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
-        private readonly configService: ConfigService,
-    ) {
+    constructor(private readonly configService: ConfigService) {
         this.configService = configService;
-        this.logger = logger;
     }
 
     /**
@@ -41,8 +35,7 @@ export class EncryptionUtil {
 
             return `${iv.toString(HEX_ENCODING)}:${encrypted}:${authTag}`;
         } catch (error) {
-            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
-            this.logger.error(formatLogMessage('ESEnc001', 'Failed to encrypt data.'), stack, EncryptionUtil.name);
+            this.logger.error(error, 'Failed to encrypt data.');
             throw new BadRequestException('Failed to encrypt data.');
         }
     }
@@ -68,8 +61,7 @@ export class EncryptionUtil {
 
             return decrypted;
         } catch (error) {
-            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
-            this.logger.error(formatLogMessage('ESDec001', 'Failed to decrypt data.'), stack, EncryptionUtil.name);
+            this.logger.error(error, 'Failed to decrypt data.');
             throw new InternalServerErrorException('Failed to decrypt data.');
         }
     }
