@@ -11,8 +11,8 @@ import { loggerConfig } from './core/configs/logger.config';
 import { AuthModule } from './features/auth/auth.module';
 import { JwtAuthGuard } from './features/auth/guards/jwt-auth.guard';
 import { EmailModule } from './features/email/email.module';
-import { TodoListModule } from './features/todolist/todo-list.module';
-import { UsersModule } from './features/users/users.module';
+import { TodoListModule } from './features/todo-list/todo-list.module';
+import { UsersModule } from './features/user/user.module';
 
 @Module({
     imports: [

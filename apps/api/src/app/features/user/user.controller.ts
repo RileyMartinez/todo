@@ -16,7 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { SafeUserDto } from './dto/safe-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { VerifyUserRequestDto } from './dto/verify-user-request.dto';
-import { UserService } from './users.service';
+import { UserService } from './user.service';
 
 @Controller('user')
 @ApiTags('user')
@@ -85,7 +85,7 @@ export class UserController {
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
         @Body() updatePasswordDto: UpdatePasswordDto,
     ): Promise<void> {
-        await this.userService.updateUserPassword(userId, updatePasswordDto);
+        await this.userService.updateUserPassword(userId, updatePasswordDto.password);
     }
 
     /**
@@ -98,8 +98,8 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
     async verifyUser(
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
-        @Body() verifyUserRequest: VerifyUserRequestDto,
+        @Body() verifyUserRequestDto: VerifyUserRequestDto,
     ): Promise<UserContextDto> {
-        return await this.userService.verifyUser(userId, verifyUserRequest.verificationCode);
+        return await this.userService.verifyUser(userId, verifyUserRequestDto.verificationCode);
     }
 }

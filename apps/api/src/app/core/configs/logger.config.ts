@@ -13,10 +13,33 @@ export const loggerConfig: LoggerModuleAsyncParams = {
         return {
             pinoHttp: {
                 level: level,
-                transport: env === AppConstants.DEV ? { target: 'pino-pretty' } : undefined,
+                transport:
+                    env === AppConstants.DEV
+                        ? {
+                              target: 'pino-pretty',
+                              options: {
+                                  colorize: true,
+                                  levelFirst: true,
+                                  translateTime: 'SYS:mm/dd/yyyy HH:mm:ss.l',
+                              },
+                          }
+                        : undefined,
                 customProps: (_req, _res) => ({
                     context: 'HTTP',
                 }),
+                redact: [
+                    'user.email',
+                    'email',
+                    'user.password',
+                    'password',
+                    'user.token',
+                    'token',
+                    'user.verificationCode',
+                    'verificationCode',
+                    'req.headers.authorization',
+                    'req.headers.cookie',
+                    'res.headers["set-cookie"]',
+                ],
             },
         };
     },

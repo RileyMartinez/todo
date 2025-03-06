@@ -1,8 +1,7 @@
 import { Client, createClient } from '@1password/sdk';
 import { ClientConfiguration } from '@1password/sdk/dist/configuration';
-import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { name, version } from '../../../../package.json';
 import { ConfigConstants } from '../constants/config.constants';
 
@@ -10,11 +9,7 @@ import { ConfigConstants } from '../constants/config.constants';
 export class SecretsUtil {
     private client: Client | undefined;
 
-    constructor(
-        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
-        private readonly configService: ConfigService,
-    ) {
-        this.logger = logger;
+    constructor(private readonly configService: ConfigService) {
         this.configService = configService;
     }
 

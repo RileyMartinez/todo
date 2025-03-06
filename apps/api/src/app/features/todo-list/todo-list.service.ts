@@ -1,9 +1,7 @@
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
-import { formatLogMessage } from '@/app/core/utils/logger.util';
-import { BadRequestException, Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validateOrReject } from 'class-validator';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { DeleteResult, Repository } from 'typeorm';
 import { TodoListDto } from './dto/todo-list.dto';
 import { TodoDto } from './dto/todo.dto';
@@ -12,12 +10,12 @@ import { Todo } from './entities/todo.entity';
 
 @Injectable()
 export class TodoListService {
+    private readonly logger = new Logger(TodoListService.name);
+
     constructor(
-        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         @InjectRepository(TodoList) private readonly todolistRepository: Repository<TodoList>,
         @InjectRepository(Todo) private readonly todoRepository: Repository<Todo>,
     ) {
-        this.logger = logger;
         this.todolistRepository = todolistRepository;
         this.todoRepository = todoRepository;
     }
@@ -34,11 +32,7 @@ export class TodoListService {
         await validateOrReject(todoListDto);
 
         if (!userId) {
-            this.logger.error(
-                formatLogMessage('TLSSTLis001', ExceptionConstants.INVALID_USER_ID, { userId }),
-                undefined,
-                TodoListService.name,
-            );
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
@@ -65,11 +59,7 @@ export class TodoListService {
      */
     async findTodoLists(userId: string): Promise<TodoList[]> {
         if (!userId) {
-            this.logger.error(
-                formatLogMessage('TLSFTLis001', ExceptionConstants.INVALID_USER_ID, { userId }),
-                undefined,
-                TodoListService.name,
-            );
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
@@ -82,22 +72,18 @@ export class TodoListService {
     /**
      * Finds a todo list by its ID.
      *
-     * @param id - The ID of the todo list.
+     * @param todoListId - The ID of the todo list.
      * @returns A promise that resolves to the found todo list, or null if not found.
      * @throws {BadRequestException} If the provided ID is invalid.
      */
-    async findTodoList(id: string): Promise<TodoList | null> {
-        if (!id) {
-            this.logger.error(
-                formatLogMessage('TLSFTLis002', ExceptionConstants.INVALID_TODO_LIST_ID, { todoListId: id }),
-                undefined,
-                TodoListService.name,
-            );
+    async findTodoList(todoListId: string): Promise<TodoList | null> {
+        if (!todoListId) {
+            this.logger.error({ todoListId }, ExceptionConstants.INVALID_TODO_LIST_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_TODO_LIST_ID);
         }
 
         return await this.todolistRepository.findOneOrFail({
-            where: { id },
+            where: { id: todoListId },
             relations: ['todos'],
         });
     }
@@ -105,31 +91,21 @@ export class TodoListService {
     /**
      * Deletes a todo list by its ID.
      *
-     * @param id - The ID of the todo list to delete.
+     * @param todoListId - The ID of the todo list to delete.
      * @returns A promise that resolves to a DeleteResult object.
      * @throws {BadRequestException} If the provided ID is invalid.
      * @throws {NotFoundException} If the todo list with the given ID is not found.
      */
-    async deleteTodoList(id: string): Promise<DeleteResult> {
-        if (!id) {
-            this.logger.error(
-                formatLogMessage('TLSDTLis001', ExceptionConstants.INVALID_TODO_LIST_ID, { todoListId: id }),
-                undefined,
-                TodoListService.name,
-            );
+    async deleteTodoList(todoListId: string): Promise<DeleteResult> {
+        if (!todoListId) {
+            this.logger.error({ todoListId }, ExceptionConstants.INVALID_TODO_LIST_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_TODO_LIST_ID);
         }
 
-        const result = await this.todolistRepository.delete(id);
+        const result = await this.todolistRepository.delete({ id: todoListId });
 
         if (!result.affected) {
-            this.logger.error(
-                'TLSDTLis002',
-                ExceptionConstants.TODO_LIST_NOT_FOUND,
-                { todoListid: id },
-                undefined,
-                TodoListService.name,
-            );
+            this.logger.error({ todoListId }, ExceptionConstants.TODO_LIST_NOT_FOUND);
             throw new NotFoundException(ExceptionConstants.TODO_LIST_NOT_FOUND);
         }
 
@@ -139,29 +115,21 @@ export class TodoListService {
     /**
      * Deletes a todo list item by its ID.
      *
-     * @param id - The ID of the todo list item to delete.
+     * @param todoId - The ID of the todo list item to delete.
      * @returns A promise that resolves to a DeleteResult object.
      * @throws {BadRequestException} If the provided ID is invalid.
      * @throws {NotFoundException} If the todo item with the given ID is not found.
      */
-    async deleteTodoListItem(id: string): Promise<DeleteResult> {
-        if (!id) {
-            this.logger.error(
-                formatLogMessage('TLSDTLIte001', ExceptionConstants.INVALID_TODO_ITEM_ID, { todoItemId: id }),
-                undefined,
-                TodoListService.name,
-            );
+    async deleteTodoListItem(todoId: string): Promise<DeleteResult> {
+        if (!todoId) {
+            this.logger.error({ todoId }, ExceptionConstants.INVALID_TODO_ITEM_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_TODO_ITEM_ID);
         }
 
-        const result = await this.todoRepository.delete(id);
+        const result = await this.todoRepository.delete({ id: todoId });
 
         if (!result.affected) {
-            this.logger.error(
-                formatLogMessage('TLSDTLIte001', ExceptionConstants.TODO_ITEM_NOT_FOUND, { todoItemId: id }),
-                undefined,
-                TodoListService.name,
-            );
+            this.logger.error({ todoId }, ExceptionConstants.TODO_ITEM_NOT_FOUND);
             throw new NotFoundException(ExceptionConstants.TODO_ITEM_NOT_FOUND);
         }
 

@@ -2,16 +2,14 @@ import { argon2HashConfig } from '@/app/core/configs/argon2-hash.config';
 import { ConfigConstants } from '@/app/core/constants/config.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { EncryptionUtil } from '@/app/core/utils/encryption.util';
-import { formatLogMessage } from '@/app/core/utils/logger.util';
-import { User } from '@/app/features/users/entities/user.entity';
-import { UserService } from '@/app/features/users/users.service';
+import { User } from '@/app/features/user/entities/user.entity';
+import { UserService } from '@/app/features/user/user.service';
 import {
     BadRequestException,
     ConflictException,
     ForbiddenException,
-    Inject,
     Injectable,
-    LoggerService,
+    Logger,
     NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -19,7 +17,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { randomInt } from 'crypto';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AccountVerificationEmailDto } from '../email/dto/account-verification-email.dto';
 import { PasswordResetEmailDto } from '../email/dto/password-reset-email.dto';
 import { EmailService } from '../email/email.service';
@@ -35,15 +32,15 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
-        @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
         private readonly usersService: UserService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly encryptionUtil: EncryptionUtil,
         private readonly emailService: EmailService,
     ) {
-        this.logger = logger;
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.configService = configService;
@@ -55,42 +52,30 @@ export class AuthService {
      * Authenticates a user by checking their email and password.
      * If the user is authenticated, JWT tokens are issued.
      *
-     * @param {AuthLoginRequestDto} login - The email and password of the user.
+     * @param {AuthLoginRequestDto} authLoginRequestDto - The email and password of the user.
      * @returns {Promise<AuthLoginResultDto>} - Auth tokens and user context.
      * @throws {ValidationError} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the email or password is incorrect.
      */
-    async login(login: AuthLoginRequestDto): Promise<AuthLoginResultDto> {
-        await validateOrReject(login);
+    async login(authLoginRequestDto: AuthLoginRequestDto): Promise<AuthLoginResultDto> {
+        await validateOrReject(authLoginRequestDto);
 
-        const user = await this.usersService.findUserByEmail(login.email);
+        const user = await this.usersService.findUserByEmail(authLoginRequestDto.email);
 
         if (!user) {
-            this.logger.error(
-                formatLogMessage('ASLog001', ExceptionConstants.USER_NOT_FOUND, { email: login.email }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ email: authLoginRequestDto.email }, ExceptionConstants.USER_NOT_FOUND);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.password) {
-            this.logger.error(
-                formatLogMessage('ASLog002', 'Password from db cannot be null or undefined', { userId: user.id }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ user }, 'Password from db cannot be null or undefined');
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        const match = await argon2.verify(user.password, login.password);
+        const match = await argon2.verify(user.password, authLoginRequestDto.password);
 
         if (!match) {
-            this.logger.error(
-                formatLogMessage('ASLog002', 'Password does not match', { userId: user.id }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ user }, 'Password does not match');
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -103,31 +88,23 @@ export class AuthService {
     /**
      * Performs a one-time login for the user.
      *
-     * @param login - The authentication login DTO.
+     * @param authLoginRequestDto - The authentication login DTO.
      * @returns {Promise<AuthLoginResultDto>} - Auth tokens and user context.
      * @throws {ValidationError} If the email or password is invalid.
      * @throws {ForbiddenException} If the user is not found, does not have a token, token is expired, or if the provided token does not match.
      */
-    async oneTimeLogin(login: AuthLoginRequestDto): Promise<AuthLoginResultDto> {
-        await validateOrReject(login);
+    async oneTimeLogin(authLoginRequestDto: AuthLoginRequestDto): Promise<AuthLoginResultDto> {
+        await validateOrReject(authLoginRequestDto);
 
-        const user = await this.usersService.findUserByEmail(login.email);
+        const user = await this.usersService.findUserByEmail(authLoginRequestDto.email);
 
         if (!user) {
-            this.logger.error(
-                formatLogMessage('ASOTLog001', ExceptionConstants.USER_NOT_FOUND, { email: login.email }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ email: authLoginRequestDto.email }, ExceptionConstants.USER_NOT_FOUND);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.token) {
-            this.logger.error(
-                formatLogMessage('ASOTLog002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ user }, ExceptionConstants.INVALID_TOKEN);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -139,21 +116,12 @@ export class AuthService {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_SECRET),
             });
         } catch (error) {
-            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
-            this.logger.error(
-                formatLogMessage('ASOTLog003', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
-                stack,
-                AuthService.name,
-            );
+            this.logger.error({ user, error }, ExceptionConstants.INVALID_TOKEN);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
-        if (verifiedToken.otp.toString() !== login.password) {
-            this.logger.error(
-                formatLogMessage('ASOTLog004', 'OTP does not match', { userId: user.id }),
-                undefined,
-                AuthService.name,
-            );
+        if (verifiedToken.otp.toString() !== authLoginRequestDto.password) {
+            this.logger.error({ user }, 'OTP does not match');
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -166,31 +134,25 @@ export class AuthService {
     /**
      * Registers a new user with the provided email and password.
      *
-     * @param {AuthRegisterRequestDto} registration - The registration data containing email and password.
+     * @param {AuthRegisterRequestDto} authRegisterRequestDto - The registration data containing email and password.
      * @returns {Promise<AuthTokensDto>} - A promise that resolves to the authentication tokens for the registered user, or null if registration fails.
      * @throws {ValidationError} - If the email or password is invalid.
      * @throws {ConflictException} - If a user with the provided email already exists.
      */
-    async register(registration: AuthRegisterRequestDto): Promise<AuthRegisterResultDto> {
-        await validateOrReject(registration);
+    async register(authRegisterRequestDto: AuthRegisterRequestDto): Promise<AuthRegisterResultDto> {
+        await validateOrReject(authRegisterRequestDto);
 
-        const user = await this.usersService.findUserByEmail(registration.email);
+        const user = await this.usersService.findUserByEmail(authRegisterRequestDto.email);
 
         if (user) {
-            this.logger.warn(
-                formatLogMessage('ASReg001', ExceptionConstants.USER_ALREADY_EXISTS, {
-                    userId: user.id,
-                    email: user.email,
-                }),
-                AuthService.name,
-            );
+            this.logger.warn({ user }, ExceptionConstants.USER_ALREADY_EXISTS);
             throw new ConflictException(ExceptionConstants.USER_ALREADY_EXISTS);
         }
 
-        const hash = await argon2.hash(registration.password, argon2HashConfig);
+        const hash = await argon2.hash(authRegisterRequestDto.password, argon2HashConfig);
 
         const newUser = await this.usersService.createUser({
-            email: registration.email,
+            email: authRegisterRequestDto.email,
             password: hash,
         });
 
@@ -211,11 +173,7 @@ export class AuthService {
      */
     async passwordlessLoginOrRegister(email: string): Promise<AuthLoginResultDto> {
         if (!email) {
-            this.logger.error(
-                formatLogMessage('ASPLOR001', ExceptionConstants.INVALID_EMAIL, { email }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ email }, ExceptionConstants.INVALID_EMAIL);
             throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
         }
 
@@ -241,11 +199,7 @@ export class AuthService {
      */
     async logout(userId: string): Promise<void> {
         if (!userId) {
-            this.logger.error(
-                formatLogMessage('ASLog001', ExceptionConstants.INVALID_USER_ID, { userId }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
@@ -255,33 +209,23 @@ export class AuthService {
     /**
      * Refreshes the authentication tokens for a user.
      *
-     * @param {AuthRefreshRequestDto} authRefreshRequestDto - The user ID and refresh token.
+     * @param {AuthRefreshRequestDto} authRefreshRequest - The user ID and refresh token.
      * @returns {Promise<AuthRefreshResultDto>} - A promise that resolves to the new access token and user context.
      * @throws {ValidationError} if the user ID or refresh token is invalid.
      * @throws {ForbiddenException} if the user is not found, does not have a refresh token, or if the provided refresh token does not match.
      */
-    async refresh(authRefreshRequestDto: AuthRefreshRequestDto): Promise<AuthRefreshResultDto> {
-        await validateOrReject(authRefreshRequestDto);
+    async refresh(authRefreshRequest: AuthRefreshRequestDto): Promise<AuthRefreshResultDto> {
+        await validateOrReject(authRefreshRequest);
 
-        const user = await this.usersService.findUserById(authRefreshRequestDto.userId);
+        const user = await this.usersService.findUserById(authRefreshRequest.userId);
 
         if (!user) {
-            this.logger.error(
-                formatLogMessage('ASRef001', ExceptionConstants.USER_NOT_FOUND, {
-                    userId: authRefreshRequestDto.userId,
-                }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ authRefreshRequest }, ExceptionConstants.USER_NOT_FOUND);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         if (!user.token) {
-            this.logger.error(
-                formatLogMessage('ASRef002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ user }, ExceptionConstants.INVALID_TOKEN);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -292,24 +236,14 @@ export class AuthService {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_REFRESH_SECRET),
             });
         } catch (error) {
-            const stack = error instanceof Error ? error.stack : ExceptionConstants.UNKNOWN_ERROR;
-            this.logger.error(
-                formatLogMessage('ASRef002', ExceptionConstants.INVALID_TOKEN, { userId: user.id }),
-                stack,
-                AuthService.name,
-            );
-
+            this.logger.error({ user, error }, ExceptionConstants.INVALID_TOKEN);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const match = verifiedToken?.sub === user.id && verifiedToken?.version === user.tokenVersion;
 
         if (!match) {
-            this.logger.error(
-                formatLogMessage('ASRef003', 'Refresh token does not match', { userId: user.id }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ user }, 'Refresh token does not match');
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
@@ -328,21 +262,14 @@ export class AuthService {
      */
     async sendPasswordResetMessage(email: string): Promise<void> {
         if (!email) {
-            this.logger.error(
-                formatLogMessage('ASSPREve001', ExceptionConstants.INVALID_EMAIL, { email }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ email }, ExceptionConstants.INVALID_EMAIL);
             throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
         }
 
         const user = await this.usersService.findUserByEmail(email);
 
         if (!user) {
-            this.logger.warn(
-                formatLogMessage('ASSPREve002', ExceptionConstants.USER_NOT_FOUND, { email }),
-                AuthService.name,
-            );
+            this.logger.warn({ email }, ExceptionConstants.USER_NOT_FOUND);
             return;
         }
 
@@ -372,21 +299,14 @@ export class AuthService {
      */
     async sendAccountVerificationMessage(userId: string): Promise<void> {
         if (!userId) {
-            this.logger.error(
-                formatLogMessage('ASSAVMe001', ExceptionConstants.INVALID_USER_ID, { userId }),
-                undefined,
-                AuthService.name,
-            );
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
         const user = await this.usersService.findUserById(userId);
 
         if (!user) {
-            this.logger.error(
-                formatLogMessage('ASSAVMe002', ExceptionConstants.USER_NOT_FOUND, { userId }),
-                AuthService.name,
-            );
+            this.logger.error({ userId }, ExceptionConstants.USER_NOT_FOUND);
             throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
         }
 

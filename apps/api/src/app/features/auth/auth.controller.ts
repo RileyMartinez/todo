@@ -70,13 +70,13 @@ export class AuthController {
     @UseGuards(LocalGuard)
     @HttpCode(HttpStatus.OK)
     async login(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Body() _: AuthLoginRequestDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<UserContextDto> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -97,12 +97,12 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async googleRedirect(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -123,12 +123,12 @@ export class AuthController {
     @UseGuards(MicrosoftAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async microsoftRedirect(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -149,12 +149,12 @@ export class AuthController {
     @UseGuards(GitHubAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async githubRedirect(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -175,12 +175,12 @@ export class AuthController {
     @UseGuards(DiscordAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async discordRedirect(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -201,12 +201,12 @@ export class AuthController {
     @UseGuards(FacebookAuthGuard)
     @HttpCode(HttpStatus.FOUND)
     async facebookRedirect(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<void> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -220,13 +220,13 @@ export class AuthController {
     @ApiOkResponse({ description: SwaggerConstants.USER_LOGIN_SUCCESS })
     @HttpCode(HttpStatus.OK)
     async oneTimeLogin(
-        @GetCurrentUser() result: AuthLoginResultDto,
+        @GetCurrentUser() authLoginResultDto: AuthLoginResultDto,
         @Body() _: AuthLoginRequestDto,
         @Res({ passthrough: true }) response: Response,
     ): Promise<UserContextDto> {
-        await validateOrReject(result);
+        await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = result;
+        const { tokens, userContext } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
@@ -321,15 +321,15 @@ export class AuthController {
      * [Public]
      * Handles the password reset request.
      *
-     * @param {string} passwordResetRequest - Email to send the password reset request to.
+     * @param {string} passwordResetRequestDto - Email to send the password reset request to.
      */
     @Public()
     @Post('send-password-reset')
     @ApiOkResponse({ description: 'Password reset request sent successfully.' })
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_EMAIL })
     @HttpCode(HttpStatus.OK)
-    async sendPasswordResetRequest(@Body() passwordResetRequest: PasswordResetRequestDto): Promise<void> {
-        return await this.authService.sendPasswordResetMessage(passwordResetRequest.email);
+    async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
+        return await this.authService.sendPasswordResetMessage(passwordResetRequestDto.email);
     }
 
     /**
