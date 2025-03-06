@@ -3,6 +3,7 @@ export class ExceptionConstants {
     static readonly UNKNOWN_ERROR = 'Unknown error';
     static readonly VALIDATION_FAILED = 'Validation failed';
     static readonly INVALID_CREDENTIALS = 'Invalid credentials';
+    static readonly INVALID_PASSWORD = 'Invalid password';
     static readonly INTERNAL_SERVER_ERROR = 'Internal server error';
     static readonly INVALID_TOKEN = 'Invalid token';
     static readonly INVALID_VERIFICATION_CODE = 'Invalid verification code';

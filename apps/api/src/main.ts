@@ -1,16 +1,14 @@
-import { LoggerService, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { AppModule } from './app/app.module';
 import { corsConfigFactory } from './app/core/configs/cors.config-factory';
 import { swaggerConfig } from './app/core/configs/swagger.config';
 import { ConfigConstants } from './app/core/constants/config.constants';
-import { AllExceptionsFilter } from './app/core/exception-filters/all-exceptions.filter';
-import { HttpExceptionsFilter } from './app/core/exception-filters/http-exceptions.filter';
 
 /**
  * Bootstraps the application.
@@ -24,12 +22,12 @@ import { HttpExceptionsFilter } from './app/core/exception-filters/http-exceptio
  * @returns {Promise<void>} A promise that resolves when the application is successfully started.
  */
 async function bootstrap(): Promise<void> {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
-    const logger = app.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
-    app.useLogger(logger);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+    app.useGlobalInterceptors(new LoggerErrorInterceptor());
+    app.useLogger(app.get(Logger));
 
-    const { httpAdapter } = app.get(HttpAdapterHost);
-    app.useGlobalFilters(new AllExceptionsFilter(httpAdapter), new HttpExceptionsFilter(logger));
+    // const { httpAdapter } = app.get(HttpAdapterHost);
+    // app.useGlobalFilters(new AllExceptionsFilter(httpAdapter), new HttpExceptionsFilter());
     app.useGlobalPipes(new ValidationPipe());
     app.use(cookieParser());
 

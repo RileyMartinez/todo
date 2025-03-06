@@ -1,13 +1,11 @@
-import { Catch, ArgumentsHost, HttpException, ExceptionFilter, LoggerService } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
 
 /**
  * Custom exception filter for handling HTTP exceptions.
  */
 @Catch(HttpException)
 export class HttpExceptionsFilter implements ExceptionFilter {
-    constructor(private readonly logger: LoggerService) {
-        this.logger = logger;
-    }
+    private readonly logger = new Logger(HttpExceptionsFilter.name);
 
     /**
      * Handles the caught HTTP exception.
@@ -22,12 +20,12 @@ export class HttpExceptionsFilter implements ExceptionFilter {
         const status = exception.getStatus();
 
         this.logger.error(
-            JSON.stringify({
+            {
                 method: request.method,
                 url: request.url,
                 status: status,
                 message: exception.message,
-            }),
+            },
             exception.stack,
             HttpExceptionsFilter.name,
         );

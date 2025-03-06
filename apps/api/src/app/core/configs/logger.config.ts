@@ -1,56 +1,46 @@
-import { ConfigConstants } from '@/app/core/constants/config.constants';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { WinstonModuleAsyncOptions } from 'nest-winston';
-import { LoggerOptions, format, transports } from 'winston';
+import { LoggerModuleAsyncParams, Params } from 'nestjs-pino';
 import { AppConstants } from '../constants/app.constants';
-import DailyRotateFile = require('winston-daily-rotate-file');
+import { ConfigConstants } from '../constants/config.constants';
 
-export const loggerConfig: WinstonModuleAsyncOptions = {
+export const loggerConfig: LoggerModuleAsyncParams = {
     imports: [ConfigModule],
-    useFactory: async (configService: ConfigService): Promise<LoggerOptions> => {
-        const isProd = process.env.APP_ENV === AppConstants.PROD;
-        const loggerLevel = configService.getOrThrow(ConfigConstants.LOGGER_LEVEL);
-        const loggerDirectory = configService.getOrThrow(ConfigConstants.LOGGER_DIRECTORY);
-        const loggerMaxSize = configService.getOrThrow(ConfigConstants.LOGGER_MAX_SIZE);
-        const loggerFileLifetime = configService.getOrThrow(ConfigConstants.LOGGER_FILE_LIFETIME);
+    inject: [ConfigService],
+    useFactory: async (configService: ConfigService): Promise<Params> => {
+        const env = configService.getOrThrow(ConfigConstants.APP_ENV);
+        const level = configService.getOrThrow(ConfigConstants.LOGGER_LEVEL);
 
         return {
-            level: loggerLevel,
-            format: isProd
-                ? format.combine(format.timestamp(), format.json())
-                : format.combine(
-                      format.colorize(),
-                      format.timestamp({ format: 'MM/DD/YYYY, hh:mm:ss A' }),
-                      format.ms(),
-                      format.align(),
-                      format.splat(),
-                      format.printf(
-                          (info) =>
-                              `${info.timestamp} [${info.level}][${info.context}][${process.pid}]: ${info.message} ${info.ms} ${info.stack ? `\n${info.stack}` : ''}`,
-                      ),
-                  ),
-            defaultMeta: { service: 'api', pid: process.pid },
-            handleExceptions: true,
-            handleRejections: true,
-            transports: [
-                new transports.Console(),
-                new DailyRotateFile({
-                    filename: `${loggerDirectory}/combined-%DATE%.log`,
-                    datePattern: 'YYYY-MM-DD',
-                    zippedArchive: true,
-                    maxSize: loggerMaxSize,
-                    maxFiles: loggerFileLifetime,
+            pinoHttp: {
+                level: level,
+                transport:
+                    env === AppConstants.DEV
+                        ? {
+                              target: 'pino-pretty',
+                              options: {
+                                  colorize: true,
+                                  levelFirst: true,
+                                  translateTime: 'SYS:mm/dd/yyyy HH:mm:ss.l',
+                              },
+                          }
+                        : undefined,
+                customProps: (_req, _res) => ({
+                    context: 'HTTP',
                 }),
-                new DailyRotateFile({
-                    filename: `${loggerDirectory}/error-%DATE%.log`,
-                    datePattern: 'YYYY-MM-DD',
-                    zippedArchive: true,
-                    maxSize: loggerMaxSize,
-                    maxFiles: loggerFileLifetime,
-                    level: 'error',
-                }),
-            ],
+                redact: [
+                    'user.email',
+                    'email',
+                    'user.password',
+                    'password',
+                    'user.token',
+                    'token',
+                    'user.verificationCode',
+                    'verificationCode',
+                    'req.headers.authorization',
+                    'req.headers.cookie',
+                    'res.headers["set-cookie"]',
+                ],
+            },
         };
     },
-    inject: [ConfigService],
 };
