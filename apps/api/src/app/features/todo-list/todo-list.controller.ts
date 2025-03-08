@@ -2,7 +2,7 @@ import { DecoratorConstants } from '@/app/core/constants/decorator.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { GetCurrentUser } from '@/app/core/decorators/get-current-user.decorator';
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { DeleteResult } from 'typeorm';
 import { TodoListDto } from './dto/todo-list.dto';
@@ -13,7 +13,7 @@ import { TodoListService } from './todo-list.service';
 
 @Controller('todo-list')
 @ApiTags('todo-list')
-@ApiBearerAuth()
+@ApiCookieAuth()
 @SkipThrottle()
 export class TodoListController {
     constructor(private readonly todolistService: TodoListService) {}

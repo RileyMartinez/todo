@@ -7,6 +7,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-facebook';
 import { AuthService } from '../auth.service';
 import { AuthLoginResultDto } from '../dto/auth-login-result.dto';
+import { PasswordlessLoginDto } from '../dto/passwordless-login.dto';
 
 @Injectable()
 export class FacebookAuthStrategy extends PassportStrategy(Strategy, AppConstants.FACEBOOK_STRATEGY_NAME) {
@@ -19,7 +20,7 @@ export class FacebookAuthStrategy extends PassportStrategy(Strategy, AppConstant
             clientID: configService.getOrThrow<string>(ConfigConstants.FACEBOOK_OAUTH20_CLIENT_ID),
             clientSecret: configService.getOrThrow<string>(ConfigConstants.FACEBOOK_OAUTH20_CLIENT_SECRET),
             callbackURL: `${urlUtil.getServerUrl()}/auth/facebook/redirect`,
-            profileFields: ['emails'],
+            profileFields: ['emails', 'photos'],
         } as StrategyOptions);
     }
 
@@ -28,6 +29,8 @@ export class FacebookAuthStrategy extends PassportStrategy(Strategy, AppConstant
             return null;
         }
 
-        return await this.authService.passwordlessLoginOrRegister(profile.emails[0].value);
+        return await this.authService.passwordlessLoginOrRegister(
+            new PasswordlessLoginDto(profile.emails[0].value, profile.photos?.[0].value),
+        );
     }
 }

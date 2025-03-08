@@ -20,6 +20,7 @@ import { randomInt } from 'crypto';
 import { AccountVerificationEmailDto } from '../email/dto/account-verification-email.dto';
 import { PasswordResetEmailDto } from '../email/dto/password-reset-email.dto';
 import { EmailService } from '../email/email.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
 import { AuthLoginResultDto } from './dto/auth-login-result.dto';
 import { AuthRefreshRequestDto } from './dto/auth-refresh-request.dto';
@@ -28,7 +29,9 @@ import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
 import { AuthRegisterResultDto } from './dto/auth-register-result.dto';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { OtpTokenDto } from './dto/otp-token.dto';
+import { PasswordlessLoginDto } from './dto/passwordless-login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { UserContextDto } from './dto/user-context.dto';
 
 @Injectable()
 export class AuthService {
@@ -82,7 +85,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return new AuthLoginResultDto(tokens, { sub: user.id, isVerified: user.isVerified });
+        return new AuthLoginResultDto(tokens, UserContextDto.from(user));
     }
 
     /**
@@ -128,7 +131,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return new AuthLoginResultDto(tokens, { sub: user.id, isVerified: user.isVerified });
+        return new AuthLoginResultDto(tokens, UserContextDto.from(user));
     }
 
     /**
@@ -159,7 +162,7 @@ export class AuthService {
         const tokens = await this.issueTokens(newUser);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(newUser.id, tokens.refreshToken));
 
-        return new AuthRegisterResultDto(tokens, { sub: newUser.id, isVerified: newUser.isVerified });
+        return new AuthRegisterResultDto(tokens, UserContextDto.from(newUser));
     }
 
     /**
@@ -171,24 +174,21 @@ export class AuthService {
      * @throws {ValidationError} - If the email or password is invalid.
      * @throws {ForbiddenException} - If the provided password does not match the stored password for an existing user.
      */
-    async passwordlessLoginOrRegister(email: string): Promise<AuthLoginResultDto> {
-        if (!email) {
-            this.logger.error({ email }, ExceptionConstants.INVALID_EMAIL);
-            throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
-        }
+    async passwordlessLoginOrRegister(passwordlessLoginDto: PasswordlessLoginDto): Promise<AuthLoginResultDto> {
+        await validateOrReject(passwordlessLoginDto);
 
-        let user = await this.usersService.findUserByEmail(email);
+        let user = await this.usersService.findUserByEmail(passwordlessLoginDto.email);
 
         if (!user) {
-            user = await this.usersService.createUser({
-                email: email,
-            });
+            user = await this.usersService.createUser(CreateUserDto.from(passwordlessLoginDto));
+        } else if (!user.avatar && passwordlessLoginDto.avatar) {
+            await this.usersService.updateUserAvatar(user.id, passwordlessLoginDto.avatar);
         }
 
         const tokens = await this.issueTokens(user);
         await this.updateUserRefreshToken(new AuthRefreshRequestDto(user.id, tokens.refreshToken));
 
-        return new AuthLoginResultDto(tokens, { sub: user.id, isVerified: user.isVerified });
+        return new AuthLoginResultDto(tokens, UserContextDto.from(user));
     }
 
     /**
@@ -249,7 +249,7 @@ export class AuthService {
 
         const token = await this.issueAccessToken(user);
 
-        return new AuthRefreshResultDto(token, { sub: user.id, isVerified: user.isVerified });
+        return new AuthRefreshResultDto(token, UserContextDto.from(user));
     }
 
     /**

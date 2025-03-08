@@ -180,6 +180,36 @@ export class UserService {
     }
 
     /**
+     * Updates the avatar url of a user.
+     *
+     * @param userId - The ID of the user.
+     * @param avatar - The URL of the avatar.
+     * @returns A promise that resolves to an UpdateResult object.
+     */
+    async updateUserAvatar(userId: string, avatar: string): Promise<UpdateResult> {
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (!avatar) {
+            this.logger.error({ userId, avatar }, ExceptionConstants.INVALID_PROFILE_PICTURE);
+            throw new BadRequestException(ExceptionConstants.INVALID_PROFILE_PICTURE);
+        }
+
+        const result = await this.userRepository.update(userId, {
+            avatar,
+        });
+
+        if (!result.affected) {
+            this.logger.error({ userId }, ExceptionConstants.USER_NOT_FOUND);
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
      * Marks a user as verified.
      *
      * @param userId - The ID of the user to verify.
@@ -206,7 +236,7 @@ export class UserService {
         user.isVerified = true;
         const updatedUser = await this.userRepository.save(user);
 
-        return new UserContextDto(updatedUser.id, updatedUser.isVerified);
+        return UserContextDto.from(updatedUser);
     }
 
     /**

@@ -52,6 +52,7 @@ export class AuthService {
     readonly resetPassword$ = new Subject<UpdatePasswordDto>();
     readonly requestAccountVerification$ = new Subject<void>();
     readonly verifyAccount$ = new Subject<VerifyUserRequestDto>();
+    readonly getUserContext$ = new Subject<void>();
 
     constructor() {
         this.initUserSession();
@@ -194,6 +195,21 @@ export class AuthService {
                 this.setSessonAndRedirect(userContext);
             });
 
+        this.getUserContext$
+            .pipe(
+                switchMap(() =>
+                    this.userClient.userControllerGetUserContext().pipe(
+                        catchError((error) => {
+                            return this.handleError(error);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((userContext) => {
+                this.setSessonAndRedirect(userContext);
+            });
+
         effect(() => this.loadingService.setLoading(!this.loaded()));
     }
 
@@ -210,7 +226,7 @@ export class AuthService {
         );
     }
 
-    public setSessonAndRedirect(userContext: UserContextDto): void {
+    private setSessonAndRedirect(userContext: UserContextDto): void {
         this.setTokenAndUserIdentity(userContext);
 
         if (userContext.isVerified) {
@@ -221,7 +237,7 @@ export class AuthService {
         }
     }
 
-    public clearSessionAndRedirect(): void {
+    private clearSessionAndRedirect(): void {
         this.clearTokenAndUserIdentity();
         this.router.navigate([RouteConstants.AUTH, RouteConstants.LOGIN]);
     }
@@ -231,6 +247,7 @@ export class AuthService {
             ...state,
             userContext,
         }));
+
         localStorage.setItem(USER_CONTEXT_KEY, this.userContext()?.sub.toString() || '');
         localStorage.setItem(USER_VERIFIED_KEY, this.userContext()?.isVerified.toString() || '');
     }
@@ -250,7 +267,11 @@ export class AuthService {
             return;
         }
 
-        this.state.update((state) => ({ ...state, userContext: { sub: userId, isVerified }, loaded: true }));
+        this.state.update((state) => ({
+            ...state,
+            userContext: { sub: userId, isVerified, avatar: null },
+            loaded: true,
+        }));
     }
 
     private handleError(error: any): Observable<never> {

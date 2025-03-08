@@ -10,8 +10,8 @@ import { Body, Controller, ForbiddenException, Get, HttpCode, HttpStatus, Post, 
 import { ConfigService } from '@nestjs/config';
 import {
     ApiBadRequestResponse,
-    ApiBearerAuth,
     ApiConflictResponse,
+    ApiCookieAuth,
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiFoundResponse,
@@ -107,7 +107,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
+        response.redirect(this.urlUtil.getCallbackUrl());
     }
 
     @Public()
@@ -133,7 +133,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
+        response.redirect(this.urlUtil.getCallbackUrl());
     }
 
     @Public()
@@ -159,7 +159,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
+        response.redirect(this.urlUtil.getCallbackUrl());
     }
 
     @Public()
@@ -180,12 +180,12 @@ export class AuthController {
     ): Promise<void> {
         await validateOrReject(authLoginResultDto);
 
-        const { tokens, userContext } = authLoginResultDto;
+        const { tokens } = authLoginResultDto;
 
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
+        response.redirect(this.urlUtil.getCallbackUrl());
     }
 
     @Public()
@@ -211,7 +211,7 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, tokens.accessToken, this.accessTokenCookieConfig);
         response.cookie(ConfigConstants.REFRESH_TOKEN_COOKIE_NAME, tokens.refreshToken, this.refreshTokenCookieConfig);
 
-        response.redirect(`${this.urlUtil.getWebUrl()}/auth/callback/${userContext.sub}/${userContext.isVerified}`);
+        response.redirect(this.urlUtil.getCallbackUrl());
     }
 
     @Public()
@@ -242,7 +242,7 @@ export class AuthController {
      * @throws {ForbiddenException} - If the user ID is invalid.
      */
     @Post('logout')
-    @ApiBearerAuth()
+    @ApiCookieAuth()
     @ApiOkResponse({ description: 'User logged out successfully.' })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @HttpCode(HttpStatus.OK)
@@ -297,7 +297,7 @@ export class AuthController {
      */
     @Public()
     @Post('refresh')
-    @ApiBearerAuth()
+    @ApiCookieAuth()
     @ApiOkResponse({ type: UserContextDto })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @UseGuards(JwtRefreshGuard)
