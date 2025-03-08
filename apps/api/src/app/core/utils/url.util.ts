@@ -29,4 +29,8 @@ export class UrlUtil {
             return basePath;
         }
     }
+
+    getCallbackUrl(): string {
+        return `${this.getWebUrl()}/auth/callback`;
+    }
 }

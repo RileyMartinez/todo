@@ -9,7 +9,7 @@ export class RouteConstants {
     // Auth routes
     static readonly LOGIN = 'login';
     static readonly OTP = 'otp';
-    static readonly OAUTH_CALLBACK = 'callback/:sub/:isVerified';
+    static readonly OAUTH_CALLBACK = 'callback';
 
     // Todo routes
     static readonly LISTS = 'lists';

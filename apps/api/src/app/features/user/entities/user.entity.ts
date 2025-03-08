@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { TodoList } from '../../todo-list/entities/todo-list.entity';
 
 @Entity()
 @Unique(['email'])
@@ -50,4 +51,15 @@ export class User {
         nullable: true,
     })
     verificationCode: number | null = null;
+
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
+    avatar: string | null = null;
+
+    @OneToMany(() => TodoList, (todoList) => todoList.user, {
+        cascade: true,
+    })
+    todoLists!: TodoList[];
 }
