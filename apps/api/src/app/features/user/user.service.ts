@@ -25,7 +25,9 @@ export class UserService {
      */
     async createUser(createUserDto: CreateUserDto): Promise<User> {
         await validateOrReject(createUserDto);
-        return await this.userRepository.save(createUserDto);
+
+        const user = this.userRepository.create(createUserDto);
+        return await this.userRepository.save(user);
     }
 
     /**
@@ -35,13 +37,13 @@ export class UserService {
      * @returns A promise that resolves to the found user.
      * @throws {BadRequestException} If the user ID is less than 1.
      */
-    async findUserById(userId: string): Promise<User> {
+    async findUserById(userId: string): Promise<User | null> {
         if (!userId) {
             this.logger.error({ userId: userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        return await this.userRepository.findOneByOrFail({ id: userId });
+        return await this.userRepository.findOneBy({ id: userId });
     }
 
     /**

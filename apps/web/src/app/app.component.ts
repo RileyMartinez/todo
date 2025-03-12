@@ -15,7 +15,6 @@ import { AuthService } from './core/services/auth.service';
 import { LoadingService } from './core/services/loading.service';
 import { SnackBarNotificationService } from './core/services/snack-bar.service';
 import { ViewPortService } from './core/services/viewport.service';
-import { SafeUrlPipe } from './core/pipes/safe-url.pipe';
 
 @Component({
     selector: 'app-root',
@@ -36,7 +35,6 @@ import { SafeUrlPipe } from './core/pipes/safe-url.pipe';
         MatListItem,
         MatMenuTrigger,
         MatDivider,
-        SafeUrlPipe,
     ],
     templateUrl: './app.component.html',
 })

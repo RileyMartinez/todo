@@ -46,6 +46,12 @@ export class UserController {
         return await this.userService.deleteUser(userId);
     }
 
+    @Get('exists')
+    @ApiOkResponse()
+    async userExists(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<boolean> {
+        return !!(await this.userService.findUserById(userId));
+    }
+
     @Get('context')
     @ApiOkResponse({ type: UserContextDto })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })

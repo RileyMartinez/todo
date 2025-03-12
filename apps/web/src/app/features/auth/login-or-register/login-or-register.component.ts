@@ -1,6 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
-import { AuthService } from '../../../core/services/auth.service';
 import { LoginComponent } from '../login/login.component';
 import { RegisterComponent } from '../register/register.component';
 
@@ -21,13 +20,4 @@ import { RegisterComponent } from '../register/register.component';
         </div>
     `,
 })
-export class LoginOrRegisterComponent implements OnInit {
-    private readonly authService = inject(AuthService);
-    private readonly userContext = this.authService.userContext;
-
-    ngOnInit(): void {
-        if (this.userContext()) {
-            this.authService.getUserContext$.next();
-        }
-    }
-}
+export class LoginOrRegisterComponent {}

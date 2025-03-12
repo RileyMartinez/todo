@@ -12,6 +12,6 @@ export class OAuthCallbackComponent implements OnInit {
     private readonly authService = inject(AuthService);
 
     ngOnInit() {
-        this.authService.getUserContext$.next();
+        this.authService.loadUserContext$.next();
     }
 }
