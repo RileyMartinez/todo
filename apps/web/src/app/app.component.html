@@ -10,7 +10,11 @@
         }
         @else if (!isMobile() && userContext()) {
         <button mat-icon-button [matMenuTriggerFor]="menu">
+            @if (userContext()?.avatar) {
+            <img [src]="userContext()?.avatar" referrerpolicy="no-referrer" class="rounded-full">
+            } @else {
             <mat-icon>account_circle</mat-icon>
+            }
         </button>
         <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="logout()">

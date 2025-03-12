@@ -1,10 +1,10 @@
 import { DecoratorConstants } from '@/app/core/constants/decorator.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { GetCurrentUser } from '@/app/core/decorators/get-current-user.decorator';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
-    ApiBearerAuth,
+    ApiCookieAuth,
     ApiCreatedResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
@@ -20,7 +20,7 @@ import { UserService } from './user.service';
 
 @Controller('user')
 @ApiTags('user')
-@ApiBearerAuth()
+@ApiCookieAuth()
 export class UserController {
     constructor(private readonly userService: UserService) {
         this.userService = userService;
@@ -37,40 +37,27 @@ export class UserController {
     }
 
     /**
-     * Find a user by their ID.
-     */
-    @Get(':id')
-    @ApiOkResponse({ type: SafeUserDto })
-    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async findOneById(@Param('id') id: string): Promise<SafeUserDto> {
-        const user = await this.userService.findUserById(id);
-        return new SafeUserDto(user);
-    }
-
-    /**
-     * Find a user by their email.
-     */
-    @Get('email/:email')
-    @ApiOkResponse({ type: SafeUserDto })
-    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async findOneByEmail(@Param('email') email: string): Promise<SafeUserDto | null> {
-        const user = await this.userService.findUserByEmail(email);
-
-        if (!user) {
-            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
-        }
-
-        return new SafeUserDto(user);
-    }
-
-    /**
      * Remove a user by their ID.
      */
-    @Delete(':id')
+    @Delete()
     @ApiOkResponse({ type: Number, description: 'The number of users deleted' })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async remove(@Param('id') id: string): Promise<DeleteResult> {
-        return await this.userService.deleteUser(id);
+    async remove(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<DeleteResult> {
+        return await this.userService.deleteUser(userId);
+    }
+
+    @Get('exists')
+    @ApiOkResponse()
+    async userExists(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<boolean> {
+        return !!(await this.userService.findUserById(userId));
+    }
+
+    @Get('context')
+    @ApiOkResponse({ type: UserContextDto })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    async getUserContext(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<UserContextDto> {
+        const user = await this.userService.findUserById(userId);
+        return UserContextDto.from(user);
     }
 
     /**

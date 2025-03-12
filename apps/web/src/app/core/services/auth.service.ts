@@ -52,10 +52,10 @@ export class AuthService {
     readonly resetPassword$ = new Subject<UpdatePasswordDto>();
     readonly requestAccountVerification$ = new Subject<void>();
     readonly verifyAccount$ = new Subject<VerifyUserRequestDto>();
+    readonly loadUserContext$ = new Subject<void>();
+    readonly userExists$ = new Subject<void>();
 
     constructor() {
-        this.initUserSession();
-
         // reducers
         this.login$
             .pipe(
@@ -70,7 +70,6 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe((userContext) => {
-                this.snackBarNotificationService.emit({ message: 'Login successful' });
                 this.setSessonAndRedirect(userContext);
             });
 
@@ -87,8 +86,7 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe((userContext) => {
-                this.snackBarNotificationService.emit({ message: 'Login successful' });
-                this.setTokenAndUserIdentity(userContext);
+                this.setUserContext(userContext);
                 this.router.navigate([RouteConstants.ACCOUNT, RouteConstants.RESET_PASSWORD]);
             });
 
@@ -105,7 +103,6 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe((userContext) => {
-                this.snackBarNotificationService.emit({ message: 'Registration successful' });
                 this.setSessonAndRedirect(userContext);
             });
 
@@ -122,7 +119,6 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe(() => {
-                this.snackBarNotificationService.emit({ message: 'Logout successful' });
                 return this.clearSessionAndRedirect();
             });
 
@@ -190,7 +186,22 @@ export class AuthService {
                 takeUntilDestroyed(),
             )
             .subscribe((userContext) => {
-                this.snackBarNotificationService.emit({ message: 'Account verification successful' });
+                this.snackBarNotificationService.emit({ message: 'Account verified successfully' });
+                this.setSessonAndRedirect(userContext);
+            });
+
+        this.loadUserContext$
+            .pipe(
+                switchMap(() =>
+                    this.userClient.userControllerGetUserContext().pipe(
+                        catchError((error) => {
+                            return this.handleError(error);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((userContext) => {
                 this.setSessonAndRedirect(userContext);
             });
 
@@ -201,7 +212,7 @@ export class AuthService {
         return this.authClient.authControllerRefresh().pipe(
             first(),
             tap((userContext) => {
-                this.setTokenAndUserIdentity(userContext);
+                this.setUserContext(userContext);
             }),
             catchError((error) => {
                 this.handleError(error);
@@ -210,8 +221,8 @@ export class AuthService {
         );
     }
 
-    public setSessonAndRedirect(userContext: UserContextDto): void {
-        this.setTokenAndUserIdentity(userContext);
+    private setSessonAndRedirect(userContext: UserContextDto): void {
+        this.setUserContext(userContext);
 
         if (userContext.isVerified) {
             this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
@@ -221,36 +232,21 @@ export class AuthService {
         }
     }
 
-    public clearSessionAndRedirect(): void {
-        this.clearTokenAndUserIdentity();
+    private clearSessionAndRedirect(): void {
+        this.clearUserContext();
         this.router.navigate([RouteConstants.AUTH, RouteConstants.LOGIN]);
     }
 
-    private setTokenAndUserIdentity(userContext: UserContextDto): void {
+    private setUserContext(userContext: UserContextDto): void {
         this.state.update((state) => ({
             ...state,
             userContext,
+            loaded: true,
         }));
-        localStorage.setItem(USER_CONTEXT_KEY, this.userContext()?.sub.toString() || '');
-        localStorage.setItem(USER_VERIFIED_KEY, this.userContext()?.isVerified.toString() || '');
     }
 
-    private clearTokenAndUserIdentity(): void {
+    private clearUserContext(): void {
         this.state.update((state) => ({ ...state, userContext: null, loaded: true }));
-        localStorage.removeItem(USER_CONTEXT_KEY);
-        localStorage.removeItem(USER_VERIFIED_KEY);
-    }
-
-    private initUserSession(): void {
-        const userId = localStorage.getItem(USER_CONTEXT_KEY);
-        const isVerified = localStorage.getItem(USER_VERIFIED_KEY) === 'true';
-
-        if (!userId) {
-            this.clearTokenAndUserIdentity();
-            return;
-        }
-
-        this.state.update((state) => ({ ...state, userContext: { sub: userId, isVerified }, loaded: true }));
     }
 
     private handleError(error: any): Observable<never> {

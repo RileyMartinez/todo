@@ -1,4 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 import { Todo } from './todo.entity';
 
 @Entity()
@@ -23,6 +24,11 @@ export class TodoList {
      */
     @Column()
     userId!: string;
+
+    @ManyToOne(() => User, (user) => user.todoLists, {
+        onDelete: 'CASCADE',
+    })
+    user!: User;
 
     /**
      * Todo list items

@@ -25,7 +25,9 @@ export class UserService {
      */
     async createUser(createUserDto: CreateUserDto): Promise<User> {
         await validateOrReject(createUserDto);
-        return await this.userRepository.save(createUserDto);
+
+        const user = this.userRepository.create(createUserDto);
+        return await this.userRepository.save(user);
     }
 
     /**
@@ -35,13 +37,13 @@ export class UserService {
      * @returns A promise that resolves to the found user.
      * @throws {BadRequestException} If the user ID is less than 1.
      */
-    async findUserById(userId: string): Promise<User> {
+    async findUserById(userId: string): Promise<User | null> {
         if (!userId) {
             this.logger.error({ userId: userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        return await this.userRepository.findOneByOrFail({ id: userId });
+        return await this.userRepository.findOneBy({ id: userId });
     }
 
     /**
@@ -180,6 +182,36 @@ export class UserService {
     }
 
     /**
+     * Updates the avatar url of a user.
+     *
+     * @param userId - The ID of the user.
+     * @param avatar - The URL of the avatar.
+     * @returns A promise that resolves to an UpdateResult object.
+     */
+    async updateUserAvatar(userId: string, avatar: string): Promise<UpdateResult> {
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (!avatar) {
+            this.logger.error({ userId, avatar }, ExceptionConstants.INVALID_PROFILE_PICTURE);
+            throw new BadRequestException(ExceptionConstants.INVALID_PROFILE_PICTURE);
+        }
+
+        const result = await this.userRepository.update(userId, {
+            avatar,
+        });
+
+        if (!result.affected) {
+            this.logger.error({ userId }, ExceptionConstants.USER_NOT_FOUND);
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
      * Marks a user as verified.
      *
      * @param userId - The ID of the user to verify.
@@ -206,7 +238,7 @@ export class UserService {
         user.isVerified = true;
         const updatedUser = await this.userRepository.save(user);
 
-        return new UserContextDto(updatedUser.id, updatedUser.isVerified);
+        return UserContextDto.from(updatedUser);
     }
 
     /**

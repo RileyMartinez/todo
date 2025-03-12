@@ -7,6 +7,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-google-oauth20';
 import { AuthService } from '../auth.service';
 import { AuthLoginResultDto } from '../dto/auth-login-result.dto';
+import { PasswordlessLoginDto } from '../dto/passwordless-login.dto';
 
 @Injectable()
 export class GoogleAuthStrategy extends PassportStrategy(Strategy, AppConstants.GOOGLE_STRATEGY_NAME) {
@@ -30,6 +31,8 @@ export class GoogleAuthStrategy extends PassportStrategy(Strategy, AppConstants.
             return null;
         }
 
-        return await this.authService.passwordlessLoginOrRegister(profile.emails[0].value);
+        return await this.authService.passwordlessLoginOrRegister(
+            new PasswordlessLoginDto(profile.emails[0].value, profile.photos?.[0].value),
+        );
     }
 }
