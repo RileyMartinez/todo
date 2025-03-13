@@ -18,9 +18,6 @@ export interface AuthServiceState {
     error: string | null;
 }
 
-export const USER_CONTEXT_KEY: string = 'todo.sub';
-export const USER_VERIFIED_KEY: string = 'todo.verified';
-
 @Injectable({
     providedIn: 'root',
 })

@@ -7,17 +7,6 @@ import { RegisterComponent } from '../register/register.component';
     selector: 'app-login-or-register',
     standalone: true,
     imports: [MatTabGroup, MatTab, LoginComponent, RegisterComponent],
-    template: `
-        <div class="flex flex-col overflow-hidden">
-            <mat-tab-group>
-                <mat-tab label="Login">
-                    <app-login></app-login>
-                </mat-tab>
-                <mat-tab label="Register">
-                    <app-register></app-register>
-                </mat-tab>
-            </mat-tab-group>
-        </div>
-    `,
+    templateUrl: './login-or-register.component.html',
 })
 export class LoginOrRegisterComponent {}

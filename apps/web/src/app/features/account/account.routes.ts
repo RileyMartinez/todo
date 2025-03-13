@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { verificationGuard } from '../../core/auth/verification.guard';
 import { RouteConstants } from '../../core/constants/route.constants';
-import { ResetPasswordComponent } from './reset-password/reset-password-component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { VerifyAccountComponent } from './verify-account/verify-account.component';
 
 export const ACCOUNT_ROUTES: Routes = [

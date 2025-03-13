@@ -20,24 +20,7 @@ import { MatInput } from '@angular/material/input';
         MatFormField,
         MatLabel,
     ],
-    template: `
-        <form [formGroup]="passwordResetForm">
-            <h2 mat-dialog-title>Forgot Password</h2>
-            <mat-dialog-content>
-                <p>We'll send you an email to reset your password.</p>
-                <mat-form-field appearance="fill" class="w-3/4">
-                    <mat-label>Email</mat-label>
-                    <input matInput type="email" [formControl]="emailFormControl" autocomplete="email" required />
-                </mat-form-field>
-            </mat-dialog-content>
-            <mat-dialog-actions>
-                <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-                <button mat-button [mat-dialog-close]="emailFormControl.value" [disabled]="passwordResetForm.invalid">
-                    Send
-                </button>
-            </mat-dialog-actions>
-        </form>
-    `,
+    templateUrl: './forgot-password.dialog.html',
 })
 export class ForgotPasswordDialog implements OnInit {
     private readonly formBuilder = inject(FormBuilder);

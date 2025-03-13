@@ -20,20 +20,7 @@ import { MatInput } from '@angular/material/input';
         MatDialogClose,
         MatLabel,
     ],
-    template: `
-        <h2 mat-dialog-title>Create Todo List</h2>
-        <mat-dialog-content>
-            <p>Enter a title:</p>
-            <mat-form-field>
-                <mat-label>Title</mat-label>
-                <input matInput [(ngModel)]="title" />
-            </mat-form-field>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-            <button mat-button [mat-dialog-close]="title" cdkFocusInitial>Create</button>
-        </mat-dialog-actions>
-    `,
+    templateUrl: './todo-list-create.dialog.html',
 })
 export class TodoListCreateDialog {
     title = '';

@@ -7,15 +7,6 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } fr
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [MatDialogContent, MatDialogTitle, MatDialogActions, MatDialogClose, MatButton],
-    template: `
-        <h2 mat-dialog-title>Delete Todo List</h2>
-        <mat-dialog-content>
-            <p>Are you sure you want to delete the list? All items will be lost.</p>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button [mat-dialog-close]="false">Cancel</button>
-            <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
-        </mat-dialog-actions>
-    `,
+    templateUrl: './todo-list-delete.dialog.html',
 })
 export class TodoListDeleteDialog {}
