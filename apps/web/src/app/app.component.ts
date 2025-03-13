@@ -11,6 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Router, RouterOutlet } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { RouteConstants } from './core/constants/route.constants';
 import { AuthService } from './core/services/auth.service';
 import { LoadingService } from './core/services/loading.service';
 import { SnackBarNotificationService } from './core/services/snack-bar.service';
@@ -47,8 +48,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly viewportService = inject(ViewPortService);
     private readonly destroy$ = new Subject<void>();
 
-    @ViewChild('sidenav') sidenav: MatSidenav | undefined;
+    @ViewChild('sidenav') sidenav!: MatSidenav;
 
+    readonly routes = RouteConstants;
     loading = this.loadingService.loading;
     userContext = this.authService.userContext;
     isMobile = this.viewportService.isMobile;
@@ -70,8 +72,13 @@ export class AppComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
+    navigateTo(route: string[]): void {
+        this.sidenav.close();
+        this.router.navigate(route);
+    }
+
     logout(): void {
-        this.sidenav?.close();
+        this.sidenav.close();
         this.authService.logout$.next();
     }
 }
