@@ -22,7 +22,8 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
             if (
                 error.status === HttpStatusCode.Unauthorized &&
                 !req.url.endsWith('login') &&
-                !req.url.endsWith('register')
+                !req.url.endsWith('register') &&
+                !req.url.endsWith('refresh')
             ) {
                 return handleRefresh(req, next);
             }
