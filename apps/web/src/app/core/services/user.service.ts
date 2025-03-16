@@ -1,9 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { catchError, EMPTY, Observable, Subject, switchMap } from 'rxjs';
+import { catchError, EMPTY, merge, mergeMap, Observable, Subject, switchMap, tap } from 'rxjs';
 import {
     PasswordResetRequestDto,
+    ResetPasswordDto,
     SafeUserDto,
     UpdateDisplayNameDto,
     UpdatePasswordDto,
@@ -40,15 +41,30 @@ export class UserService {
     readonly error = computed(() => this.state().error);
 
     // sources
-    readonly getUser$ = new Subject<void>();
+    readonly load$ = new Subject<void>();
     readonly sendPasswordResetRequest$ = new Subject<PasswordResetRequestDto>();
-    readonly updatePassword$ = new Subject<UpdatePasswordDto>();
+    readonly resetPassword$ = new Subject<ResetPasswordDto>();
     readonly updateDisplayName$ = new Subject<UpdateDisplayNameDto>();
+    readonly updatePassword$ = new Subject<UpdatePasswordDto>();
+
+    private readonly displayNameUpdated$ = this.updateDisplayName$.pipe(
+        mergeMap((updateDisplayNameDto) =>
+            this.userClient.userControllerUpdateDisplayName(updateDisplayNameDto).pipe(
+                catchError((error) => {
+                    this.snackBarNotificationService.emit({
+                        message: NotificationConstants.PROFILE_UPDATE_ERROR,
+                    });
+                    return this.handleError(error);
+                }),
+            ),
+        ),
+    );
 
     constructor() {
         // reducers
-        this.getUser$
+        merge(this.load$, this.displayNameUpdated$)
             .pipe(
+                tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
                     this.userClient.userControllerGetUser().pipe(
                         catchError((error) => {
@@ -78,10 +94,10 @@ export class UserService {
                 this.snackBarNotificationService.emit({ message: 'Password reset email sent' });
             });
 
-        this.updatePassword$
+        this.resetPassword$
             .pipe(
-                switchMap((updatePasswordDto) =>
-                    this.userClient.userControllerUpdatePassword(updatePasswordDto).pipe(
+                switchMap((resetPasswordDto) =>
+                    this.userClient.userControllerResetPassword(resetPasswordDto).pipe(
                         catchError((error) => {
                             this.snackBarNotificationService.emit({ message: 'Password reset failed' });
                             return this.handleError(error);
@@ -95,10 +111,10 @@ export class UserService {
                 this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
             });
 
-        this.updateDisplayName$
+        this.updatePassword$
             .pipe(
-                switchMap((updateDisplayNameDto) =>
-                    this.userClient.userControllerUpdateDisplayName(updateDisplayNameDto).pipe(
+                switchMap((updatePasswordDto) =>
+                    this.userClient.userControllerUpdatePassword(updatePasswordDto).pipe(
                         catchError((error) => {
                             this.snackBarNotificationService.emit({
                                 message: NotificationConstants.PROFILE_UPDATE_ERROR,

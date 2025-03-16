@@ -1,7 +1,8 @@
+import { argon2HashConfig } from '@/app/core/configs/argon2-hash.config';
 import { ConfigConstants } from '@/app/core/constants/config.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { EncryptionUtil } from '@/app/core/utils/encryption.util';
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +15,7 @@ import { AccountVerificationEmailDto } from '../email/dto/account-verification-e
 import { PasswordResetEmailDto } from '../email/dto/password-reset-email.dto';
 import { EmailService } from '../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -133,12 +135,59 @@ export class UserService {
 
     /**
      * Updates the password of a user.
+     *
+     * @param userId - The ID of the user.
+     * @param updatePasswordDto - The data for updating the password.
+     * @returns A promise that resolves to an UpdateResult object.
+     * @throws {BadRequestException} If the user ID is invalid or the new/confirmed passwords don't match.
+     * @throws {NotFoundException} If no user is updated.
+     * @throws {UnauthorizedException} If the current password is invalid.
+     */
+    async updateUserPassword(userId: string, updatePasswordDto: UpdatePasswordDto): Promise<UpdateResult> {
+        await validateOrReject(updatePasswordDto);
+        const { currentPassword, newPassword, confirmPassword } = updatePasswordDto;
+
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (newPassword !== confirmPassword) {
+            const errorMessage = 'New password and confirm password do not match';
+            this.logger.error({ userId }, errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
+
+        const user = await this.userRepository.findOneByOrFail({ id: userId });
+        const match = await argon2.verify(user.password, currentPassword);
+
+        if (!match) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_CREDENTIALS);
+            throw new UnauthorizedException(ExceptionConstants.INVALID_CREDENTIALS);
+        }
+
+        const hash = await argon2.hash(newPassword, argon2HashConfig);
+
+        const result = await this.userRepository.update(userId, {
+            password: hash,
+        });
+
+        if (!result.affected) {
+            this.logger.error({ userId }, ExceptionConstants.USER_NOT_FOUND);
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
+     * Resets the password of a user.
      * @param userId - The ID of the user.
      * @param password - The new password.
      * @returns A promise that resolves to an UpdateResult object.
      * @throws {BadRequestException} If the user ID is invalid.
      */
-    async updateUserPassword(userId: string, password: string): Promise<UpdateResult> {
+    async resetUserPassword(userId: string, password: string): Promise<UpdateResult> {
         if (!userId) {
             this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
@@ -170,15 +219,10 @@ export class UserService {
      * @param displayName - The new display name.
      * @returns A promise that resolves to an UpdateResult object.
      */
-    async updateUserDisplayName(userId: string, displayName: string): Promise<UpdateResult> {
+    async updateUserDisplayName(userId: string, displayName: string | null): Promise<UpdateResult> {
         if (!userId) {
             this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
-        }
-
-        if (!displayName) {
-            this.logger.error({ userId, displayName }, ExceptionConstants.INVALID_DISPLAY_NAME);
-            throw new BadRequestException(ExceptionConstants.INVALID_DISPLAY_NAME);
         }
 
         const result = await this.userRepository.update(userId, {

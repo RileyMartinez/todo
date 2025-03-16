@@ -65,7 +65,7 @@ export class ResetPasswordComponent implements OnInit {
             return;
         }
 
-        this.userService.updatePassword$.next({
+        this.userService.resetPassword$.next({
             password: this.confirmPasswordFormControl.value,
         });
     }

@@ -1,100 +1,103 @@
-<div class="grid-container">
-  <div class="grid-container">
-    <h1>User Profile</h1>
-    <mat-grid-list cols="2" rowHeight="250px">
-      <mat-grid-tile>
-        <mat-card class="dashboard-card">
-          <mat-card-header>
-            <mat-card-title>
-              Profile Information
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="dashboard-card-content">
-            <div class="flex flex-col items-center gap-4">
-              <div>
-                @if (user()?.avatar) {
-                <img [src]="user()?.avatar" referrerpolicy="no-referrer" alt="Profile picture"
-                  class="rounded-full h-24 w-24">
-                } @else {
-                <mat-icon>account_circle</mat-icon>
-                }
-              </div>
-              <h2 class="mat-h2">{{ user()?.displayName || user()?.email }}</h2>
-              @if (user()?.displayName) {
-              <p>{{ user()?.email }}</p>
+<div class="container mx-auto p-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <mat-card class="h-full">
+      <mat-card-header>
+        <mat-card-title>
+          Profile Information
+        </mat-card-title>
+      </mat-card-header>
+      <form [formGroup]="displayNameForm" (ngSubmit)="updateDisplayName()" class="flex flex-col gap-4 p-4">
+        <mat-card-content>
+          <div class="flex flex-col gap-4">
+            <div>
+              @if (user()?.avatar) {
+              <img [src]="user()?.avatar" referrerpolicy="no-referrer" alt="Profile picture"
+                class="rounded-full h-32 w-32">
+              } @else {
+              <mat-icon class="text-6xl">account_circle</mat-icon>
               }
-
-              <form [formGroup]="displayNameForm" (ngSubmit)="updateDisplayName()" class="w-full mt-4">
-                <mat-form-field class="w-3/4">
-                  <mat-label>Display Name</mat-label>
-                  <input matInput [formControl]="displayNameControl" placeholder="Enter display name">
-                </mat-form-field>
-                <button mat-raised-button color="primary" type="submit"
-                  [disabled]="displayNameForm.invalid || displayNameForm.pristine">
-                  Update Display Name
-                </button>
-              </form>
             </div>
-          </mat-card-content>
-        </mat-card>
-      </mat-grid-tile>
+            <h2 class="text-xl font-medium">{{ user()?.displayName || user()?.email }}</h2>
+            @if (user()?.displayName) {
+            <p>{{ user()?.email }}</p>
+            }
 
-      <mat-grid-tile>
-        <mat-card class="dashboard-card">
-          <mat-card-header>
-            <mat-card-title>
-              Security
-            </mat-card-title>
-          </mat-card-header>
-          <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="flex flex-col gap-4">
-            <mat-card-content class="dashboard-card-content">
+            <mat-divider></mat-divider>
+
+            <div class="flex flex-col gap-4">
               <mat-form-field class="w-3/4">
-                <mat-label>Current Password</mat-label>
-                <input matInput type="password" [formControl]="currentPasswordControl">
-                @if (currentPasswordControl.hasError('minlength')) {
-                <mat-error>Current Password must be at least 8 characters long</mat-error>
-                }
-                @if (currentPasswordControl.hasError('required')) {
-                <mat-error>Current Password is required</mat-error>
-                }
+                <mat-label>Display Name</mat-label>
+                <input matInput [formControl]="displayNameControl" placeholder="Enter display name">
               </mat-form-field>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button type="submit" [disabled]="displayNameForm.invalid">
+            Update Display Name
+          </button>
+        </mat-card-actions>
+      </form>
+    </mat-card>
 
-              <mat-form-field class="w-3/4">
-                <mat-label>New Password</mat-label>
-                <input matInput type="password" [formControl]="newPasswordControl">
-                @if (confirmPasswordControl.hasError('minlength')) {
-                <mat-error>New Password must be at least 8 characters long</mat-error>
-                }
-                @if (confirmPasswordControl.hasError('required')) {
-                <mat-error>New Password is required</mat-error>
-                }
-                @if (confirmPasswordControl.hasError('passwordMatch')) {
-                <mat-error>New password cannot match your current password</mat-error>
-                }
-              </mat-form-field>
+    <mat-card class="h-full">
+      <mat-card-header>
+        <mat-card-title>
+          Security
+        </mat-card-title>
+      </mat-card-header>
+      <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="flex flex-col gap-4 p-4">
+        <mat-card-content>
+          <div class="flex flex-col gap-4">
+            <mat-form-field class="w-3/4">
+              <mat-label>Current Password</mat-label>
+              <input matInput type="password" [formControl]="currentPasswordControl">
+              @if (currentPasswordControl.hasError('minlength')) {
+              <mat-error>Current Password must be at least 8 characters long</mat-error>
+              }
+              @if (currentPasswordControl.hasError('required')) {
+              <mat-error>Current Password is required</mat-error>
+              }
+            </mat-form-field>
 
-              <mat-form-field class="w-3/4">
-                <mat-label>Confirm Password</mat-label>
-                <input matInput type="password" [formControl]="confirmPasswordControl">
-                @if (confirmPasswordControl.hasError('minlength')) {
-                <mat-error>Password must be at least 8 characters long</mat-error>
-                }
-                @if (confirmPasswordControl.hasError('required')) {
-                <mat-error>Confirm Password is required</mat-error>
-                }
-                @if (confirmPasswordControl.hasError('mismatch')) {
-                <mat-error>Passwords do not match</mat-error>
-                }
-              </mat-form-field>
+            <mat-divider></mat-divider>
 
-            </mat-card-content>
-            <mat-card-actions>
-              <button mat-raised-button type="submit" [disabled]="passwordForm.invalid">
-                Change Password
-              </button>
-            </mat-card-actions>
-          </form>
-        </mat-card>
-      </mat-grid-tile>
-    </mat-grid-list>
+            <mat-form-field class="w-3/4">
+              <mat-label>New Password</mat-label>
+              <input matInput type="password" [formControl]="newPasswordControl">
+              @if (confirmPasswordControl.hasError('minlength')) {
+              <mat-error>New Password must be at least 8 characters long</mat-error>
+              }
+              @if (confirmPasswordControl.hasError('required')) {
+              <mat-error>New Password is required</mat-error>
+              }
+              @if (confirmPasswordControl.hasError('passwordMatch')) {
+              <mat-error>New password cannot match your current password</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field class="w-3/4">
+              <mat-label>Confirm Password</mat-label>
+              <input matInput type="password" [formControl]="confirmPasswordControl">
+              @if (confirmPasswordControl.hasError('minlength')) {
+              <mat-error>Password must be at least 8 characters long</mat-error>
+              }
+              @if (confirmPasswordControl.hasError('required')) {
+              <mat-error>Confirm Password is required</mat-error>
+              }
+              @if (confirmPasswordControl.hasError('mismatch')) {
+              <mat-error>Passwords do not match</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button type="submit" [disabled]="passwordForm.invalid">
+            Change Password
+          </button>
+        </mat-card-actions>
+      </form>
+    </mat-card>
   </div>
+</div>

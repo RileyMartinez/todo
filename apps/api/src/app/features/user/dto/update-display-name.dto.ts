@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateDisplayNameDto {
     @IsString()
-    @IsNotEmpty()
-    displayName: string;
+    @IsOptional()
+    displayName: string | null;
 
     constructor(displayName: string) {
         this.displayName = displayName;

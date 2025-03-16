@@ -1,38 +1,31 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDivider } from '@angular/material/divider';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { matchValidator } from '../../../core/validators/match.validator';
 
-interface Card {
-    title: string;
-    cols: number;
-    rows: number;
-}
-
 @Component({
     selector: 'app-profile',
     templateUrl: './profile.component.html',
-    styleUrl: './profile.component.css',
     standalone: true,
     imports: [
         MatGridListModule,
-        MatMenuModule,
-        MatIconModule,
-        MatButtonModule,
         MatCardModule,
         ReactiveFormsModule,
         MatFormField,
+        MatIcon,
         MatLabel,
         MatInput,
         MatError,
+        MatButton,
+        MatDivider,
     ],
 })
 export class ProfileComponent implements OnInit {
@@ -43,11 +36,6 @@ export class ProfileComponent implements OnInit {
     readonly userContext = this.authService.userContext;
     readonly user = this.userService.user;
 
-    readonly cards: Card[] = [
-        { title: 'Profile Information', cols: 1, rows: 1 },
-        { title: 'Security', cols: 1, rows: 2 },
-    ];
-
     passwordForm!: FormGroup;
     currentPasswordControl!: FormControl;
     newPasswordControl!: FormControl;
@@ -57,7 +45,7 @@ export class ProfileComponent implements OnInit {
     displayNameControl!: FormControl;
 
     ngOnInit(): void {
-        this.displayNameControl = new FormControl('', [Validators.required, Validators.minLength(1)]);
+        this.displayNameControl = new FormControl('');
 
         this.displayNameForm = this.formBuilder.group({
             displayName: this.displayNameControl,
@@ -76,7 +64,7 @@ export class ProfileComponent implements OnInit {
             { validators: matchValidator('newPassword', 'confirmPassword') },
         );
 
-        this.userService.getUser$.next();
+        this.userService.load$.next();
     }
 
     updateDisplayName(): void {
@@ -85,8 +73,10 @@ export class ProfileComponent implements OnInit {
         }
 
         this.userService.updateDisplayName$.next({
-            displayName: this.displayNameControl.value,
+            displayName: this.displayNameControl.value?.trim() || null,
         });
+
+        this.resetFormState(this.displayNameForm);
     }
 
     updatePassword(): void {
@@ -100,7 +90,19 @@ export class ProfileComponent implements OnInit {
         }
 
         this.userService.updatePassword$.next({
-            password: this.newPasswordControl.value,
+            currentPassword: this.currentPasswordControl.value,
+            newPassword: this.newPasswordControl.value,
+            confirmPassword: this.confirmPasswordControl.value,
         });
+
+        this.resetFormState(this.passwordForm);
+    }
+
+    resetFormState(form: FormGroup): void {
+        form.reset();
+        form.markAsPristine();
+        form.markAsUntouched();
+        form.setErrors(null);
+        form.updateValueAndValidity();
     }
 }

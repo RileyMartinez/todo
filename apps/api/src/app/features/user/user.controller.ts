@@ -10,12 +10,14 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { DeleteResult } from 'typeorm';
 import { PasswordResetRequestDto } from '../auth/dto/password-reset-request.dto';
 import { UserContextDto } from '../auth/dto/user-context.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SafeUserDto } from './dto/safe-user.dto';
 import { UpdateDisplayNameDto } from './dto/update-display-name.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
@@ -69,19 +71,32 @@ export class UserController {
         return UserContextDto.from(user);
     }
 
-    /**
-     * Update a user's password.
-     */
-    @Post('password')
+    @Post('update-password')
     @ApiOkResponse({ description: 'Password updated successfully.' })
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    @ApiUnauthorizedResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @HttpCode(HttpStatus.OK)
     async updatePassword(
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
         @Body() updatePasswordDto: UpdatePasswordDto,
     ): Promise<void> {
-        await this.userService.updateUserPassword(userId, updatePasswordDto.password);
+        await this.userService.updateUserPassword(userId, updatePasswordDto);
+    }
+
+    /**
+     * Reset a user's password.
+     */
+    @Post('reset-password')
+    @ApiOkResponse({ description: 'Password updated successfully.' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
+    async resetPassword(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: string,
+        @Body() resetPasswordDto: ResetPasswordDto,
+    ): Promise<void> {
+        await this.userService.resetUserPassword(userId, resetPasswordDto.password);
     }
 
     /**
