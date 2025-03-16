@@ -2,11 +2,10 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
-import { UpdatePasswordDto, UserClient, VerifyUserRequestDto } from '../../shared/openapi-client';
+import { UserClient, VerifyUserRequestDto } from '../../shared/openapi-client';
 import { AuthClient } from '../../shared/openapi-client/api/auth.client';
 import { AuthLoginRequestDto } from '../../shared/openapi-client/model/auth-login-request-dto';
 import { AuthRegisterRequestDto } from '../../shared/openapi-client/model/auth-register-request-dto';
-import { PasswordResetRequestDto } from '../../shared/openapi-client/model/password-reset-request-dto';
 import { UserContextDto } from '../../shared/openapi-client/model/user-context-dto';
 import { RouteConstants } from '../constants/route.constants';
 import { LoadingService } from './loading.service';
@@ -45,12 +44,9 @@ export class AuthService {
     readonly otpLogin$ = new Subject<AuthLoginRequestDto>();
     readonly register$ = new Subject<AuthRegisterRequestDto>();
     readonly logout$ = new Subject<void>();
-    readonly requestPasswordReset$ = new Subject<PasswordResetRequestDto>();
-    readonly resetPassword$ = new Subject<UpdatePasswordDto>();
-    readonly requestAccountVerification$ = new Subject<void>();
+    readonly sendAccountVerification$ = new Subject<void>();
     readonly verifyAccount$ = new Subject<VerifyUserRequestDto>();
     readonly loadUserContext$ = new Subject<void>();
-    readonly userExists$ = new Subject<void>();
 
     constructor() {
         // reducers
@@ -119,43 +115,10 @@ export class AuthService {
                 return this.clearSessionAndRedirect();
             });
 
-        this.requestPasswordReset$
-            .pipe(
-                switchMap((passwordResetRequestDto) =>
-                    this.authClient.authControllerSendPasswordResetRequest(passwordResetRequestDto).pipe(
-                        catchError((error) => {
-                            this.snackBarNotificationService.emit({ message: 'Password reset email send failed' });
-                            return this.handleError(error);
-                        }),
-                    ),
-                ),
-                takeUntilDestroyed(),
-            )
-            .subscribe(() => {
-                this.snackBarNotificationService.emit({ message: 'Password reset email sent' });
-            });
-
-        this.resetPassword$
-            .pipe(
-                switchMap((updatePasswordDto) =>
-                    this.userClient.userControllerUpdatePassword(updatePasswordDto).pipe(
-                        catchError((error) => {
-                            this.snackBarNotificationService.emit({ message: 'Password reset failed' });
-                            return this.handleError(error);
-                        }),
-                    ),
-                ),
-                takeUntilDestroyed(),
-            )
-            .subscribe(() => {
-                this.snackBarNotificationService.emit({ message: 'Password reset successful' });
-                this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
-            });
-
-        this.requestAccountVerification$
+        this.sendAccountVerification$
             .pipe(
                 switchMap(() =>
-                    this.authClient.authControllerSendAccountVerification().pipe(
+                    this.userClient.userControllerSendAccountVerification().pipe(
                         catchError((error) => {
                             this.snackBarNotificationService.emit({
                                 message: 'Account verification email send failed',
@@ -224,7 +187,7 @@ export class AuthService {
         if (userContext.isVerified) {
             this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
         } else {
-            this.requestAccountVerification$.next();
+            this.sendAccountVerification$.next();
             this.router.navigate([RouteConstants.ACCOUNT, RouteConstants.VERIFY]);
         }
     }

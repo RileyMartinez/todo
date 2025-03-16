@@ -11,8 +11,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, AppConstants.LOCAL
         super({
             usernameField: 'email',
         } as IStrategyOptions);
-
-        this.authService = authService;
     }
 
     /**

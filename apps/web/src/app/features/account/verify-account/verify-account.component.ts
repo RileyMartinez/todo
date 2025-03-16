@@ -63,6 +63,6 @@ export class VerifyAccountComponent implements OnInit {
     }
 
     resendVerificationCode(): void {
-        this.authService.requestAccountVerification$.next();
+        this.authService.sendAccountVerification$.next();
     }
 }

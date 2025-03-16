@@ -1,7 +1,8 @@
 import { DecoratorConstants } from '@/app/core/constants/decorator.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { GetCurrentUser } from '@/app/core/decorators/get-current-user.decorator';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Public } from '@/app/core/decorators/public.decorator';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Post } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiCookieAuth,
@@ -10,10 +11,13 @@ import {
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { DeleteResult } from 'typeorm';
+import { PasswordResetRequestDto } from '../auth/dto/password-reset-request.dto';
 import { UserContextDto } from '../auth/dto/user-context.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SafeUserDto } from './dto/safe-user.dto';
+import { UpdateDisplayNameDto } from './dto/update-display-name.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { VerifyUserRequestDto } from './dto/verify-user-request.dto';
 import { UserService } from './user.service';
@@ -22,8 +26,19 @@ import { UserService } from './user.service';
 @ApiTags('user')
 @ApiCookieAuth()
 export class UserController {
-    constructor(private readonly userService: UserService) {
-        this.userService = userService;
+    constructor(private readonly userService: UserService) {}
+
+    @Get()
+    @ApiOkResponse({ type: SafeUserDto })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    async getUser(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<SafeUserDto> {
+        const user = await this.userService.findUserById(userId);
+
+        if (!user) {
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return new SafeUserDto(user);
     }
 
     /**
@@ -31,7 +46,7 @@ export class UserController {
      */
     @Post()
     @ApiCreatedResponse({ type: SafeUserDto })
-    async create(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
+    async createUser(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
         const user = await this.userService.createUser(createUserDto);
         return new SafeUserDto(user);
     }
@@ -42,14 +57,8 @@ export class UserController {
     @Delete()
     @ApiOkResponse({ type: Number, description: 'The number of users deleted' })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async remove(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<DeleteResult> {
+    async deleteUser(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<DeleteResult> {
         return await this.userService.deleteUser(userId);
-    }
-
-    @Get('exists')
-    @ApiOkResponse()
-    async userExists(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<boolean> {
-        return !!(await this.userService.findUserById(userId));
     }
 
     @Get('context')
@@ -76,6 +85,21 @@ export class UserController {
     }
 
     /**
+     * Update a user's display name.
+     */
+    @Post('display-name')
+    @ApiOkResponse({ description: 'Display name updated successfully.' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
+    async updateDisplayName(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: string,
+        @Body() updateDisplayNameDto: UpdateDisplayNameDto,
+    ): Promise<void> {
+        await this.userService.updateUserDisplayName(userId, updateDisplayNameDto.displayName);
+    }
+
+    /**
      * Verify a user's email.
      */
     @Post('verify')
@@ -88,5 +112,35 @@ export class UserController {
         @Body() verifyUserRequestDto: VerifyUserRequestDto,
     ): Promise<UserContextDto> {
         return await this.userService.verifyUser(userId, verifyUserRequestDto.verificationCode);
+    }
+
+    /**
+     *  Handles the account verification request.
+     *
+     * @param accountVerificationRequest - The email to send the account verification request to.
+     */
+    @Post('send-account-verification')
+    @ApiOkResponse({ description: 'Account verification request sent successfully.' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
+    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
+    @Throttle({ default: { limit: 3, ttl: 60000 } })
+    async sendAccountVerification(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<void> {
+        return await this.userService.sendAccountVerificationMessage(userId);
+    }
+
+    /**
+     * [Public]
+     * Handles the password reset request.
+     *
+     * @param {string} passwordResetRequestDto - Email to send the password reset request to.
+     */
+    @Public()
+    @Post('send-password-reset')
+    @ApiOkResponse({ description: 'Password reset request sent successfully.' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_EMAIL })
+    @HttpCode(HttpStatus.OK)
+    async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
+        return await this.userService.sendPasswordResetMessage(passwordResetRequestDto.email);
     }
 }

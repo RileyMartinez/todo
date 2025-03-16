@@ -10,6 +10,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteConstants } from '../../../core/constants/route.constants';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
     selector: 'app-one-time-login',
@@ -35,6 +36,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class OneTimeLoginComponent implements OnInit {
     private readonly authService = inject(AuthService);
+    private readonly userService = inject(UserService);
     private readonly formBuilder = inject(FormBuilder);
     private readonly route = inject(ActivatedRoute);
     private readonly destroy$ = new Subject<void>();
@@ -75,6 +77,6 @@ export class OneTimeLoginComponent implements OnInit {
             return;
         }
 
-        this.authService.requestPasswordReset$.next({ email: this.email });
+        this.userService.sendPasswordResetRequest$.next({ email: this.email });
     }
 }

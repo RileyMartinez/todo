@@ -1,10 +1,18 @@
+import { ConfigConstants } from '@/app/core/constants/config.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
+import { EncryptionUtil } from '@/app/core/utils/encryption.util';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
 import { validateOrReject } from 'class-validator';
+import { randomInt } from 'crypto';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserContextDto } from '../auth/dto/user-context.dto';
+import { AccountVerificationEmailDto } from '../email/dto/account-verification-email.dto';
+import { PasswordResetEmailDto } from '../email/dto/password-reset-email.dto';
+import { EmailService } from '../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 
@@ -12,9 +20,13 @@ import { User } from './entities/user.entity';
 export class UserService {
     private readonly logger = new Logger(UserService.name);
 
-    constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
-        this.userRepository = userRepository;
-    }
+    constructor(
+        @InjectRepository(User) private readonly userRepository: Repository<User>,
+        private readonly emailService: EmailService,
+        private readonly configService: ConfigService,
+        private readonly encryptionUtil: EncryptionUtil,
+        private readonly jwtService: JwtService,
+    ) {}
 
     /**
      * Creates a new user.
@@ -152,6 +164,36 @@ export class UserService {
     }
 
     /**
+     * Updates the display name of a user.
+     *
+     * @param userId - The ID of the user.
+     * @param displayName - The new display name.
+     * @returns A promise that resolves to an UpdateResult object.
+     */
+    async updateUserDisplayName(userId: string, displayName: string): Promise<UpdateResult> {
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (!displayName) {
+            this.logger.error({ userId, displayName }, ExceptionConstants.INVALID_DISPLAY_NAME);
+            throw new BadRequestException(ExceptionConstants.INVALID_DISPLAY_NAME);
+        }
+
+        const result = await this.userRepository.update(userId, {
+            displayName,
+        });
+
+        if (!result.affected) {
+            this.logger.error({ userId }, ExceptionConstants.USER_NOT_FOUND);
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return result;
+    }
+
+    /**
      * Updates the verification code of a user for account verification.
      *
      * @param userId - The ID of the user.
@@ -195,8 +237,8 @@ export class UserService {
         }
 
         if (!avatar) {
-            this.logger.error({ userId, avatar }, ExceptionConstants.INVALID_PROFILE_PICTURE);
-            throw new BadRequestException(ExceptionConstants.INVALID_PROFILE_PICTURE);
+            this.logger.error({ userId, avatar }, ExceptionConstants.INVALID_AVATAR);
+            throw new BadRequestException(ExceptionConstants.INVALID_AVATAR);
         }
 
         const result = await this.userRepository.update(userId, {
@@ -263,5 +305,71 @@ export class UserService {
         }
 
         return result;
+    }
+
+    /**
+     * Sends an account verification confirmation message for the given email.
+     *
+     * @param email - The email of the user.
+     * @throws {BadRequestException} If the email is not provided.
+     * @throws {NotFoundException} If the user is not found.
+     */
+    async sendAccountVerificationMessage(userId: string): Promise<void> {
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        const user = await this.findUserById(userId);
+
+        if (!user) {
+            this.logger.error({ userId }, ExceptionConstants.USER_NOT_FOUND);
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        const confirmationPin = randomInt(100000, 999999);
+
+        await Promise.all([
+            this.updateUserVerificationCode(user.id, confirmationPin),
+            this.emailService.sendAccountVerification(new AccountVerificationEmailDto(user.email, confirmationPin)),
+        ]);
+    }
+
+    /**
+     * Sends a password reset event for the given email.
+     *
+     * @remarks We intentionally do not provide feedback if the email does not exist to prevent user enumeration.
+     *
+     * @param email - The email of the user.
+     * @returns A promise that resolves to void.
+     */
+    async sendPasswordResetMessage(email: string): Promise<void> {
+        if (!email) {
+            this.logger.error({ email }, ExceptionConstants.INVALID_EMAIL);
+            throw new BadRequestException(ExceptionConstants.INVALID_EMAIL);
+        }
+
+        const user = await this.findUserByEmail(email);
+
+        if (!user) {
+            this.logger.warn({ email }, ExceptionConstants.USER_NOT_FOUND);
+            return;
+        }
+
+        const otp = randomInt(100000, 999999);
+        const token = await this.jwtService.signAsync(
+            {
+                otp,
+            },
+            {
+                secret: this.configService.getOrThrow(ConfigConstants.JWT_SECRET),
+                expiresIn: this.configService.getOrThrow(ConfigConstants.JWT_EXPIRATION),
+            },
+        );
+
+        const encryptedToken = this.encryptionUtil.encrypt(token);
+        await this.updateUserToken(user.id, encryptedToken);
+
+        await this.emailService.sendPasswordReset(new PasswordResetEmailDto(user.email, otp));
     }
 }

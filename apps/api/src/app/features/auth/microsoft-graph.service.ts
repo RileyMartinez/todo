@@ -7,9 +7,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 export class MicrosoftGraphService {
     private readonly logger = new Logger(MicrosoftGraphService.name);
 
-    constructor(private readonly httpService: HttpService) {
-        this.httpService = httpService;
-    }
+    constructor(private readonly httpService: HttpService) {}
 
     /**
      * Fetches user profile picture from Microsoft Graph API

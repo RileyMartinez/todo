@@ -1,6 +1,9 @@
 {
     "name": "@repo/openapi-client-generator",
     "version": "1.0.0",
+    "description": "OpenAPI Angular TypeScript HTTP Client Generator",
+    "author": "Riley Martinez",
+    "license": "MIT",
     "private": true,
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",

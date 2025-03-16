@@ -37,9 +37,23 @@ const parseExpiration = (expiration: string): number => {
         throw new Error('Expiration unit is not valid');
     }
 
-    return (
-        expirationValue *
-        (expirationUnit === 'd' ? 24 * 60 * 60 : expirationUnit === 'h' ? 60 * 60 : expirationUnit === 'm' ? 60 : 1) *
-        1000
-    );
+    let multiplier: number;
+
+    switch (expirationUnit) {
+        case 'd':
+            multiplier = 24 * 60 * 60;
+            break;
+        case 'h':
+            multiplier = 60 * 60;
+            break;
+        case 'm':
+            multiplier = 60;
+            break;
+        case 's':
+        default:
+            multiplier = 1;
+            break;
+    }
+
+    return expirationValue * multiplier * 1000;
 };

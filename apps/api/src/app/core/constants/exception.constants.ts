@@ -10,8 +10,10 @@ export class ExceptionConstants {
     static readonly TOKEN_EXPIRED = 'Token expired';
     static readonly USER_ALREADY_EXISTS = 'User already exists';
     static readonly USER_NOT_FOUND = 'User not found';
+    static readonly INVALID_USER = 'User cannot be null';
     static readonly INVALID_USER_ID = 'User ID must be greater than 0';
-    static readonly INVALID_PROFILE_PICTURE = 'Profile picture must be a valid URL string';
+    static readonly INVALID_AVATAR = 'Avatar must be a valid URL string';
+    static readonly INVALID_DISPLAY_NAME = 'Display name must be a valid string';
     static readonly INVALID_EMAIL = 'Email must be provided';
     static readonly INVALID_TODO_LIST_ID = 'Todo list ID must be greater than 0';
     static readonly TODO_LIST_NOT_FOUND = 'Todo list not found';

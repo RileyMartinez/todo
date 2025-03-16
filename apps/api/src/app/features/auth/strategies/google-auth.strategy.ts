@@ -22,8 +22,6 @@ export class GoogleAuthStrategy extends PassportStrategy(Strategy, AppConstants.
             callbackURL: `${urlUtil.getServerUrl()}/auth/google/redirect`,
             scope: ['email', 'profile'],
         } as StrategyOptions);
-
-        this.authService = authService;
     }
 
     async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {

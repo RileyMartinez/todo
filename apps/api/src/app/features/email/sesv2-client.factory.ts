@@ -15,7 +15,6 @@ export class SESV2ClientFactory {
     private client: SESv2Client;
 
     constructor(private readonly configService: ConfigService) {
-        this.configService = configService;
         this.region = this.configService.get(ConfigConstants.AWS_REGION) || AppConstants.DEFAULT_AWS_REGION;
         this.profile = this.configService.get(ConfigConstants.AWS_PROFILE) || AppConstants.DEFAULT_AWS_PROFILE;
         const env = this.configService.getOrThrow(ConfigConstants.APP_ENV);

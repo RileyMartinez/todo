@@ -15,10 +15,7 @@ export class EmailService {
     constructor(
         private readonly configService: ConfigService,
         private readonly sesv2ClientFactory: SESV2ClientFactory,
-    ) {
-        this.configService = configService;
-        this.sesv2ClientFactory = sesv2ClientFactory;
-    }
+    ) {}
 
     /**
      * Sends a password reset email.

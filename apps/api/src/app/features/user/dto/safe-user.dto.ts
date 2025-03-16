@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ExceptionConstants } from '@/app/core/constants/exception.constants';
+import { BadRequestException } from '@nestjs/common';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { User } from '../entities/user.entity';
 
 export class SafeUserDto {
@@ -8,7 +10,15 @@ export class SafeUserDto {
      */
     @IsString()
     @IsNotEmpty()
-    id: string = '';
+    id: string;
+
+    /**
+     * User display name
+     * @example John Doe
+     */
+    @IsString()
+    @IsOptional()
+    displayName: string | null;
 
     /**
      * User email address
@@ -16,10 +26,33 @@ export class SafeUserDto {
      */
     @IsString()
     @IsNotEmpty()
-    email: string = '';
+    email: string;
 
-    constructor(user: User) {
+    /**
+     * User verification status
+     * @example true
+     */
+    @IsBoolean()
+    @IsNotEmpty()
+    isVerified: boolean;
+
+    /**
+     * User avatar
+     * @example 'https://www.example.com/avatar.jpg'
+     */
+    @IsString()
+    @IsOptional()
+    avatar: string | null;
+
+    constructor(user: User | null) {
+        if (!user) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+
         this.id = user.id;
+        this.displayName = user.displayName;
         this.email = user.email;
+        this.isVerified = user.isVerified;
+        this.avatar = user.avatar;
     }
 }
