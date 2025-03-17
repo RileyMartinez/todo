@@ -12,6 +12,16 @@ export class User {
     id!: string;
 
     /**
+     * User display name
+     * @example John Doe
+     */
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
+    displayName: string | null = null;
+
+    /**
      * User email address
      * @example foo.bar@foobar.com
      */
@@ -21,11 +31,8 @@ export class User {
     /**
      * User hashed password
      */
-    @Column({
-        type: 'text',
-        nullable: true,
-    })
-    password: string | null = null;
+    @Column()
+    password!: string;
 
     /**
      * User hashed token

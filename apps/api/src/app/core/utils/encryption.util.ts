@@ -1,6 +1,14 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CipherGCMTypes, createCipheriv, createDecipheriv, Encoding, randomBytes, scryptSync } from 'crypto';
+import {
+    CipherGCMTypes,
+    createCipheriv,
+    createDecipheriv,
+    Encoding,
+    randomBytes,
+    randomFillSync,
+    scryptSync,
+} from 'crypto';
 import { ConfigConstants } from '../constants/config.constants';
 
 const HEX_ENCODING: Encoding = 'hex';
@@ -12,9 +20,7 @@ export class EncryptionUtil {
     private readonly logger = new Logger(EncryptionUtil.name);
     private encryptionKey: Buffer | undefined;
 
-    constructor(private readonly configService: ConfigService) {
-        this.configService = configService;
-    }
+    constructor(private readonly configService: ConfigService) {}
 
     /**
      * Encrypts the given data using AES-256-GCM encryption algorithm.
@@ -64,6 +70,25 @@ export class EncryptionUtil {
             this.logger.error(error, 'Failed to decrypt data.');
             throw new InternalServerErrorException('Failed to decrypt data.');
         }
+    }
+
+    /**
+     * Generates a random password of the specified length.
+     *
+     * @param length - The length of the password to generate.
+     * @returns Randomly generated password.
+     */
+    generatePassword(length: number = 32): string {
+        if (length < 1) {
+            const errorMessage = 'Password length to generate must be greater than 0.';
+            this.logger.error(length, errorMessage);
+            throw new InternalServerErrorException(errorMessage);
+        }
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+';
+        return Array.from(randomFillSync(new Uint32Array(length)))
+            .map((value) => characters[value % characters.length])
+            .join('');
     }
 
     /**

@@ -1,10 +1,10 @@
 {
     "name": "api",
     "version": "1.0.0",
-    "description": "",
-    "author": "",
+    "description": "Todo List API with NestJS, TypeORM, and PostgreSQL",
+    "author": "Riley Martinez",
     "private": true,
-    "license": "UNLICENSED",
+    "license": "MIT",
     "scripts": {
         "op": "op run --env-file='./.env'",
         "build": "nest start --entryFile=src/openapi.main.js",

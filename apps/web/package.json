@@ -1,6 +1,8 @@
 {
     "name": "web",
     "version": "1.0.0",
+    "description": "Todo List Web App with Angular and TailwindCSS",
+    "author": "Riley Martinez",
     "private": true,
     "scripts": {
         "ng": "ng",

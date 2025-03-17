@@ -15,10 +15,7 @@ export class TodoListService {
     constructor(
         @InjectRepository(TodoList) private readonly todolistRepository: Repository<TodoList>,
         @InjectRepository(Todo) private readonly todoRepository: Repository<Todo>,
-    ) {
-        this.todolistRepository = todolistRepository;
-        this.todoRepository = todoRepository;
-    }
+    ) {}
 
     /**
      * Saves a todo list for a specific user.

@@ -6,6 +6,14 @@ export class UserContextDto {
     @IsNotEmpty()
     sub: string;
 
+    @IsString()
+    @IsNotEmpty()
+    email: string;
+
+    @IsString()
+    @IsOptional()
+    displayName: string | null;
+
     @IsBoolean()
     @IsNotEmpty()
     isVerified: boolean;
@@ -14,8 +22,10 @@ export class UserContextDto {
     @IsOptional()
     avatar: string | null;
 
-    constructor(sub: string, isVerified: boolean, avatar: string | null) {
+    constructor(sub: string, email: string, displayName: string | null, isVerified: boolean, avatar: string | null) {
         this.sub = sub;
+        this.email = email;
+        this.displayName = displayName;
         this.isVerified = isVerified;
         this.avatar = avatar;
     }
@@ -25,7 +35,7 @@ export class UserContextDto {
 
         switch (className) {
             case User.name:
-                return new UserContextDto(obj.id, obj.isVerified, obj.avatar);
+                return new UserContextDto(obj.id, obj.email, obj.displayName, obj.isVerified, obj.avatar);
             default:
                 throw new Error(`Unknown class type: ${className}`);
         }

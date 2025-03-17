@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
+import { MatChip } from '@angular/material/chips';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatListItem, MatNavList } from '@angular/material/list';
@@ -11,10 +12,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Router, RouterOutlet } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../environments/environment';
 import { RouteConstants } from './core/constants/route.constants';
 import { AuthService } from './core/services/auth.service';
 import { LoadingService } from './core/services/loading.service';
 import { SnackBarNotificationService } from './core/services/snack-bar.service';
+import { UserContextStore } from './core/services/user-context.store';
 import { ViewPortService } from './core/services/viewport.service';
 
 @Component({
@@ -36,12 +39,14 @@ import { ViewPortService } from './core/services/viewport.service';
         MatListItem,
         MatMenuTrigger,
         MatDivider,
+        MatChip,
     ],
     templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit, OnDestroy {
     private readonly loadingService = inject(LoadingService);
     private readonly authService = inject(AuthService);
+    private readonly userContextStore = inject(UserContextStore);
     private readonly router = inject(Router);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly snackBar = inject(MatSnackBar);
@@ -51,12 +56,10 @@ export class AppComponent implements OnInit, OnDestroy {
     @ViewChild('sidenav') sidenav!: MatSidenav;
 
     readonly routes = RouteConstants;
-    loading = this.loadingService.loading;
-    userContext = this.authService.userContext;
-    isMobile = this.viewportService.isMobile;
-
-    title = 'web';
-    isAuthenticated = false;
+    readonly loading = this.loadingService.loading;
+    readonly userContext = this.userContextStore.userContext;
+    readonly isMobile = this.viewportService.isMobile;
+    readonly env = environment;
 
     ngOnInit(): void {
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {

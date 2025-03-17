@@ -9,24 +9,20 @@ import { UrlUtil } from '@/app/core/utils/url.util';
 import { Body, Controller, ForbiddenException, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-    ApiBadRequestResponse,
     ApiConflictResponse,
     ApiCookieAuth,
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiFoundResponse,
-    ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
 import { validateOrReject } from 'class-validator';
 import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthLoginRequestDto } from './dto/auth-login-request.dto';
 import { AuthLoginResultDto } from './dto/auth-login-result.dto';
 import { AuthRegisterRequestDto } from './dto/auth-register-request.dto';
-import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { UserContextDto } from './dto/user-context.dto';
 import { DiscordAuthGuard } from './guards/discord-auth.guard';
 import { FacebookAuthGuard } from './guards/facebook-auth.guard';
@@ -48,9 +44,6 @@ export class AuthController {
         private readonly configService: ConfigService,
         private readonly urlUtil: UrlUtil,
     ) {
-        this.authService = authService;
-        this.configService = configService;
-        this.urlUtil = urlUtil;
         this.accessTokenCookieConfig = cookieConfigFactory(this.configService, ConfigConstants.JWT_EXPIRATION);
         this.refreshTokenCookieConfig = cookieConfigFactory(this.configService, ConfigConstants.JWT_REFRESH_EXPIRATION);
     }
@@ -316,35 +309,5 @@ export class AuthController {
         response.cookie(ConfigConstants.ACCESS_TOKEN_COOKIE_NAME, accessToken, this.accessTokenCookieConfig);
 
         return userContext;
-    }
-
-    /**
-     * [Public]
-     * Handles the password reset request.
-     *
-     * @param {string} passwordResetRequestDto - Email to send the password reset request to.
-     */
-    @Public()
-    @Post('send-password-reset')
-    @ApiOkResponse({ description: 'Password reset request sent successfully.' })
-    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_EMAIL })
-    @HttpCode(HttpStatus.OK)
-    async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
-        return await this.authService.sendPasswordResetMessage(passwordResetRequestDto.email);
-    }
-
-    /**
-     *  Handles the account verification request.
-     *
-     * @param accountVerificationRequest - The email to send the account verification request to.
-     */
-    @Post('send-account-verification')
-    @ApiOkResponse({ description: 'Account verification request sent successfully.' })
-    @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
-    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    @HttpCode(HttpStatus.OK)
-    @Throttle({ default: { limit: 3, ttl: 60000 } })
-    async sendAccountVerification(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<void> {
-        return await this.authService.sendAccountVerificationMessage(userId);
     }
 }

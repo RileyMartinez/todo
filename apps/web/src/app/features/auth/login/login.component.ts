@@ -22,6 +22,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RouteConstants } from '../../../core/constants/route.constants';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { ForgotPasswordDialog } from './forgot-password.dialog';
 
 @Component({
@@ -50,6 +51,7 @@ import { ForgotPasswordDialog } from './forgot-password.dialog';
 })
 export class LoginComponent implements OnInit, OnDestroy {
     private readonly authService = inject(AuthService);
+    private readonly userService = inject(UserService);
     private readonly formBuilder = inject(FormBuilder);
     private readonly dialog = inject(MatDialog);
     private readonly router = inject(Router);
@@ -104,7 +106,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                     return;
                 }
 
-                this.authService.requestPasswordReset$.next({ email });
+                this.userService.sendPasswordResetRequest$.next({ email });
                 this.router.navigate([RouteConstants.AUTH, RouteConstants.LOGIN, RouteConstants.OTP], {
                     queryParams: { email },
                 });

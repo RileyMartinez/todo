@@ -9,7 +9,7 @@ import { MatInput } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { RouteConstants } from '../../../core/constants/route.constants';
-import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { matchValidator } from '../../../core/validators/match.validator';
 
 @Component({
@@ -37,7 +37,7 @@ import { matchValidator } from '../../../core/validators/match.validator';
 })
 export class ResetPasswordComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
-    private readonly authService = inject(AuthService);
+    private readonly userService = inject(UserService);
 
     readonly routes = RouteConstants;
 
@@ -65,7 +65,7 @@ export class ResetPasswordComponent implements OnInit {
             return;
         }
 
-        this.authService.resetPassword$.next({
+        this.userService.resetPassword$.next({
             password: this.confirmPasswordFormControl.value,
         });
     }
