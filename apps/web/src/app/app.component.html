@@ -10,8 +10,8 @@
         </div>
         }
         <span class="flex-grow"></span>
-        @if (userContext()?.displayName) {
-        <mat-chip>{{ userContext()?.displayName }}</mat-chip>
+        @if (userContext()) {
+        <mat-chip>{{ userContext()?.displayName ?? userContext()?.email }}</mat-chip>
         }
         @if (isMobile() && userContext()) {
         <button mat-icon-button (click)="sidenav.toggle()" class="mr-4">

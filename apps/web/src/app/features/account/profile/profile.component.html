@@ -39,7 +39,8 @@
           </div>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-raised-button type="submit" [disabled]="displayNameForm.invalid">
+          <button mat-raised-button type="submit"
+            [disabled]="displayNameForm.invalid || (displayNameControl.value === userContext()?.displayName)">
             Update Profile
           </button>
         </mat-card-actions>
