@@ -1,12 +1,12 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { RouteConstants } from '../constants/route.constants';
-import { AuthService } from '../services/auth.service';
+import { UserContextStore } from '../services/user-context.store';
 
 export const authGuard: CanActivateFn = (_: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-    const authService = inject(AuthService);
+    const userContextStore = inject(UserContextStore);
     const router = inject(Router);
-    const userContext = authService.userContext();
+    const userContext = userContextStore.userContext();
 
     if (userContext) {
         return true;

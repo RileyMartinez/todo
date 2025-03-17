@@ -10,9 +10,9 @@ import { UserContextDto } from '../../shared/openapi-client/model/user-context-d
 import { RouteConstants } from '../constants/route.constants';
 import { LoadingService } from './loading.service';
 import { SnackBarNotificationService } from './snack-bar.service';
+import { UserContextStore } from './user-context.store';
 
 export interface AuthServiceState {
-    userContext: UserContextDto | null;
     loaded: boolean;
     error: string | null;
 }
@@ -26,16 +26,15 @@ export class AuthService {
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
+    private readonly userContextStore = inject(UserContextStore);
 
     // state
     private readonly state = signal<AuthServiceState>({
-        userContext: null,
         loaded: false,
         error: null,
     });
 
     // selectors
-    readonly userContext = computed(() => this.state().userContext);
     readonly loaded = computed(() => this.state().loaded);
     readonly error = computed(() => this.state().error);
 
@@ -200,13 +199,14 @@ export class AuthService {
     private setUserContext(userContext: UserContextDto): void {
         this.state.update((state) => ({
             ...state,
-            userContext,
             loaded: true,
         }));
+        this.userContextStore.setUserContext(userContext);
     }
 
     private clearUserContext(): void {
-        this.state.update((state) => ({ ...state, userContext: null, loaded: true }));
+        this.state.update((state) => ({ ...state, loaded: true }));
+        this.userContextStore.clearUserContext();
     }
 
     private handleError(error: any): Observable<never> {

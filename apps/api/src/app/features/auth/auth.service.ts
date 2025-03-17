@@ -265,6 +265,7 @@ export class AuthService {
             await this.jwtService.signAsync(
                 {
                     sub: user.id,
+                    version: user.tokenVersion + 1,
                 },
                 {
                     secret: refreshTokenSecret,

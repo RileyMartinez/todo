@@ -1,5 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    FormBuilder,
+    FormControl,
+    FormGroup,
+    ReactiveFormsModule,
+    ValidationErrors,
+    ValidatorFn,
+    Validators,
+} from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDivider } from '@angular/material/divider';
@@ -7,9 +16,11 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { AuthService } from '../../../core/services/auth.service';
+import { MatTooltip } from '@angular/material/tooltip';
+import { UserContextStore } from '../../../core/services/user-context.store';
 import { UserService } from '../../../core/services/user.service';
 import { matchValidator } from '../../../core/validators/match.validator';
+import { notMatchValidator } from '../../../core/validators/not-match.validator';
 
 @Component({
     selector: 'app-profile',
@@ -26,15 +37,15 @@ import { matchValidator } from '../../../core/validators/match.validator';
         MatError,
         MatButton,
         MatDivider,
+        MatTooltip,
     ],
 })
 export class ProfileComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
-    private readonly authService = inject(AuthService);
     private readonly userService = inject(UserService);
+    private readonly userContextStore = inject(UserContextStore);
 
-    readonly userContext = this.authService.userContext;
-    readonly user = this.userService.user;
+    readonly userContext = this.userContextStore.userContext;
 
     passwordForm!: FormGroup;
     currentPasswordControl!: FormControl;
@@ -45,7 +56,7 @@ export class ProfileComponent implements OnInit {
     displayNameControl!: FormControl;
 
     ngOnInit(): void {
-        this.displayNameControl = new FormControl('');
+        this.displayNameControl = new FormControl('', [this.displayNameValidator()]);
 
         this.displayNameForm = this.formBuilder.group({
             displayName: this.displayNameControl,
@@ -61,7 +72,12 @@ export class ProfileComponent implements OnInit {
                 newPassword: this.newPasswordControl,
                 confirmPassword: this.confirmPasswordControl,
             },
-            { validators: matchValidator('newPassword', 'confirmPassword') },
+            {
+                validators: [
+                    matchValidator('newPassword', 'confirmPassword'),
+                    notMatchValidator('currentPassword', 'newPassword'),
+                ],
+            },
         );
 
         this.userService.load$.next();
@@ -76,16 +92,12 @@ export class ProfileComponent implements OnInit {
             displayName: this.displayNameControl.value?.trim() || null,
         });
 
-        this.resetFormState(this.displayNameForm);
+        this.displayNameForm.reset();
+        this.displayNameControl.setErrors(null);
     }
 
     updatePassword(): void {
         if (this.passwordForm.invalid) {
-            return;
-        }
-
-        if (this.currentPasswordControl.value === this.newPasswordControl.value) {
-            this.newPasswordControl.setErrors({ passwordMatch: true });
             return;
         }
 
@@ -95,14 +107,22 @@ export class ProfileComponent implements OnInit {
             confirmPassword: this.confirmPasswordControl.value,
         });
 
-        this.resetFormState(this.passwordForm);
+        this.passwordForm.reset();
+        Object.keys(this.passwordForm.controls).forEach((key) => {
+            this.passwordForm.controls[key].setErrors(null);
+        });
     }
 
-    resetFormState(form: FormGroup): void {
-        form.reset();
-        form.markAsPristine();
-        form.markAsUntouched();
-        form.setErrors(null);
-        form.updateValueAndValidity();
+    private displayNameValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const currentDisplayName = this.userContext()?.displayName;
+            const newDisplayName = control.value?.trim();
+
+            if (newDisplayName === currentDisplayName || (!newDisplayName && !currentDisplayName)) {
+                return { same: true };
+            }
+
+            return null;
+        };
     }
 }

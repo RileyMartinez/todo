@@ -30,19 +30,6 @@ import { UserService } from './user.service';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get()
-    @ApiOkResponse({ type: SafeUserDto })
-    @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async getUser(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<SafeUserDto> {
-        const user = await this.userService.findUserById(userId);
-
-        if (!user) {
-            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
-        }
-
-        return new SafeUserDto(user);
-    }
-
     /**
      * Create a new user.
      */
@@ -75,7 +62,6 @@ export class UserController {
     @ApiOkResponse({ description: 'Password updated successfully.' })
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_USER_ID })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    @ApiUnauthorizedResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
     @HttpCode(HttpStatus.OK)
     async updatePassword(
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,

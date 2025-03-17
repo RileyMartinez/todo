@@ -5,7 +5,6 @@ import { catchError, EMPTY, merge, mergeMap, Observable, Subject, switchMap, tap
 import {
     PasswordResetRequestDto,
     ResetPasswordDto,
-    SafeUserDto,
     UpdateDisplayNameDto,
     UpdatePasswordDto,
     UserClient,
@@ -13,10 +12,10 @@ import {
 import { NotificationConstants } from '../constants/notification.constants';
 import { RouteConstants } from '../constants/route.constants';
 import { SnackBarNotificationService } from './snack-bar.service';
+import { UserContextStore } from './user-context.store';
 
 export interface UserServiceState {
     loaded: boolean;
-    user: SafeUserDto | undefined;
     error: string | null;
 }
 
@@ -27,16 +26,15 @@ export class UserService {
     private readonly userClient = inject(UserClient);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly router = inject(Router);
+    private readonly userContextStore = inject(UserContextStore);
 
     // state
     private readonly state = signal<UserServiceState>({
-        user: undefined,
         loaded: false,
         error: null,
     });
 
     // selectors
-    readonly user = computed(() => this.state().user);
     readonly loaded = computed(() => this.state().loaded);
     readonly error = computed(() => this.state().error);
 
@@ -50,6 +48,9 @@ export class UserService {
     private readonly displayNameUpdated$ = this.updateDisplayName$.pipe(
         mergeMap((updateDisplayNameDto) =>
             this.userClient.userControllerUpdateDisplayName(updateDisplayNameDto).pipe(
+                tap(() => {
+                    this.snackBarNotificationService.emit({ message: NotificationConstants.PROFILE_UPDATE_SUCCESS });
+                }),
                 catchError((error) => {
                     this.snackBarNotificationService.emit({
                         message: NotificationConstants.PROFILE_UPDATE_ERROR,
@@ -66,7 +67,7 @@ export class UserService {
             .pipe(
                 tap(() => this.state.update((state) => ({ ...state, loaded: false }))),
                 switchMap(() =>
-                    this.userClient.userControllerGetUser().pipe(
+                    this.userClient.userControllerGetUserContext().pipe(
                         catchError((error) => {
                             return this.handleError(error);
                         }),
@@ -74,8 +75,9 @@ export class UserService {
                 ),
                 takeUntilDestroyed(),
             )
-            .subscribe((user) => {
-                this.state.update((state) => ({ ...state, user, loaded: true }));
+            .subscribe((userContext) => {
+                this.state.update((state) => ({ ...state, loaded: true }));
+                this.userContextStore.setUserContext(userContext);
             });
 
         this.sendPasswordResetRequest$

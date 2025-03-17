@@ -1,25 +1,28 @@
-<div class="container mx-auto p-4">
+<div class="container mx-auto p-14">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <mat-card class="h-full">
       <mat-card-header>
         <mat-card-title>
-          Profile Information
+          Profile
         </mat-card-title>
       </mat-card-header>
       <form [formGroup]="displayNameForm" (ngSubmit)="updateDisplayName()" class="flex flex-col gap-4 p-4">
         <mat-card-content>
           <div class="flex flex-col gap-4">
             <div>
-              @if (user()?.avatar) {
-              <img [src]="user()?.avatar" referrerpolicy="no-referrer" alt="Profile picture"
+              @if (userContext()?.avatar) {
+              <img [src]="userContext()?.avatar" referrerpolicy="no-referrer" alt="Profile picture"
                 class="rounded-full h-32 w-32">
               } @else {
               <mat-icon class="text-6xl">account_circle</mat-icon>
               }
             </div>
-            <h2 class="text-xl font-medium">{{ user()?.displayName || user()?.email }}</h2>
-            @if (user()?.displayName) {
-            <p>{{ user()?.email }}</p>
+            <h2 class="text-xl font-medium" matTooltip="Display Name" matTooltipPosition="left">{{
+              userContext()?.displayName
+              ||
+              userContext()?.email }}</h2>
+            @if (userContext()?.displayName) {
+            <p class="inline-block" matTooltip="Email" matTooltipPosition="left">{{ userContext()?.email }}</p>
             }
 
             <mat-divider></mat-divider>
@@ -28,13 +31,16 @@
               <mat-form-field class="w-3/4">
                 <mat-label>Display Name</mat-label>
                 <input matInput [formControl]="displayNameControl" placeholder="Enter display name">
+                @if (displayNameControl.hasError('same')) {
+                <mat-error>Display Name cannot be the same as your current display name</mat-error>
+                }
               </mat-form-field>
             </div>
           </div>
         </mat-card-content>
         <mat-card-actions>
           <button mat-raised-button type="submit" [disabled]="displayNameForm.invalid">
-            Update Display Name
+            Update Profile
           </button>
         </mat-card-actions>
       </form>
@@ -65,13 +71,13 @@
             <mat-form-field class="w-3/4">
               <mat-label>New Password</mat-label>
               <input matInput type="password" [formControl]="newPasswordControl">
-              @if (confirmPasswordControl.hasError('minlength')) {
+              @if (newPasswordControl.hasError('minlength')) {
               <mat-error>New Password must be at least 8 characters long</mat-error>
               }
-              @if (confirmPasswordControl.hasError('required')) {
+              @if (newPasswordControl.hasError('required')) {
               <mat-error>New Password is required</mat-error>
               }
-              @if (confirmPasswordControl.hasError('passwordMatch')) {
+              @if (newPasswordControl.hasError('match')) {
               <mat-error>New password cannot match your current password</mat-error>
               }
             </mat-form-field>

@@ -139,7 +139,8 @@ export class UserService {
      * @param userId - The ID of the user.
      * @param updatePasswordDto - The data for updating the password.
      * @returns A promise that resolves to an UpdateResult object.
-     * @throws {BadRequestException} If the user ID is invalid or the new/confirmed passwords don't match.
+     * @throws {BadRequestException} If the user ID is invalid, the current password is incorrect,
+     *      or the new/confirmed passwords don't match.
      * @throws {NotFoundException} If no user is updated.
      * @throws {UnauthorizedException} If the current password is invalid.
      */
@@ -163,7 +164,7 @@ export class UserService {
 
         if (!match) {
             this.logger.error({ userId }, ExceptionConstants.INVALID_CREDENTIALS);
-            throw new UnauthorizedException(ExceptionConstants.INVALID_CREDENTIALS);
+            throw new BadRequestException(ExceptionConstants.INVALID_CREDENTIALS);
         }
 
         const hash = await argon2.hash(newPassword, argon2HashConfig);
