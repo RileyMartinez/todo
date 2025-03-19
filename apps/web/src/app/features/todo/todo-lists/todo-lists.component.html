@@ -1,36 +1,44 @@
-<div class="flex justify-center p-14">
-    <mat-card class="w-full max-w-[360px] sm:max-w-[400px] md:max-w-[600px]">
-        <mat-card-header class="mb-4">
-            <mat-card-title>Todo Lists</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-selection-list #todoListSelections [multiple]="false">
-                @for (list of todoLists(); track list.id) {
-                <mat-list-option [value]="list">{{ list.title }}</mat-list-option>
-                }
-            </mat-selection-list>
-            @if (todoLists().length === 0) {
-            <p>No lists found. Create a new list to get started.</p>
-            }
-        </mat-card-content>
+<div class="container mx-auto p-14">
+    <div class="grid grid-cols-1 gap-8">
         <div class="flex justify-between items-center">
-            <mat-card-actions [align]="'start'">
-                <button mat-icon-button aria-label="Create new list" (click)="openCreateDialog()">
-                    <mat-icon>add</mat-icon>
+            <div class="flex items-center gap-4">
+                <h1 class="text-2xl">Lists</h1>
+                <button mat-fab (click)="openCreateDialog()" aria-label="Create new list">
+                    <i class="material-icons text-2xl">add</i>
                 </button>
-            </mat-card-actions>
-            @if (todoListSelections.selectedOptions.selected.length) {
-            <mat-card-actions [align]="'end'">
-                <button mat-icon-button aria-label="Edit selected list"
-                    (click)="openEditPage(todoListSelections.selectedOptions.selected[0].value)">
-                    <mat-icon>edit_note</mat-icon>
-                </button>
-                <button mat-icon-button aria-label="Delete selected list"
-                    (click)="openDeleteDialog(todoListSelections.selectedOptions.selected[0].value)">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </mat-card-actions>
+            </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            @for (list of todoLists(); track list.id) {
+            <mat-card class="cursor-pointer hover:shadow-lg transition-shadow" (click)="openEditPage(list)">
+                <mat-card-content class="p-4">
+                    <div class="flex justify-between items-center">
+                        <i class="material-icons text-4xl text-blue-500">list</i>
+                        <h3 class="text-lg">{{ list.title }}</h3>
+                        <div class="flex space-x-1">
+                            <button mat-icon-button (click)="openDeleteDialog(list, $event)"
+                                aria-label="Delete list">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+            }
+
+            @if (todoLists().length === 0) {
+            <div class="col-span-full flex flex-col items-center py-12 text-cente rounded-lg"
+                style="background-color: #dfe2ec;">
+                <div class="flex items-center justify-center h-24 w-24 mb-4">
+                    <i class="material-icons text-blue-500 text-[56px] w-[56px] h-[56px]">note_add</i>
+                </div>
+                <h3 class="text-xl mb-2">No Lists Found</h3>
+                <p class="text-gray-600">Create a new list to get started.</p>
+            </div>
             }
         </div>
-    </mat-card>
+    </div>
 </div>

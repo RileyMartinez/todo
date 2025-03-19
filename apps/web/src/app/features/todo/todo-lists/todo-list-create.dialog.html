@@ -5,6 +5,24 @@
         <mat-label>Title</mat-label>
         <input matInput [(ngModel)]="title" />
     </mat-form-field>
+
+    <div>
+        <label class="text-gray-600 text-sm mb-2 block">Choose an icon:</label>
+        <div class="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded">
+            @for (icon of availableIcons; track icon) {
+            <button mat-icon-button (click)="selectedIcon = icon">
+                <mat-icon>{{icon}}</mat-icon>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if (selectedIcon) {
+    <div class="flex items-center gap-2 p-3 bg-gray-50 rounded">
+        <mat-icon class="text-primary-600">{{selectedIcon}}</mat-icon>
+        <span>Selected icon: <strong>{{selectedIcon}}</strong></span>
+    </div>
+    }
 </mat-dialog-content>
 <mat-dialog-actions>
     <button mat-button [mat-dialog-close]="undefined">Cancel</button>

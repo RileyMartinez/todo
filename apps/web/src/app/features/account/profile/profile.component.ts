@@ -10,10 +10,9 @@ import {
     Validators,
 } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatDivider } from '@angular/material/divider';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -27,9 +26,12 @@ import { notMatchValidator } from '../../../core/validators/not-match.validator'
     templateUrl: './profile.component.html',
     standalone: true,
     imports: [
-        MatGridListModule,
-        MatCardModule,
         ReactiveFormsModule,
+        MatCard,
+        MatCardHeader,
+        MatCardTitle,
+        MatCardContent,
+        MatCardActions,
         MatFormField,
         MatIcon,
         MatLabel,

@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatFabButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
-import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteConstants } from '../../../core/constants/route.constants';
@@ -16,18 +16,7 @@ import { TodoListsService } from './todo-lists.service';
 @Component({
     selector: 'app-todo-lists',
     standalone: true,
-    imports: [
-        CommonModule,
-        MatCard,
-        MatCardHeader,
-        MatCardTitle,
-        MatCardContent,
-        MatCardActions,
-        MatIconButton,
-        MatIcon,
-        MatSelectionList,
-        MatListOption,
-    ],
+    imports: [CommonModule, MatCard, MatCardContent, MatIconButton, MatIcon, MatFabButton, MatDivider],
     templateUrl: './todo-lists.component.html',
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
@@ -70,7 +59,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
         this.router.navigate([RouteConstants.TODO, RouteConstants.LIST, todoList.id]);
     }
 
-    openDeleteDialog(todoList: TodoList): void {
+    openDeleteDialog(todoList: TodoList, $event: Event): void {
+        $event.stopPropagation();
+
         this.dialog
             .open(TodoListDeleteDialog)
             .afterClosed()
