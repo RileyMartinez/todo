@@ -28,13 +28,13 @@
             }
 
             @if (todoLists().length === 0) {
-            <div appearance="outlined" class="col-span-full flex flex-col items-center py-12 text-center">
+            <mat-card appearance="outlined" class="col-span-full flex flex-col items-center py-12 text-center">
                 <div class="flex items-center justify-center h-24 w-24 mb-4">
                     <i class="material-icons text-blue-500 text-[56px] w-[56px] h-[56px]">note_add</i>
                 </div>
                 <h3 class="text-xl mb-2">No Lists Found</h3>
                 <p class="text-gray-600">Create a new list to get started.</p>
-            </div>
+            </mat-card>
             }
         </div>
     </div>
