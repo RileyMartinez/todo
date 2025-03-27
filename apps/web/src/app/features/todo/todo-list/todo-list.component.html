@@ -1,42 +1,66 @@
 <div class="container mx-auto p-14">
-    <div class="grid grid-cols-1 gap-6 max-w-3xl mx-auto">
+    <div class="grid grid-cols-1 gap-6 max-w-4xl mx-auto">
         @if (todoList(); as list) {
-        <mat-card class="h-full w-full">
-            <mat-card-header>
-                <mat-card-title>{{ list.title }}</mat-card-title>
-            </mat-card-header>
-            <mat-card-content class="p-4">
-                <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
-                    <div class="flex items-center space-x-2 pt-4">
-                        <mat-form-field class="flex-grow">
-                            <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
-                        </mat-form-field>
-                        <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
-                            <mat-icon>add</mat-icon>
-                        </button>
+        <span class="flex items-center gap-2">
+            <i class="material-icons text-4xl text-blue-500">{{ list.icon }}</i>
+            <h1 class="text-2xl">{{ list.title }}</h1>
+        </span>
+        <mat-card appearance="outlined" class="h-full w-full">
+            <div class="p-4">
+                <mat-card-content>
+                    <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
+                        <div class="flex items-center space-x-2 pt-4">
+                            <mat-form-field class="flex-grow">
+                                <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
+                            </mat-form-field>
+                            <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
+                    </form>
+                    @if (list.todos.length === 0) {
+                    <div class="flex flex-col items-center py-8 text-center">
+                        <i class="material-icons text-6xl text-green-500">task_alt</i>
+                        <h3 class="text-xl font-medium mb-2">All caught up!</h3>
+                        <p class="text-gray-600">Congratulations! You have no tasks to complete.</p>
                     </div>
-                </form>
-                @if (list.todos.length === 0) {
-                <div class="flex flex-col items-center py-8 text-center">
-                    <i class="material-icons text-6xl text-green-500">task_alt</i>
-                    <h3 class="text-xl font-medium mb-2">All caught up!</h3>
-                    <p class="text-gray-600">Congratulations! You have no tasks to complete.</p>
-                </div>
-                }
-                <mat-selection-list [multiple]="true">
-                    @for (item of list.todos; track item.id) {
-                    <mat-list-option [togglePosition]="'before'" (click)="removeTodoItem(item.id)"
-                        (keydown.enter)="removeTodoItem(item.id)">
-                        {{ item.title }}
-                    </mat-list-option>
+                    } @else {
+                    <mat-accordion multi="true">
+                        <mat-expansion-panel expanded="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>Todo</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-selection-list [multiple]="true">
+                                @for (item of list.todos; track item.id) {
+                                <mat-list-option [togglePosition]="'before'" (click)="removeTodoItem(item.id)"
+                                    (keydown.enter)="removeTodoItem(item.id)">
+                                    {{ item.title }}
+                                </mat-list-option>
+                                }
+                            </mat-selection-list>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>Completed</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-selection-list [multiple]="true">
+                                <!--@for (item of list.completed; track item.id) {
+                                <mat-list-option [togglePosition]="'before'" (click)="removeTodoItem(item.id)"
+                                    (keydown.enter)="removeTodoItem(item.id)">
+                                    {{ item.title }}
+                                </mat-list-option>
+                            }-->
+                            </mat-selection-list>
+                        </mat-expansion-panel>
+                    </mat-accordion>
                     }
-                </mat-selection-list>
-            </mat-card-content>
-            <mat-card-actions class="px-4 pb-4">
-                <button mat-icon-button (click)="goBack()">
-                    <mat-icon>arrow_back</mat-icon>
-                </button>
-            </mat-card-actions>
+                </mat-card-content>
+                <mat-card-actions class="px-4 pb-4">
+                    <button mat-icon-button (click)="goBack()">
+                        <mat-icon>arrow_back</mat-icon>
+                    </button>
+                </mat-card-actions>
+            </div>
         </mat-card>
         }
     </div>

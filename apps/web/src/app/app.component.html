@@ -43,10 +43,10 @@
         }
     </mat-toolbar>
 
+    <mat-divider></mat-divider>
+
     @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    } @else {
-    <mat-progress-bar mode="determinate" [value]="0"></mat-progress-bar>
     }
     <mat-sidenav-container class="flex-grow">
         <mat-sidenav class="min-w-48" #sidenav mode="push" position="end">

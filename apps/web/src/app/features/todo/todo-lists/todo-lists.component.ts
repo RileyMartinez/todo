@@ -3,11 +3,11 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
-import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteConstants } from '../../../core/constants/route.constants';
+import { AddTodoList } from '../../../core/models/todo-list.model';
 import { TodoList } from '../../../shared/openapi-client';
 import { TodoListCreateDialog } from './todo-list-create.dialog';
 import { TodoListDeleteDialog } from './todo-list-delete.dialog';
@@ -16,7 +16,7 @@ import { TodoListsService } from './todo-lists.service';
 @Component({
     selector: 'app-todo-lists',
     standalone: true,
-    imports: [CommonModule, MatCard, MatCardContent, MatIconButton, MatIcon, MatFabButton, MatDivider],
+    imports: [CommonModule, MatCard, MatCardContent, MatIconButton, MatIcon, MatFabButton],
     templateUrl: './todo-lists.component.html',
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
@@ -46,12 +46,12 @@ export class TodoListsComponent implements OnInit, OnDestroy {
             .open(TodoListCreateDialog)
             .afterClosed()
             .pipe(takeUntil(this.destroy$))
-            .subscribe((title) => {
-                if (!title) {
+            .subscribe((addTodoList: AddTodoList) => {
+                if (!addTodoList) {
                     return;
                 }
 
-                this.todoListsService.add$.next({ title });
+                this.todoListsService.add$.next(addTodoList);
             });
     }
 

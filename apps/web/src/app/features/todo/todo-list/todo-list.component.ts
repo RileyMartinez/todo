@@ -2,7 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatCard, MatCardActions, MatCardContent } from '@angular/material/card';
+import {
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+} from '@angular/material/expansion';
 import { MatFormField } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -18,8 +24,6 @@ import { TodoListService } from './todo-list.service';
         CommonModule,
         ReactiveFormsModule,
         MatCard,
-        MatCardHeader,
-        MatCardTitle,
         MatCardContent,
         MatCardActions,
         MatIconButton,
@@ -28,6 +32,10 @@ import { TodoListService } from './todo-list.service';
         MatListOption,
         MatInput,
         MatFormField,
+        MatAccordion,
+        MatExpansionPanel,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
     ],
     templateUrl: './todo-list.component.html',
 })

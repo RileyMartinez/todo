@@ -18,6 +18,9 @@ export class TodoList {
     @Column()
     title!: string;
 
+    @Column()
+    icon!: string;
+
     /**
      * User id
      * @example 1

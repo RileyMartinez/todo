@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -11,7 +12,8 @@ import { MatInput } from '@angular/material/input';
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        MatIconButton,
+        MatButtonToggleGroup,
+        MatButtonToggle,
         FormsModule,
         MatInput,
         MatIcon,

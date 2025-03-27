@@ -10,9 +10,11 @@
         <label class="text-gray-600 text-sm mb-2 block">Choose an icon:</label>
         <div class="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded">
             @for (icon of availableIcons; track icon) {
-            <button mat-icon-button (click)="selectedIcon = icon">
-                <mat-icon>{{icon}}</mat-icon>
-            </button>
+            <mat-button-toggle-group [(ngModel)]="selectedIcon" hideSingleSelectionIndicator="true">
+                <mat-button-toggle [value]="icon">
+                    <mat-icon>{{icon}}</mat-icon>
+                </mat-button-toggle>
+            </mat-button-toggle-group>
             }
         </div>
     </div>
@@ -26,5 +28,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
     <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-    <button mat-button [mat-dialog-close]="title" cdkFocusInitial>Create</button>
+    <button mat-button [mat-dialog-close]="{ title, icon: selectedIcon }" cdkFocusInitial>Create</button>
 </mat-dialog-actions>
