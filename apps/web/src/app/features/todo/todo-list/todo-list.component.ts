@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardActions, MatCardContent } from '@angular/material/card';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import {
     MatAccordion,
     MatExpansionPanel,
@@ -13,8 +13,8 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
-import { ActivatedRoute, Router } from '@angular/router';
-import { RouteConstants } from '../../../core/constants/route.constants';
+import { ActivatedRoute } from '@angular/router';
+import { Todo } from '../../../shared/openapi-client';
 import { TodoListService } from './todo-list.service';
 
 @Component({
@@ -25,7 +25,6 @@ import { TodoListService } from './todo-list.service';
         ReactiveFormsModule,
         MatCard,
         MatCardContent,
-        MatCardActions,
         MatIconButton,
         MatIcon,
         MatSelectionList,
@@ -41,14 +40,19 @@ import { TodoListService } from './todo-list.service';
 })
 export class TodoListComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
-    private readonly router = inject(Router);
     private readonly todoListService = inject(TodoListService);
     private readonly formBuilder = inject(FormBuilder);
 
+    readonly todoList = this.todoListService.todoList;
+    readonly incompleteTodos = computed(() => {
+        return this.todoList()?.todos?.filter((todo) => !todo.completed) || [];
+    });
+    readonly completedTodos = computed(() => {
+        return this.todoList()?.todos?.filter((todo) => todo.completed) || [];
+    });
+
     todoForm!: FormGroup;
     todoFormControl!: FormControl;
-
-    todoList = this.todoListService.todoList;
 
     ngOnInit(): void {
         this.todoFormControl = new FormControl('', Validators.required);
@@ -60,16 +64,18 @@ export class TodoListComponent implements OnInit {
         this.todoListService.load$.next({ id: todoListId });
     }
 
-    addTodoItem(id: string, title: string): void {
-        this.todoListService.add$.next({ todoListId: id, title, order: 1, completed: false });
+    addTodoItem(todoListId: string, title: string): void {
+        this.todoListService.add$.next({ todoListId, title, order: 1, completed: false });
         this.todoFormControl.reset();
+    }
+
+    updateTodoItemCompletion(item: Todo): void {
+        const { todoList, ...todo } = item;
+        todo.completed = !todo.completed;
+        this.todoListService.update$.next(todo);
     }
 
     removeTodoItem(id: string): void {
         this.todoListService.remove$.next({ id });
-    }
-
-    goBack(): void {
-        this.router.navigate([RouteConstants.TODO, RouteConstants.LISTS]);
     }
 }

@@ -8,7 +8,7 @@ export class Todo {
      * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
     @PrimaryGeneratedColumn('uuid')
-    id!: string;
+    id?: string;
 
     /**
      * Todo item title
@@ -25,7 +25,7 @@ export class Todo {
         type: 'text',
         nullable: true,
     })
-    description: string | null = null;
+    description?: string | null;
 
     /**
      * Todo item completion status
@@ -42,7 +42,7 @@ export class Todo {
         type: 'timestamp',
         nullable: true,
     })
-    dueDate: Date | null = null;
+    dueDate?: Date | null;
 
     /**
      * Todo item order

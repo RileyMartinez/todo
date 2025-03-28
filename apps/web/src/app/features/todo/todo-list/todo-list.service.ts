@@ -1,9 +1,10 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, concatMap, delay, EMPTY, mergeMap, Observable, Subject, switchMap } from 'rxjs';
+import { catchError, concatMap, delay, EMPTY, Observable, Subject, switchMap } from 'rxjs';
 import { GetTodoList } from '../../../core/models/todo-list.model';
 import { AddTodo, RemoveTodo } from '../../../core/models/todo.model';
 import { LoadingService } from '../../../core/services/loading.service';
+import { TodoDto } from '../../../shared/openapi-client';
 import { TodoListClient } from '../../../shared/openapi-client/api/todo-list.client';
 import { TodoList } from '../../../shared/openapi-client/model/todo-list';
 
@@ -36,6 +37,7 @@ export class TodoListService {
     public readonly load$ = new Subject<GetTodoList>();
     public readonly add$ = new Subject<AddTodo>();
     public readonly remove$ = new Subject<RemoveTodo>();
+    public readonly update$ = new Subject<TodoDto>();
 
     private readonly todoAdded$ = this.add$.pipe(
         concatMap((todo) =>
@@ -46,9 +48,17 @@ export class TodoListService {
     );
 
     private readonly todoRemoved$ = this.remove$.pipe(
-        mergeMap((todo) =>
+        concatMap((todo) =>
             this.todoListClient
-                .todoListControllerRemoveTodoListItem(todo.id)
+                .todoListControllerRemoveTodoListItem(todo.id || '')
+                .pipe(catchError((error) => this.handleError(error))),
+        ),
+    );
+
+    private readonly todoUpdated$ = this.update$.pipe(
+        switchMap((todo) =>
+            this.todoListClient
+                .todoListControllerSaveTodoListItem(todo)
                 .pipe(catchError((error) => this.handleError(error))),
         ),
     );
@@ -87,6 +97,19 @@ export class TodoListService {
                         delay(250),
                         catchError((error) => this.handleError(error)),
                     ),
+                ),
+                takeUntilDestroyed(),
+            )
+            .subscribe((todoList) => {
+                this.state.update((state) => ({ ...state, todoList }));
+            });
+
+        this.todoUpdated$
+            .pipe(
+                switchMap(() =>
+                    this.todoListClient
+                        .todoListControllerFindTodoList(this.todoList()?.id || '')
+                        .pipe(catchError((error) => this.handleError(error))),
                 ),
                 takeUntilDestroyed(),
             )
