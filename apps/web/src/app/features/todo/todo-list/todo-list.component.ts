@@ -66,7 +66,8 @@ export class TodoListComponent implements OnInit {
 
     addTodoItem(todoListId: string, title: string): void {
         this.todoListService.add$.next({ todoListId, title, order: 1, completed: false });
-        this.todoFormControl.reset();
+        this.todoForm.reset();
+        this.todoFormControl.setErrors(null);
     }
 
     updateTodoItemCompletion(item: Todo): void {

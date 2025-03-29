@@ -9,13 +9,15 @@
             <div class="p-4">
                 <mat-card-content>
                     <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
-                        <div class="flex items-center space-x-2 pt-4">
+                        <div class="flex items-center">
                             <mat-form-field class="flex-grow">
-                                <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
+                                <div class="flex items-center justify-between">
+                                    <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
+                                        <mat-icon>add</mat-icon>
+                                    </button>
+                                    <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
+                                </div>
                             </mat-form-field>
-                            <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
-                                <mat-icon>add</mat-icon>
-                            </button>
                         </div>
                     </form>
                     <mat-accordion multi="true">
@@ -54,7 +56,7 @@
                                     (click)="updateTodoItemCompletion(item)"
                                     (keydown.enter)="updateTodoItemCompletion(item)">
 
-                                    <div class="flex justify-between items-center">{{ item.title }}
+                                    <div class="flex items-center justify-between">{{ item.title }}
                                         <button mat-icon-button
                                             (click)="$event.stopPropagation(); removeTodoItem(item.id || '')">
                                             <mat-icon>delete</mat-icon>
