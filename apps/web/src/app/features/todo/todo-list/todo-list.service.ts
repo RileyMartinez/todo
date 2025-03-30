@@ -1,6 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, concatMap, delay, EMPTY, Observable, Subject, switchMap } from 'rxjs';
+import { catchError, concatMap, EMPTY, merge, Observable, Subject, switchMap } from 'rxjs';
 import { GetTodoList } from '../../../core/models/todo-list.model';
 import { AddTodo, RemoveTodo } from '../../../core/models/todo.model';
 import { LoadingService } from '../../../core/services/loading.service';
@@ -76,35 +76,7 @@ export class TodoListService {
             )
             .subscribe((todoList) => this.state.update((state) => ({ ...state, todoList, loaded: true })));
 
-        this.todoAdded$
-            .pipe(
-                switchMap(() =>
-                    this.todoListClient
-                        .todoListControllerFindTodoList(this.todoList()?.id || '')
-                        .pipe(catchError((error) => this.handleError(error))),
-                ),
-                takeUntilDestroyed(),
-            )
-            .subscribe((todoList) => {
-                this.state.update((state) => ({ ...state, todoList }));
-            });
-
-        this.todoRemoved$
-            .pipe(
-                switchMap(() =>
-                    this.todoListClient.todoListControllerFindTodoList(this.todoList()?.id || '').pipe(
-                        // Delay to allow the UI to animate todo item completion state
-                        delay(250),
-                        catchError((error) => this.handleError(error)),
-                    ),
-                ),
-                takeUntilDestroyed(),
-            )
-            .subscribe((todoList) => {
-                this.state.update((state) => ({ ...state, todoList }));
-            });
-
-        this.todoUpdated$
+        merge(this.todoAdded$, this.todoRemoved$, this.todoUpdated$)
             .pipe(
                 switchMap(() =>
                     this.todoListClient

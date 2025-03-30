@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { validateOrReject } from 'class-validator';
 import { DeleteResult, Repository } from 'typeorm';
 import { TodoListDto } from './dto/todo-list.dto';
+import { TodoSearchDto } from './dto/todo-search.dto';
 import { TodoDto } from './dto/todo.dto';
 import { TodoList } from './entities/todo-list.entity';
 import { Todo } from './entities/todo.entity';
@@ -64,6 +65,47 @@ export class TodoListService {
             where: { userId },
             relations: ['todos'],
         });
+    }
+
+    /**
+     * Retrieves todo lists for a given user based on a search term.
+     *
+     * @param userId - The ID of the user.
+     * @param term - The search term to filter todo lists.
+     * @param page - The page number for pagination.
+     * @param limit - The number of items per page.
+     * @returns A promise that resolves to an array of TodoList objects matching the search term.
+     * @throws {BadRequestException} If the userId is invalid.
+     */
+    async searchTodoLists(userId: string, todoSearchDto: TodoSearchDto): Promise<TodoList[]> {
+        validateOrReject(todoSearchDto);
+
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        const { term, page, limit } = todoSearchDto;
+        const skip = (page - 1) * limit;
+
+        const queryBuilder = this.todolistRepository
+            .createQueryBuilder('todoList')
+            .leftJoinAndSelect('todoList.todos', 'todo')
+            .where('todoList.userId = :userId', { userId })
+            .andWhere(
+                `(
+                todoList.title ILIKE :searchTerm
+                OR todo.title ILIKE :searchTerm 
+                OR todo.description ILIKE :searchTerm
+            )`,
+                {
+                    searchTerm: `%${term}%`,
+                },
+            )
+            .take(limit)
+            .skip(skip);
+
+        return await queryBuilder.getMany();
     }
 
     /**

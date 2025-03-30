@@ -9,7 +9,11 @@
             <mat-chip>DEV</mat-chip>
         </div>
         }
-        <span class="flex-grow"></span>
+        <div class="flex flex-grow justify-center">
+            @if (!isMobile()) {
+            <app-search></app-search>
+            }
+        </div>
         @if (userContext()) {
         <mat-chip>{{ userContext()?.displayName ?? userContext()?.email }}</mat-chip>
         }
@@ -49,7 +53,8 @@
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
     <mat-sidenav-container class="flex-grow">
-        <mat-sidenav class="min-w-48" #sidenav mode="push" position="end">
+        <mat-sidenav #sidenav mode="push" position="end">
+            <app-search></app-search>
             <mat-nav-list>
                 <a mat-list-item (click)="navigateTo([routes.TODO, routes.LISTS])">
                     <div class="flex items-center gap-2"><mat-icon>list</mat-icon> Lists </div>

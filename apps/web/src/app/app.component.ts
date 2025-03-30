@@ -19,6 +19,7 @@ import { LoadingService } from './core/services/loading.service';
 import { SnackBarNotificationService } from './core/services/snack-bar.service';
 import { UserContextStore } from './core/services/user-context.store';
 import { ViewPortService } from './core/services/viewport.service';
+import { SearchComponent } from './features/todo/search.component';
 
 @Component({
     selector: 'app-root',
@@ -40,6 +41,7 @@ import { ViewPortService } from './core/services/viewport.service';
         MatMenuTrigger,
         MatDivider,
         MatChip,
+        SearchComponent,
     ],
     templateUrl: './app.component.html',
 })
