@@ -6,7 +6,7 @@ import {
     MatAutocompleteTrigger,
     MatOption,
 } from '@angular/material/autocomplete';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { TodoList } from '../../shared/openapi-client';
 import { SearchService } from './search.service';
 
 @Component({
-    selector: 'app-search',
+    selector: 'app-list-search',
     standalone: true,
     imports: [
         ReactiveFormsModule,
@@ -27,6 +27,7 @@ import { SearchService } from './search.service';
         MatLabel,
         MatOption,
         MatIcon,
+        MatSuffix,
     ],
     templateUrl: './search.component.html',
 })
@@ -72,6 +73,8 @@ export class SearchComponent implements OnInit, OnDestroy {
             await this.router.navigateByUrl(urlTree);
 
             this.searchFormControl.reset(null, { emitEvent: false });
+            this.searchService.clearResults$.next();
+            this.searchService.onResultSelected$.next();
         }
     }
 }

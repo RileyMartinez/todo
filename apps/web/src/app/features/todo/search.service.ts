@@ -31,6 +31,8 @@ export class SearchService {
 
     // sources
     public readonly search$ = new Subject<string>();
+    public readonly clearResults$ = new Subject<void>();
+    public readonly onResultSelected$ = new Subject<void>();
 
     constructor() {
         this.search$
@@ -50,6 +52,13 @@ export class SearchService {
                     error: null,
                 }));
             });
+
+        this.clearResults$
+            .pipe(
+                tap(() => this.state.update((state) => ({ ...state, results: [] }))),
+                takeUntilDestroyed(),
+            )
+            .subscribe();
 
         effect(() => this.loadingService.setLoading(!this.loaded()));
     }

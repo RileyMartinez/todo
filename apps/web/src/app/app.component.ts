@@ -20,6 +20,7 @@ import { SnackBarNotificationService } from './core/services/snack-bar.service';
 import { UserContextStore } from './core/services/user-context.store';
 import { ViewPortService } from './core/services/viewport.service';
 import { SearchComponent } from './features/todo/search.component';
+import { SearchService } from './features/todo/search.service';
 
 @Component({
     selector: 'app-root',
@@ -53,6 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly snackBar = inject(MatSnackBar);
     private readonly viewportService = inject(ViewPortService);
+    private readonly searchService = inject(SearchService);
     private readonly destroy$ = new Subject<void>();
 
     @ViewChild('sidenav') sidenav!: MatSidenav;
@@ -69,6 +71,12 @@ export class AppComponent implements OnInit, OnDestroy {
                 duration: notification.duration,
                 verticalPosition: 'top',
             });
+        });
+
+        this.searchService.onResultSelected$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            if (this.sidenav && this.sidenav.opened) {
+                this.sidenav.close();
+            }
         });
     }
 

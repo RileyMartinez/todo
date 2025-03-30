@@ -9,9 +9,9 @@
             <mat-chip>DEV</mat-chip>
         </div>
         }
-        <div class="flex flex-grow justify-center">
+        <div class="flex flex-grow justify-end px-2">
             @if (!isMobile()) {
-            <app-search></app-search>
+            <app-list-search></app-list-search>
             }
         </div>
         @if (userContext()) {
@@ -53,8 +53,8 @@
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
     <mat-sidenav-container class="flex-grow">
-        <mat-sidenav #sidenav mode="push" position="end">
-            <app-search></app-search>
+        <mat-sidenav #sidenav mode="push" position="end" fixedInViewport="true" fixedBottomGap="57" fixedTopGap="57">
+            <app-list-search></app-list-search>
             <mat-nav-list>
                 <a mat-list-item (click)="navigateTo([routes.TODO, routes.LISTS])">
                     <div class="flex items-center gap-2"><mat-icon>list</mat-icon> Lists </div>
