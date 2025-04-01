@@ -63,6 +63,33 @@
         "close": true
       },
       "dependsOn": ["build-api"]
+    },
+    {
+      "label": "start-web",
+      "type": "shell",
+      "command": "cd ./apps/web && pnpm start:dev",
+      "windows": {
+        "command": "cd ./apps/web; pnpm start:dev;"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "angular",
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Watch mode enabled. Watching for file changes..."
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     }
   ]
 }

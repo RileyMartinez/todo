@@ -9,20 +9,15 @@
             <mat-chip>DEV</mat-chip>
         </div>
         }
-        <div class="flex flex-grow justify-end px-2">
-            @if (!isMobile()) {
-            <app-list-search></app-list-search>
-            }
-        </div>
-        @if (userContext()) {
-        <mat-chip>{{ userContext()?.displayName ?? userContext()?.email }}</mat-chip>
-        }
+        <div class="flex-grow"></div>
         @if (isMobile() && userContext()) {
-        <button mat-icon-button (click)="sidenav.toggle()" class="mr-4">
+        <button mat-icon-button (click)="sidenav.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
         }
-        @else if (!isMobile() && userContext()) {
+        @else if (userContext()) {
+        <app-list-search class="px-2"></app-list-search>
+        <mat-chip>{{ userContext()?.displayName ?? userContext()?.email }}</mat-chip>
         <button mat-icon-button [matMenuTriggerFor]="menu">
             @if (userContext()?.avatar) {
             <img [src]="userContext()?.avatar" referrerpolicy="no-referrer" class="rounded-full">

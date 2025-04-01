@@ -6,7 +6,23 @@
       "request": "launch",
       "type": "chrome",
       "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/apps/web/"
+      "webRoot": "${workspaceFolder}/apps/web/",
+      "preLaunchTask": "start-web"
+    },
+    {
+      "name": "api: launch",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start:local"],
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": [
+        "${workspaceFolder}/apps/api/dist/**/*.js",
+        "!**/node_modules/**"
+      ],
+      "sourceMaps": true
     },
     {
       "name": "api: attach",
@@ -19,6 +35,20 @@
       "localRoot": "${workspaceFolder}/apps/api/",
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "fullstack: local",
+      "configurations": ["api: launch", "web: launch"]
+    },
+    {
+      "name": "fullstack: docker",
+      "configurations": ["api: attach", "web: launch"]
+    },
+    {
+      "name": "fullstack: hybrid",
+      "configurations": ["api: attach", "web: launch"]
     }
   ]
 }
