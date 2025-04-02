@@ -10,7 +10,7 @@ import { UserContextDto } from '../../shared/openapi-client/model/user-context-d
 import { RouteConstants } from '../constants/route.constants';
 import { LoadingService } from './loading.service';
 import { SnackBarNotificationService } from './snack-bar.service';
-import { UserContextStore } from './user-context.store';
+import { UserContextService } from './user-context.service';
 
 export interface AuthServiceState {
     loaded: boolean;
@@ -26,7 +26,7 @@ export class AuthService {
     private readonly router = inject(Router);
     private readonly loadingService = inject(LoadingService);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
-    private readonly userContextStore = inject(UserContextStore);
+    private readonly userContextStore = inject(UserContextService);
 
     // state
     private readonly state = signal<AuthServiceState>({

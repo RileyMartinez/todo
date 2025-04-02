@@ -11,7 +11,7 @@
         }
         <div class="flex-grow"></div>
         @if (isMobile() && userContext()) {
-        <button mat-icon-button (click)="sidenav.toggle()">
+        <button mat-icon-button (click)="sidenavService.toggleMenu()">
             <mat-icon>menu</mat-icon>
         </button>
         }
@@ -48,9 +48,12 @@
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
     <mat-sidenav-container class="flex-grow">
-        <mat-sidenav #sidenav mode="push" position="end" fixedInViewport="true" fixedBottomGap="57" fixedTopGap="57">
-            <app-list-search></app-list-search>
+        <mat-sidenav #sidenav mode="push" position="end" [opened]="sidenavOpen()" (closed)="sidenavService.close()">
+            @if (sidenavContent().type === 'menu') {
             <mat-nav-list>
+                <div class="px-4 py-2">
+                    <app-list-search></app-list-search>
+                </div>
                 <a mat-list-item (click)="navigateTo([routes.TODO, routes.LISTS])">
                     <div class="flex items-center gap-2"><mat-icon>list</mat-icon> Lists </div>
                 </a>
@@ -61,6 +64,10 @@
                     <div class="flex items-center gap-2"><mat-icon>logout</mat-icon> Logout</div>
                 </a>
             </mat-nav-list>
+            }
+            @if (sidenavContent().type === 'details') {
+            <app-todo-details [todo]="sidenavContent().data"></app-todo-details>
+            }
         </mat-sidenav>
         <mat-sidenav-content>
             <main>

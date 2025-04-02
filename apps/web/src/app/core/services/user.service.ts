@@ -12,7 +12,7 @@ import {
 import { NotificationConstants } from '../constants/notification.constants';
 import { RouteConstants } from '../constants/route.constants';
 import { SnackBarNotificationService } from './snack-bar.service';
-import { UserContextStore } from './user-context.store';
+import { UserContextService } from './user-context.service';
 
 export interface UserServiceState {
     loaded: boolean;
@@ -26,7 +26,7 @@ export class UserService {
     private readonly userClient = inject(UserClient);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly router = inject(Router);
-    private readonly userContextStore = inject(UserContextStore);
+    private readonly userContextService = inject(UserContextService);
 
     // state
     private readonly state = signal<UserServiceState>({
@@ -77,7 +77,7 @@ export class UserService {
             )
             .subscribe((userContext) => {
                 this.state.update((state) => ({ ...state, loaded: true }));
-                this.userContextStore.setUserContext(userContext);
+                this.userContextService.setUserContext(userContext);
             });
 
         this.sendPasswordResetRequest$

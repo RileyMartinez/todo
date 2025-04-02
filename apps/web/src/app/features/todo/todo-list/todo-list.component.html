@@ -1,157 +1,91 @@
-<mat-sidenav-container>
-    <mat-sidenav-content>
-        <div class="container mx-auto p-14">
-            <div class="grid grid-cols-1 gap-6 max-w-4xl mx-auto">
-                @if (todoList(); as list) {
-                <span class="flex items-center gap-2">
-                    <i class="material-icons text-4xl text-blue-500">{{ list.icon }}</i>
-                    <h1 class="text-2xl">{{ list.title }}</h1>
-                </span>
+<div class="container mx-auto p-14">
+    <div class="grid grid-cols-1 gap-6 max-w-4xl mx-auto">
+        @if (todoList(); as list) {
+        <span class="flex items-center gap-2">
+            <i class="material-icons text-4xl text-blue-500">{{ list.icon }}</i>
+            <h1 class="text-2xl">{{ list.title }}</h1>
+        </span>
 
-                <mat-card appearance="outlined" class="max-h-full w-full">
-                    <div class="p-4">
-                        <mat-card-content>
-                            <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
-                                <div class="flex items-center">
-                                    <mat-form-field class="flex-grow">
-                                        <div class="flex items-center justify-between">
-                                            <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
-                                                <mat-icon>add</mat-icon>
-                                            </button>
-                                            <input matInput [formControl]="todoFormControl"
-                                                placeholder="Add a new todo item" />
-                                        </div>
-                                    </mat-form-field>
+        <mat-card appearance="outlined" class="max-h-full w-full">
+            <div class="p-4">
+                <mat-card-content>
+                    <form [formGroup]="todoForm" (ngSubmit)="addTodoItem(list.id, todoFormControl.value)">
+                        <div class="flex items-center">
+                            <mat-form-field class="flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <button mat-icon-button type="submit" [disabled]="todoForm.invalid">
+                                        <mat-icon>add</mat-icon>
+                                    </button>
+                                    <input matInput [formControl]="todoFormControl" placeholder="Add a new todo item" />
                                 </div>
-                            </form>
-                            <mat-accordion multi="true">
-                                <mat-expansion-panel expanded="true">
-                                    <mat-expansion-panel-header>
-                                        <mat-panel-title>Incomplete ({{ incompleteTodos().length
-                                            }})</mat-panel-title>
-                                    </mat-expansion-panel-header>
-                                    @if (incompleteTodos().length > 0) {
-                                    <mat-list>
-                                        @for (item of incompleteTodos(); track item.id) {
-                                        <mat-list-item matRipple (click)="showDetails(item)"
-                                            class="!cursor-pointer hover:bg-gray-200">
-                                            <div class="flex items-center w-full">
-                                                <mat-checkbox [checked]="item.completed"
-                                                    (change)="updateTodoItemCompletion(item)"
-                                                    (click)="$event.stopPropagation()">
-                                                </mat-checkbox>
-                                                <span class="flex-grow">{{ item.title }}</span>
-                                            </div>
-                                        </mat-list-item>
-                                        }
-                                    </mat-list>
-                                    } @else {
-                                    <div class="flex flex-col items-center py-8 text-center">
-                                        <i class="material-icons text-6xl text-green-500">task_alt</i>
-                                        <h3 class="text-xl font-medium mb-2">All caught up!</h3>
-                                        <p class="text-gray-600">Congratulations! You have no tasks to complete.</p>
+                            </mat-form-field>
+                        </div>
+                    </form>
+                    <mat-accordion multi="true">
+                        <mat-expansion-panel expanded="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>Incomplete ({{ incompleteTodos().length
+                                    }})</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            @if (incompleteTodos().length > 0) {
+                            <mat-list>
+                                @for (item of incompleteTodos(); track item.id) {
+                                <mat-list-item matRipple (click)="showDetails(item)"
+                                    class="!cursor-pointer hover:bg-gray-200">
+                                    <div class="flex items-center w-full">
+                                        <mat-checkbox [checked]="item.completed"
+                                            (change)="updateTodoItemCompletion(item)"
+                                            (click)="$event.stopPropagation()">
+                                        </mat-checkbox>
+                                        <span class="flex-grow">{{ item.title }}</span>
                                     </div>
-                                    }
-                                </mat-expansion-panel>
-                                <mat-expansion-panel>
-                                    <mat-expansion-panel-header>
-                                        <mat-panel-title>Completed ({{ completedTodos().length
-                                            }})</mat-panel-title>
-                                    </mat-expansion-panel-header>
-                                    @if (completedTodos().length > 0) {
-                                    <mat-list>
-                                        @for (item of completedTodos(); track item.id) {
-                                        <mat-list-item matRipple (click)="showDetails(item)"
-                                            class="!cursor-pointer hover:bg-gray-200">
-                                            <div class="flex items-center justify-between">
-                                                <mat-checkbox [checked]="item.completed"
-                                                    (change)="updateTodoItemCompletion(item)"
-                                                    (click)="$event.stopPropagation()">
-                                                </mat-checkbox>
-                                                <span class="flex-grow">{{ item.title }}</span>
-                                                <button mat-icon-button
-                                                    (click)="$event.stopPropagation(); removeTodoItem(item.id || '')">
-                                                    <mat-icon>delete</mat-icon>
-                                                </button>
-                                            </div>
-                                        </mat-list-item>
-                                        }
-                                    </mat-list>
-                                    } @else {
-                                    <div class="flex flex-col items-center py-8 text-center">
-                                        <i class="material-icons text-6xl text-orange-500">checklist</i>
-                                        <h3 class="text-xl font-medium mb-2">No completed tasks yet</h3>
-                                        <p class="text-gray-600">Items will appear here when you complete them.</p>
+                                </mat-list-item>
+                                }
+                            </mat-list>
+                            } @else {
+                            <div class="flex flex-col items-center py-8 text-center">
+                                <i class="material-icons text-6xl text-green-500">task_alt</i>
+                                <h3 class="text-xl font-medium mb-2">All caught up!</h3>
+                                <p class="text-gray-600">Congratulations! You have no tasks to complete.</p>
+                            </div>
+                            }
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>Completed ({{ completedTodos().length
+                                    }})</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            @if (completedTodos().length > 0) {
+                            <mat-list>
+                                @for (item of completedTodos(); track item.id) {
+                                <mat-list-item matRipple (click)="showDetails(item)"
+                                    class="!cursor-pointer hover:bg-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <mat-checkbox [checked]="item.completed"
+                                            (change)="updateTodoItemCompletion(item)"
+                                            (click)="$event.stopPropagation()">
+                                        </mat-checkbox>
+                                        <span class="flex-grow">{{ item.title }}</span>
+                                        <button mat-icon-button
+                                            (click)="$event.stopPropagation(); removeTodoItem(item.id || '')">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
                                     </div>
-                                    }
-                                </mat-expansion-panel>
-                            </mat-accordion>
-                        </mat-card-content>
-                    </div>
-                </mat-card>
-                }
+                                </mat-list-item>
+                                }
+                            </mat-list>
+                            } @else {
+                            <div class="flex flex-col items-center py-8 text-center">
+                                <i class="material-icons text-6xl text-orange-500">checklist</i>
+                                <h3 class="text-xl font-medium mb-2">No completed tasks yet</h3>
+                                <p class="text-gray-600">Items will appear here when you complete them.</p>
+                            </div>
+                            }
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </mat-card-content>
             </div>
-        </div>
-    </mat-sidenav-content>
-
-    <mat-sidenav #sidenav position="end" mode="push" fixedInViewport="true" fixedTopGap="65" fixedBottomGap="57"
-        class="border-l border-gray-200 w-80 max-w-[90%] overflow-x-hidden">
-        @if (selectedTodo(); as item) {
-        <div class="flex flex-col h-full">
-            <div class="p-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-medium">Details</h2>
-                    <button mat-icon-button (click)="sidenav.close()">
-                        <mat-icon>close</mat-icon>
-                    </button>
-                </div>
-            </div>
-
-            <mat-divider></mat-divider>
-
-            <form [formGroup]="detailsForm" class="flex flex-col gap-4 p-4">
-                <mat-form-field>
-                    <mat-label>Title</mat-label>
-                    <input matInput [formControl]="detailsTitleControl" placeholder="Task title" />
-                    @if (detailsTitleControl.hasError('required')) {
-                    <mat-error>Title is required</mat-error>
-                    }
-                </mat-form-field>
-
-                <mat-form-field>
-                    <mat-label>Description</mat-label>
-                    <textarea matInput [formControl]="detailsDescriptionControl" placeholder="Add details"
-                        rows="6"></textarea>
-                </mat-form-field>
-
-                <mat-form-field>
-                    <mat-label>Due Date</mat-label>
-                    <input matInput [formControl]="detailsDueDateControl" [matDatepicker]="picker"
-                        placeholder="Select a date" />
-                    <mat-hint>MM/DD/YYYY</mat-hint>
-                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
-
-                <div class="flex items-center mt-2">
-                    <mat-slide-toggle [formControl]="detailsCompletedControl">
-                        Completed
-                    </mat-slide-toggle>
-                </div>
-            </form>
-
-            <div class="flex-grow"></div>
-            <mat-divider></mat-divider>
-
-            <div class="p-4">
-                <div class="flex justify-end gap-2">
-                    <button mat-button (click)="sidenav.close()">Cancel</button>
-                    <button mat-raised-button color="primary" [disabled]="detailsForm.invalid" (click)="saveDetails()">
-                        Save
-                    </button>
-                </div>
-            </div>
-        </div>
+        </mat-card>
         }
-    </mat-sidenav>
-</mat-sidenav-container>
+    </div>
+</div>

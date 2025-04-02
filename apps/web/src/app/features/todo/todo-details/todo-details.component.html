@@ -1,0 +1,54 @@
+<div class="flex flex-col h-full">
+    <div class="p-4">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-medium">Details</h2>
+            <button mat-icon-button (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <form [formGroup]="detailsForm" class="flex flex-col gap-4 p-4">
+        <mat-form-field>
+            <mat-label>Title</mat-label>
+            <input matInput [formControl]="detailsTitleControl" placeholder="Task title" />
+            @if (detailsTitleControl.hasError('required')) {
+            <mat-error>Title is required</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Description</mat-label>
+            <textarea matInput [formControl]="detailsDescriptionControl" placeholder="Add details" rows="6"></textarea>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Due Date</mat-label>
+            <input matInput [formControl]="detailsDueDateControl" [matDatepicker]="picker"
+                placeholder="Select a date" />
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="flex items-center mt-2">
+            <mat-slide-toggle [formControl]="detailsCompletedControl">
+                Completed
+            </mat-slide-toggle>
+        </div>
+    </form>
+
+    <div class="flex-grow"></div>
+    <mat-divider></mat-divider>
+
+    <div class="p-4">
+        <div class="flex justify-end gap-2">
+            <button mat-button (click)="close()">Cancel</button>
+            <button mat-raised-button color="primary" [disabled]="detailsForm.invalid" (click)="saveDetails()">
+                Save
+            </button>
+        </div>
+    </div>
+</div>

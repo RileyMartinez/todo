@@ -16,7 +16,7 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatTooltip } from '@angular/material/tooltip';
-import { UserContextStore } from '../../../core/services/user-context.store';
+import { UserContextService } from '../../../core/services/user-context.service';
 import { UserService } from '../../../core/services/user.service';
 import { matchValidator } from '../../../core/validators/match.validator';
 import { notMatchValidator } from '../../../core/validators/not-match.validator';
@@ -45,7 +45,7 @@ import { notMatchValidator } from '../../../core/validators/not-match.validator'
 export class ProfileComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
     private readonly userService = inject(UserService);
-    private readonly userContextStore = inject(UserContextStore);
+    private readonly userContextStore = inject(UserContextService);
 
     readonly userContext = this.userContextStore.userContext;
 

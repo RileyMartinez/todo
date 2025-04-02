@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Signal } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatChip } from '@angular/material/chips';
 import { MatDivider } from '@angular/material/divider';
@@ -14,13 +14,17 @@ import { Router, RouterOutlet } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../environments/environment';
 import { RouteConstants } from './core/constants/route.constants';
+import { Environment } from './core/models/environment.model';
 import { AuthService } from './core/services/auth.service';
 import { LoadingService } from './core/services/loading.service';
+import { SidenavContent, SidenavService } from './core/services/sidenav.service';
 import { SnackBarNotificationService } from './core/services/snack-bar.service';
-import { UserContextStore } from './core/services/user-context.store';
+import { UserContextService } from './core/services/user-context.service';
 import { ViewPortService } from './core/services/viewport.service';
 import { SearchComponent } from './features/todo/search.component';
 import { SearchService } from './features/todo/search.service';
+import { TodoDetailsComponent } from './features/todo/todo-details/todo-details.component';
+import { UserContextDto } from './shared/openapi-client';
 
 @Component({
     selector: 'app-root',
@@ -43,27 +47,29 @@ import { SearchService } from './features/todo/search.service';
         MatDivider,
         MatChip,
         SearchComponent,
+        TodoDetailsComponent,
     ],
     templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit, OnDestroy {
     private readonly loadingService = inject(LoadingService);
     private readonly authService = inject(AuthService);
-    private readonly userContextStore = inject(UserContextStore);
+    private readonly userContextStore = inject(UserContextService);
     private readonly router = inject(Router);
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly snackBar = inject(MatSnackBar);
     private readonly viewportService = inject(ViewPortService);
     private readonly searchService = inject(SearchService);
     private readonly destroy$ = new Subject<void>();
-
-    @ViewChild('sidenav') sidenav!: MatSidenav;
+    readonly sidenavService = inject(SidenavService);
 
     readonly routes = RouteConstants;
-    readonly loading = this.loadingService.loading;
-    readonly userContext = this.userContextStore.userContext;
-    readonly isMobile = this.viewportService.isMobile;
-    readonly env = environment;
+    readonly env: Environment = environment;
+    readonly loading: Signal<boolean> = this.loadingService.loading;
+    readonly userContext: Signal<UserContextDto | null> = this.userContextStore.userContext;
+    readonly isMobile: Signal<boolean> = this.viewportService.isMobile;
+    readonly sidenavContent: Signal<SidenavContent> = this.sidenavService.sidenavContent;
+    readonly sidenavOpen: Signal<boolean> = this.sidenavService.sidenavOpen;
 
     ngOnInit(): void {
         this.snackBarNotificationService.notifications$.pipe(takeUntil(this.destroy$)).subscribe((notification) => {
@@ -74,9 +80,7 @@ export class AppComponent implements OnInit, OnDestroy {
         });
 
         this.searchService.onResultSelected$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            if (this.sidenav && this.sidenav.opened) {
-                this.sidenav.close();
-            }
+            this.sidenavService.close();
         });
     }
 
@@ -86,12 +90,12 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     navigateTo(route: string[]): void {
-        this.sidenav.close();
+        this.sidenavService.close();
         this.router.navigate(route);
     }
 
     logout(): void {
-        this.sidenav.close();
+        this.sidenavService.close();
         this.authService.logout$.next();
     }
 }

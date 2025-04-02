@@ -8,7 +8,7 @@ import { MatInput } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { RouteConstants } from '../../../core/constants/route.constants';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserContextStore } from '../../../core/services/user-context.store';
+import { UserContextService } from '../../../core/services/user-context.service';
 
 @Component({
     selector: 'app-verify-account',
@@ -32,7 +32,7 @@ import { UserContextStore } from '../../../core/services/user-context.store';
 })
 export class VerifyAccountComponent implements OnInit {
     private readonly authService = inject(AuthService);
-    private readonly userContextStore = inject(UserContextStore);
+    private readonly userContextStore = inject(UserContextService);
     private readonly formBuilder = inject(FormBuilder);
 
     readonly routes = RouteConstants;

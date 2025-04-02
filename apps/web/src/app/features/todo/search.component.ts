@@ -77,4 +77,9 @@ export class SearchComponent implements OnInit, OnDestroy {
             this.searchService.onResultSelected$.next();
         }
     }
+
+    onBlur(): void {
+        this.searchFormControl.reset(null, { emitEvent: false });
+        this.searchService.clearResults$.next();
+    }
 }
