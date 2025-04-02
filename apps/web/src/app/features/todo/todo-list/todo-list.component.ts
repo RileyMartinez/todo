@@ -125,10 +125,10 @@ export class TodoListComponent implements OnInit {
         const dueDate = new Date(dueDateDt.getFullYear(), dueDateDt.getMonth(), dueDateDt.getDate());
         const today = new Date(todayDt.getFullYear(), todayDt.getMonth(), todayDt.getDate());
 
-        const threeDaysFromNow = new Date(today);
-        threeDaysFromNow.setDate(today.getDate() + 2);
+        const dayThreshold = new Date(today);
+        dayThreshold.setDate(today.getDate() + 2);
 
-        return dueDate >= today && dueDate <= threeDaysFromNow;
+        return dueDate >= today && dueDate <= dayThreshold;
     }
 
     private initializeTodoForm() {
