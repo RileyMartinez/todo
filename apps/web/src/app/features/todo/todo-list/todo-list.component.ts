@@ -88,6 +88,49 @@ export class TodoListComponent implements OnInit {
         this.sidenavService.openDetails(item);
     }
 
+    colorDueDate(dateStr: string | null | undefined): string {
+        if (!dateStr) {
+            return '';
+        }
+
+        if (this.isOverDue(dateStr)) {
+            return '!text-red-500';
+        } else if (this.isDueSoon(dateStr)) {
+            return '!text-orange-500';
+        } else {
+            return '';
+        }
+    }
+
+    private isOverDue(dateStr: string | null | undefined): boolean {
+        if (!dateStr) {
+            return false;
+        }
+
+        const dueDateDt = new Date(dateStr);
+        const todayDt = new Date();
+        const dueDate = new Date(dueDateDt.getFullYear(), dueDateDt.getMonth(), dueDateDt.getDate());
+        const today = new Date(todayDt.getFullYear(), todayDt.getMonth(), todayDt.getDate());
+
+        return dueDate < today;
+    }
+
+    private isDueSoon(dateStr: string | null | undefined): boolean {
+        if (!dateStr) {
+            return false;
+        }
+
+        const dueDateDt = new Date(dateStr);
+        const todayDt = new Date();
+        const dueDate = new Date(dueDateDt.getFullYear(), dueDateDt.getMonth(), dueDateDt.getDate());
+        const today = new Date(todayDt.getFullYear(), todayDt.getMonth(), todayDt.getDate());
+
+        const threeDaysFromNow = new Date(today);
+        threeDaysFromNow.setDate(today.getDate() + 2);
+
+        return dueDate >= today && dueDate <= threeDaysFromNow;
+    }
+
     private initializeTodoForm() {
         this.todoFormControl = new FormControl('', Validators.required);
         this.todoForm = this.formBuilder.group({

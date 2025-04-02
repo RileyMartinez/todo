@@ -32,13 +32,16 @@
                                 @for (item of incompleteTodos(); track item.id) {
                                 <mat-list-item matRipple (click)="showDetails(item)"
                                     class="!cursor-pointer hover:bg-gray-200">
-                                    <div class="flex items-center w-full">
-                                        <mat-checkbox [checked]="item.completed"
-                                            (change)="updateTodoItemCompletion(item)"
-                                            (click)="$event.stopPropagation()">
-                                        </mat-checkbox>
-                                        <span class="flex-grow">{{ item.title }}</span>
-                                    </div>
+                                    <mat-checkbox matListItemIcon [checked]="item.completed"
+                                        (change)="updateTodoItemCompletion(item)" (click)="$event.stopPropagation()">
+                                    </mat-checkbox>
+                                    <div matListItemTitle class="px-2">{{ item.title }}</div>
+                                    @if (item.dueDate) {
+                                    <div matListItemLine [ngClass]="['px-2', colorDueDate(item.dueDate)]">{{
+                                        item.dueDate | date }}</div>
+                                    } @else {
+                                    <div matListItemLine class="px-2">No due date</div>
+                                    }
                                 </mat-list-item>
                                 }
                             </mat-list>
