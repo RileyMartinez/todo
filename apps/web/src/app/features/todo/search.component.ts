@@ -12,6 +12,7 @@ import { MatInput } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, filter, Subject, takeUntil, tap } from 'rxjs';
 import { RouteConstants } from '../../core/constants/route.constants';
+import { SidenavService } from '../../core/services/sidenav.service';
 import { TodoList } from '../../shared/openapi-client';
 import { SearchService } from './search.service';
 
@@ -33,6 +34,7 @@ import { SearchService } from './search.service';
 })
 export class SearchComponent implements OnInit, OnDestroy {
     private readonly searchService = inject(SearchService);
+    private readonly sidenavService = inject(SidenavService);
     private readonly router = inject(Router);
     private readonly destroy$ = new Subject<void>();
     readonly searchResults: Signal<TodoList[]> = this.searchService.results;
@@ -74,12 +76,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
             this.searchFormControl.reset(null, { emitEvent: false });
             this.searchService.clearResults$.next();
-            this.searchService.onResultSelected$.next();
+            this.sidenavService.close();
         }
-    }
-
-    onBlur(): void {
-        this.searchFormControl.reset(null, { emitEvent: false });
-        this.searchService.clearResults$.next();
     }
 }

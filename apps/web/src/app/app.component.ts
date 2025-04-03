@@ -22,7 +22,6 @@ import { SnackBarNotificationService } from './core/services/snack-bar.service';
 import { UserContextService } from './core/services/user-context.service';
 import { ViewPortService } from './core/services/viewport.service';
 import { SearchComponent } from './features/todo/search.component';
-import { SearchService } from './features/todo/search.service';
 import { TodoDetailsComponent } from './features/todo/todo-details/todo-details.component';
 import { UserContextDto } from './shared/openapi-client';
 
@@ -59,7 +58,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly snackBarNotificationService = inject(SnackBarNotificationService);
     private readonly snackBar = inject(MatSnackBar);
     private readonly viewportService = inject(ViewPortService);
-    private readonly searchService = inject(SearchService);
     private readonly destroy$ = new Subject<void>();
     readonly sidenavService = inject(SidenavService);
 
@@ -77,10 +75,6 @@ export class AppComponent implements OnInit, OnDestroy {
                 duration: notification.duration,
                 verticalPosition: 'top',
             });
-        });
-
-        this.searchService.onResultSelected$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.sidenavService.close();
         });
     }
 
