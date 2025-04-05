@@ -32,7 +32,6 @@ export class SearchService {
     // sources
     public readonly search$ = new Subject<string>();
     public readonly clearResults$ = new Subject<void>();
-    public readonly onResultSelected$ = new Subject<void>();
 
     constructor() {
         this.search$
