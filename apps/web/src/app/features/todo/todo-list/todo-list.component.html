@@ -82,6 +82,8 @@
                                             @for (item of todos; track item.id) {
                                                 <mat-list-item
                                                     matRipple
+                                                    cdkDrag
+                                                    cdkDragLockAxis="y"
                                                     (click)="showDetails(item)"
                                                     class="!cursor-pointer hover:bg-gray-200"
                                                 >
