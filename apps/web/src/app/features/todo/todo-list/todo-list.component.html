@@ -37,7 +37,7 @@
                                     </mat-checkbox>
                                     <div matListItemTitle class="px-2">{{ item.title }}</div>
                                     @if (item.dueDate) {
-                                    <div matListItemLine [ngClass]="['px-2', colorDueDate(item.dueDate)]">{{
+                                    <div matListItemLine class="px-2" [style.color]="getDueDateColor(item.dueDate)">{{
                                         item.dueDate | date }}</div>
                                     } @else {
                                     <div matListItemLine class="px-2">No due date</div>

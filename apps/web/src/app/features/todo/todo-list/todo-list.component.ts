@@ -88,15 +88,15 @@ export class TodoListComponent implements OnInit {
         this.sidenavService.openDetails(item);
     }
 
-    colorDueDate(dateStr: string | null | undefined): string {
+    getDueDateColor(dateStr: string | null | undefined): string {
         if (!dateStr) {
             return '';
         }
 
         if (this.isOverDue(dateStr)) {
-            return '!text-red-500';
+            return 'red';
         } else if (this.isDueSoon(dateStr)) {
-            return '!text-orange-500';
+            return 'orangered';
         } else {
             return '';
         }
