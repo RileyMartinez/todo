@@ -11,30 +11,37 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             @for (list of todoLists(); track list.id) {
-            <mat-card appearance="outlined" class="cursor-pointer hover:shadow-lg transition-shadow"
-                (click)="openEditPage(list)">
-                <mat-card-content class="p-4">
-                    <div class="flex justify-between items-center">
-                        <i class="material-icons text-4xl text-blue-500">{{ list.icon }}</i>
-                        <h3 class="text-lg">{{ list.title }}</h3>
-                        <div class="flex space-x-1">
-                            <button mat-icon-button (click)="openDeleteDialog(list, $event)" aria-label="Delete list">
-                                <mat-icon>delete</mat-icon>
-                            </button>
+                <mat-card
+                    appearance="outlined"
+                    class="cursor-pointer hover:shadow-lg transition-shadow"
+                    (click)="openEditPage(list)"
+                >
+                    <mat-card-content class="p-4">
+                        <div class="flex justify-between items-center">
+                            <i class="material-icons text-4xl text-blue-500">{{ list.icon }}</i>
+                            <h3 class="text-lg">{{ list.title }}</h3>
+                            <div class="flex space-x-1">
+                                <button
+                                    mat-icon-button
+                                    (click)="openDeleteDialog(list, $event)"
+                                    aria-label="Delete list"
+                                >
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </mat-card-content>
-            </mat-card>
+                    </mat-card-content>
+                </mat-card>
             }
 
             @if (todoLists().length === 0) {
-            <mat-card appearance="outlined" class="col-span-full flex flex-col items-center py-12 text-center">
-                <div class="flex items-center justify-center h-24 w-24 mb-4">
-                    <i class="material-icons text-blue-500 text-[56px] w-[56px] h-[56px]">note_add</i>
-                </div>
-                <h3 class="text-xl mb-2">No Lists Found</h3>
-                <p class="text-gray-600">Create a new list to get started.</p>
-            </mat-card>
+                <mat-card appearance="outlined" class="col-span-full flex flex-col items-center py-12 text-center">
+                    <div class="flex items-center justify-center h-24 w-24 mb-4">
+                        <i class="material-icons text-blue-500 text-[56px] w-[56px] h-[56px]">note_add</i>
+                    </div>
+                    <h3 class="text-xl mb-2">No Lists Found</h3>
+                    <p class="text-gray-600">Create a new list to get started.</p>
+                </mat-card>
             }
         </div>
     </div>

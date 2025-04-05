@@ -15,7 +15,7 @@
             <mat-label>Title</mat-label>
             <input matInput [formControl]="detailsTitleControl" placeholder="Task title" />
             @if (detailsTitleControl.hasError('required')) {
-            <mat-error>Title is required</mat-error>
+                <mat-error>Title is required</mat-error>
             }
         </mat-form-field>
 
@@ -26,17 +26,19 @@
 
         <mat-form-field>
             <mat-label>Due Date</mat-label>
-            <input matInput [formControl]="detailsDueDateControl" [matDatepicker]="picker"
-                placeholder="Select a date" />
+            <input
+                matInput
+                [formControl]="detailsDueDateControl"
+                [matDatepicker]="picker"
+                placeholder="Select a date"
+            />
             <mat-hint>MM/DD/YYYY</mat-hint>
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
         <div class="flex items-center mt-2">
-            <mat-slide-toggle [formControl]="detailsCompletedControl">
-                Completed
-            </mat-slide-toggle>
+            <mat-slide-toggle [formControl]="detailsCompletedControl"> Completed </mat-slide-toggle>
         </div>
     </form>
 

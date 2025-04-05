@@ -10,7 +10,7 @@
                     <mat-label>Code</mat-label>
                     <input matInput [formControl]="verificationCodeFormControl" autocomplete="one-time-code" required />
                     @if (verificationCodeFormControl.hasError('required')) {
-                    <mat-error>Verification code is required </mat-error>
+                        <mat-error>Verification code is required </mat-error>
                     }
                 </mat-form-field>
                 <div class="py-2 flex flex-row items-center">
