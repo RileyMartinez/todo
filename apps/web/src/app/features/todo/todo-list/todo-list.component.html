@@ -24,21 +24,22 @@
                     <mat-accordion multi="true">
                         <mat-expansion-panel expanded="true">
                             <mat-expansion-panel-header>
-                                <mat-panel-title>Incomplete ({{ incompleteTodos().length
-                                    }})</mat-panel-title>
+                                <mat-panel-title>Incomplete ({{ incompleteTodos().length }})</mat-panel-title>
                             </mat-expansion-panel-header>
-                            @if (incompleteTodos().length > 0) {
-                            <mat-list>
-                                @for (item of incompleteTodos(); track item.id) {
-                                <mat-list-item matRipple (click)="showDetails(item)"
+                            @if (incompleteTodos(); as todos) {
+                            @if (todos.length > 0) {
+                            <mat-list cdkDropList (cdkDropListDropped)="drop(todos, $event)">
+                                @for (item of todos; track item.id) {
+                                <mat-list-item matRipple cdkDrag cdkDragLockAxis="y" (click)="showDetails(item)"
                                     class="!cursor-pointer hover:bg-gray-200">
                                     <mat-checkbox matListItemIcon [checked]="item.completed"
                                         (change)="updateTodoItemCompletion(item)" (click)="$event.stopPropagation()">
                                     </mat-checkbox>
                                     <div matListItemTitle class="px-2">{{ item.title }}</div>
                                     @if (item.dueDate) {
-                                    <div matListItemLine class="px-2" [style.color]="getDueDateColor(item.dueDate)">{{
-                                        item.dueDate | date }}</div>
+                                    <div matListItemLine class="px-2" [style.color]="getDueDateColor(item.dueDate)">
+                                        {{ item.dueDate | date }}
+                                    </div>
                                     } @else {
                                     <div matListItemLine class="px-2">No due date</div>
                                     }
@@ -52,15 +53,16 @@
                                 <p class="text-gray-600">Congratulations! You have no tasks to complete.</p>
                             </div>
                             }
+                            }
                         </mat-expansion-panel>
                         <mat-expansion-panel>
                             <mat-expansion-panel-header>
-                                <mat-panel-title>Completed ({{ completedTodos().length
-                                    }})</mat-panel-title>
+                                <mat-panel-title>Completed ({{ completedTodos().length }})</mat-panel-title>
                             </mat-expansion-panel-header>
-                            @if (completedTodos().length > 0) {
-                            <mat-list>
-                                @for (item of completedTodos(); track item.id) {
+                            @if (completedTodos(); as todos) {
+                            @if (todos.length > 0) {
+                            <mat-list cdkDropList (cdkDropListDropped)="drop(todos, $event)">
+                                @for (item of todos; track item.id) {
                                 <mat-list-item matRipple (click)="showDetails(item)"
                                     class="!cursor-pointer hover:bg-gray-200">
                                     <div class="flex items-center justify-between">
@@ -69,8 +71,9 @@
                                             (click)="$event.stopPropagation()">
                                         </mat-checkbox>
                                         <span class="flex-grow">{{ item.title }}</span>
-                                        <button mat-icon-button
-                                            (click)="$event.stopPropagation(); removeTodoItem(item.id || '')">
+                                        <button mat-icon-button (click)="
+                                                                $event.stopPropagation(); removeTodoItem(item.id || '')
+                                                            ">
                                             <mat-icon>delete</mat-icon>
                                         </button>
                                     </div>
@@ -83,6 +86,7 @@
                                 <h3 class="text-xl font-medium mb-2">No completed tasks yet</h3>
                                 <p class="text-gray-600">Items will appear here when you complete them.</p>
                             </div>
+                            }
                             }
                         </mat-expansion-panel>
                     </mat-accordion>

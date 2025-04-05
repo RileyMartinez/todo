@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -41,6 +42,8 @@ import { TodoListService } from './todo-list.service';
         MatCheckbox,
         MatSidenavModule,
         MatRipple,
+        CdkDrag,
+        CdkDropList,
     ],
     templateUrl: './todo-list.component.html',
 })
@@ -51,6 +54,7 @@ export class TodoListComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
 
     readonly todoList = this.todoListService.todoList;
+    readonly todos = this.todoList()?.todos ?? [];
     readonly incompleteTodos = computed(() => {
         return this.todoList()?.todos?.filter((todo) => !todo.completed) || [];
     });
@@ -100,6 +104,10 @@ export class TodoListComponent implements OnInit {
         } else {
             return '';
         }
+    }
+
+    drop(todos: Todo[], event: CdkDragDrop<string[]>) {
+        moveItemInArray(todos, event.previousIndex, event.currentIndex);
     }
 
     private isOverDue(dateStr: string | null | undefined): boolean {

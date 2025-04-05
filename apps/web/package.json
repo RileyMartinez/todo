@@ -55,7 +55,7 @@
         "karma-jasmine-html-reporter": "~2.1.0",
         "monocart-coverage-reports": "^2.12.1",
         "postcss": "^8.5.3",
-        "prettier": "^3.5.1",
+        "prettier": "^3.5.3",
         "tailwindcss": "^3.4.17",
         "tsx": "^4.19.3",
         "typescript": "~5.7.3",
