@@ -43,8 +43,9 @@
         "@repo/openapi-client-generator": "workspace:*",
         "@types/jasmine": "~5.1.6",
         "@types/node": "^22.13.4",
+        "angular-eslint": "19.3.0",
         "autoprefixer": "^10.4.20",
-        "eslint": "^9.20.1",
+        "eslint": "^9.23.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.2.3",
         "globals": "^16.0.0",
@@ -60,7 +61,7 @@
         "tailwindcss": "^3.4.17",
         "tsx": "^4.19.3",
         "typescript": "~5.7.3",
-        "typescript-eslint": "^8.29.0",
+        "typescript-eslint": "8.27.0",
         "v8-to-istanbul": "^9.3.0"
     }
 }
