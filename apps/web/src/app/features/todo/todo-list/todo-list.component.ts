@@ -46,6 +46,7 @@ import { TodoListService } from './todo-list.service';
         CdkDropList,
     ],
     templateUrl: './todo-list.component.html',
+    styleUrl: './todo-list.component.css',
 })
 export class TodoListComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
@@ -56,10 +57,18 @@ export class TodoListComponent implements OnInit {
     readonly todoList = this.todoListService.todoList;
     readonly todos = this.todoList()?.todos ?? [];
     readonly incompleteTodos = computed(() => {
-        return this.todoList()?.todos?.filter((todo) => !todo.completed) || [];
+        const todoList = this.todoList();
+        if (!todoList) {
+            return [];
+        }
+        return todoList.todos.filter((todo) => !todo.completed).sort((a, b) => a.order - b.order);
     });
     readonly completedTodos = computed(() => {
-        return this.todoList()?.todos?.filter((todo) => todo.completed) || [];
+        const todoList = this.todoList();
+        if (!todoList) {
+            return [];
+        }
+        return todoList.todos.filter((todo) => todo.completed).sort((a, b) => a.order - b.order);
     });
 
     todoForm!: FormGroup;
@@ -106,8 +115,16 @@ export class TodoListComponent implements OnInit {
         }
     }
 
-    drop(todos: Todo[], event: CdkDragDrop<string[]>) {
-        moveItemInArray(todos, event.previousIndex, event.currentIndex);
+    onDragDrop(event: CdkDragDrop<Todo[]>): void {
+        const todoList = this.todoList();
+
+        if (!todoList) {
+            return;
+        }
+
+        todoList.todos = event.container.data;
+        moveItemInArray(todoList.todos, event.previousIndex, event.currentIndex);
+        this.todoListService.updateTodoPositions$.next(todoList);
     }
 
     private isOverDue(dateStr: string | null | undefined): boolean {

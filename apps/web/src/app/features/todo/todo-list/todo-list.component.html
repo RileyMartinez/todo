@@ -32,12 +32,17 @@
                                 </mat-expansion-panel-header>
                                 @if (incompleteTodos(); as todos) {
                                     @if (todos.length > 0) {
-                                        <mat-list cdkDropList (cdkDropListDropped)="drop(todos, $event)">
+                                        <mat-list
+                                            cdkDropList
+                                            [cdkDropListData]="todos"
+                                            (cdkDropListDropped)="onDragDrop($event)"
+                                        >
                                             @for (item of todos; track item.id) {
                                                 <mat-list-item
                                                     matRipple
                                                     cdkDrag
                                                     cdkDragLockAxis="y"
+                                                    [cdkDragData]="item"
                                                     (click)="showDetails(item)"
                                                     class="!cursor-pointer hover:bg-gray-200"
                                                 >
@@ -78,7 +83,11 @@
                                 </mat-expansion-panel-header>
                                 @if (completedTodos(); as todos) {
                                     @if (todos.length > 0) {
-                                        <mat-list cdkDropList (cdkDropListDropped)="drop(todos, $event)">
+                                        <mat-list
+                                            cdkDropList
+                                            [cdkDropListData]="todos"
+                                            (cdkDropListDropped)="onDragDrop($event)"
+                                        >
                                             @for (item of todos; track item.id) {
                                                 <mat-list-item
                                                     matRipple

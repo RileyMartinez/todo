@@ -2,8 +2,9 @@ import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validateOrReject } from 'class-validator';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { TodoListDto } from './dto/todo-list.dto';
+import { TodoListsDto } from './dto/todo-lists.dto';
 import { TodoSearchDto } from './dto/todo-search.dto';
 import { TodoDto } from './dto/todo.dto';
 import { TodoList } from './entities/todo-list.entity';
@@ -46,6 +47,76 @@ export class TodoListService {
     async saveTodoListItem(todoDto: TodoDto): Promise<Todo> {
         await validateOrReject(todoDto);
         return await this.todoRepository.save(todoDto);
+    }
+
+    /**
+     * Batch updates the positions of todo lists.
+     *
+     * @param userId - The ID of the user.
+     * @param todoListsDto - The todo lists to update.
+     */
+    async updateTodoListPositions(userId: string, todoListsDto: TodoListsDto): Promise<void> {
+        await validateOrReject(todoListsDto);
+        const { todoLists } = todoListsDto;
+
+        if (!userId) {
+            this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        const updates: Promise<UpdateResult>[] = todoLists.map((todoList, index) => {
+            if (!todoList.id) {
+                this.logger.error({ todoList }, ExceptionConstants.INVALID_TODO_LIST_ID);
+                throw new BadRequestException(ExceptionConstants.INVALID_TODO_LIST_ID);
+            }
+
+            return this.todolistRepository.update(todoList.id, {
+                order: index,
+            });
+        });
+
+        await Promise.all(updates);
+    }
+
+    /**
+     * Batch updates the positions of todo list items.
+     *
+     * @param userId - The ID of the user.
+     * @param todoList - The todo list containing the items to update.
+     */
+    async updateTodoListItemPositions(userId: string, todoList: TodoList): Promise<void> {
+        if (!userId || userId !== todoList?.userId) {
+            this.logger.error(
+                { userId, todoListUserId: todoList.userId },
+                'Invalid user ID or todo list user ID mismatch',
+            );
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
+        }
+
+        if (!todoList) {
+            const errorMessage = 'Todo list is required';
+            this.logger.error({ userId }, errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
+
+        if (!todoList.todos || todoList.todos.length === 0) {
+            const errorMessage = 'Todo items are required';
+            this.logger.error({ todoList }, errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
+
+        const updates: Promise<UpdateResult>[] = todoList.todos.map((item, index) => {
+            if (!item.id) {
+                this.logger.error({ item }, ExceptionConstants.INVALID_TODO_ITEM_ID);
+                throw new BadRequestException(ExceptionConstants.INVALID_TODO_ITEM_ID);
+            }
+
+            return this.todoRepository.update(item.id, {
+                order: index,
+            });
+        });
+
+        await Promise.all(updates);
     }
 
     /**

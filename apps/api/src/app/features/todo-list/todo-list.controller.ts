@@ -1,7 +1,7 @@
 import { DecoratorConstants } from '@/app/core/constants/decorator.constants';
 import { ExceptionConstants } from '@/app/core/constants/exception.constants';
 import { GetCurrentUser } from '@/app/core/decorators/get-current-user.decorator';
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiCookieAuth,
@@ -11,8 +11,10 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { HttpStatusCode } from 'axios';
 import { DeleteResult } from 'typeorm';
 import { TodoListDto } from './dto/todo-list.dto';
+import { TodoListsDto } from './dto/todo-lists.dto';
 import { TodoSearchDto } from './dto/todo-search.dto';
 import { TodoDto } from './dto/todo.dto';
 import { TodoList } from './entities/todo-list.entity';
@@ -49,6 +51,28 @@ export class TodoListController {
     @ApiBadRequestResponse({ description: ExceptionConstants.VALIDATION_FAILED })
     async saveTodoListItem(@Body() todoDto: TodoDto): Promise<Todo> {
         return await this.todolistService.saveTodoListItem(todoDto);
+    }
+
+    @Post('item/position')
+    @ApiOkResponse({ description: 'Todo list item positions updated successfully' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.VALIDATION_FAILED })
+    @HttpCode(HttpStatusCode.Ok)
+    async updateTodoListItemPositions(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: string,
+        @Body() todoList: TodoList,
+    ): Promise<void> {
+        await this.todolistService.updateTodoListItemPositions(userId, todoList);
+    }
+
+    @Post('list/position')
+    @ApiOkResponse({ description: 'Todo list positions updated successfully' })
+    @ApiBadRequestResponse({ description: ExceptionConstants.VALIDATION_FAILED })
+    @HttpCode(HttpStatusCode.Ok)
+    async updateTodoListPositions(
+        @GetCurrentUser(DecoratorConstants.SUB) userId: string,
+        @Body() todoListsDto: TodoListsDto,
+    ): Promise<void> {
+        await this.todolistService.updateTodoListPositions(userId, todoListsDto);
     }
 
     /**
