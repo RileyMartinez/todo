@@ -18,8 +18,19 @@ export class TodoList {
     @Column()
     title!: string;
 
+    /**
+     * Todo list icon
+     * @example 'shopping-cart'
+     */
     @Column()
     icon!: string;
+
+    /**
+     * Todo list order position
+     * @example 1
+     */
+    @Column()
+    order!: number;
 
     /**
      * User id

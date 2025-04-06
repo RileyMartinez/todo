@@ -1,5 +1,6 @@
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,8 +17,9 @@ import { TodoListsService } from './todo-lists.service';
 @Component({
     selector: 'app-todo-lists',
     standalone: true,
-    imports: [CommonModule, MatCard, MatCardContent, MatIconButton, MatIcon, MatFabButton],
+    imports: [CommonModule, MatCard, MatCardContent, MatIconButton, MatIcon, MatFabButton, CdkDrag, CdkDropList],
     templateUrl: './todo-lists.component.html',
+    styleUrls: ['./todo-lists.component.css'],
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
     private readonly todoListsService = inject(TodoListsService);
@@ -25,7 +27,10 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     private readonly dialog = inject(MatDialog);
     private readonly destroy$ = new Subject<void>();
 
-    todoLists = this.todoListsService.todoLists;
+    readonly todoLists = computed(() => {
+        const todoLists = this.todoListsService.todoLists();
+        return todoLists.sort((a, b) => a.order - b.order);
+    });
 
     ngOnInit(): void {
         this.todoListsService.load$.next();
@@ -51,7 +56,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
                     return;
                 }
 
-                this.todoListsService.add$.next(addTodoList);
+                this.todoListsService.add$.next({ ...addTodoList, order: 0 });
             });
     }
 
@@ -73,5 +78,16 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 
                 this.todoListsService.remove$.next({ id: todoList.id });
             });
+    }
+
+    onDragDrop(event: CdkDragDrop<TodoList[]>): void {
+        const todoLists = event.container.data;
+
+        if (!todoLists) {
+            return;
+        }
+
+        moveItemInArray(todoLists, event.previousIndex, event.currentIndex);
+        this.todoListsService.updatePositions$.next({ todoLists });
     }
 }

@@ -12,7 +12,7 @@
             @for (icon of availableIcons; track icon) {
             <mat-button-toggle-group [(ngModel)]="selectedIcon" hideSingleSelectionIndicator="true">
                 <mat-button-toggle [value]="icon">
-                    <mat-icon>{{icon}}</mat-icon>
+                    <mat-icon>{{ icon }}</mat-icon>
                 </mat-button-toggle>
             </mat-button-toggle-group>
             }
@@ -21,13 +21,14 @@
 
     @if (selectedIcon) {
     <div class="flex items-center gap-2 p-3 bg-gray-50 rounded">
-        <mat-icon class="text-primary-600">{{selectedIcon}}</mat-icon>
-        <span>Selected icon: <strong>{{selectedIcon}}</strong></span>
+        <mat-icon class="text-primary-600">{{ selectedIcon }}</mat-icon>
+        <span>Selected icon: <strong>{{ selectedIcon }}</strong></span>
     </div>
     }
 </mat-dialog-content>
 <mat-dialog-actions>
     <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-    <button mat-button [mat-dialog-close]="{ title, icon: selectedIcon }" cdkFocusInitial
-        [disabled]="!title">Create</button>
+    <button mat-button [mat-dialog-close]="{ title, icon: selectedIcon }" cdkFocusInitial [disabled]="!title">
+        Create
+    </button>
 </mat-dialog-actions>

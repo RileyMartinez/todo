@@ -86,11 +86,19 @@
                         "styles": ["@angular/material/prebuilt-themes/azure-blue.css", "src/styles.css"],
                         "scripts": []
                     }
+                },
+                "lint": {
+                    "builder": "@angular-eslint/builder:lint",
+                    "options": {
+                        "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+                    }
                 }
             }
         }
     },
     "cli": {
-        "analytics": false
+        "analytics": false,
+        "packageManager": "pnpm",
+        "schematicCollections": ["angular-eslint"]
     }
 }

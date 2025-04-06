@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class TodoListDto {
     /**
@@ -16,4 +16,20 @@ export class TodoListDto {
     @IsString()
     @IsNotEmpty()
     title: string = '';
+
+    /**
+     * Todo list icon
+     * @example 'shopping-cart'
+     */
+    @IsString()
+    @IsNotEmpty()
+    icon: string = '';
+
+    /**
+     * Todo list order position
+     * @example 1
+     */
+    @IsNumber()
+    @IsNotEmpty()
+    order: number = 0;
 }
