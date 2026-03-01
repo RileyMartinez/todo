@@ -1,0 +1,19 @@
+import { AppConstants } from '@/shared/constants/app.constants';
+import { ConfigConstants } from '@/shared/constants/config.constants';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
+
+export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
+    imports: [ConfigModule],
+    useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => ({
+        type: 'postgres',
+        host: configService.getOrThrow(ConfigConstants.DB_HOST),
+        port: configService.getOrThrow<number>(ConfigConstants.DB_PORT),
+        username: configService.getOrThrow(ConfigConstants.DB_USERNAME),
+        password: configService.getOrThrow(ConfigConstants.DB_PASSWORD),
+        database: configService.getOrThrow(ConfigConstants.DB_NAME),
+        synchronize: configService.getOrThrow(ConfigConstants.APP_ENV) === AppConstants.DEV,
+        autoLoadEntities: configService.getOrThrow<boolean>(ConfigConstants.DB_AUTOLOAD_ENTITIES),
+    }),
+    inject: [ConfigService],
+};

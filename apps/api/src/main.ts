@@ -5,10 +5,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
-import { AppModule } from './app/app.module';
-import { corsConfigFactory } from './app/core/configs/cors.config-factory';
-import { swaggerConfig } from './app/core/configs/swagger.config';
-import { ConfigConstants } from './app/core/constants/config.constants';
+import { AppModule } from '@/app.module';
+import { corsConfigFactory } from '@/config/cors.config-factory';
+import { swaggerConfig } from '@/config/swagger.config';
+import { ConfigConstants } from '@/shared/constants/config.constants';
 
 /**
  * Bootstraps the application.
