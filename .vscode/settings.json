@@ -4,6 +4,7 @@
     "source.fixAll": "always",
     "source.organizeImports": "always",
     "source.sortMembers": "always"
-  }
+  },
+  "postman.settings.dotenv-detection-notification-visibility": false
 }
 
