@@ -1,13 +1,12 @@
+import { AppModule } from '@/app.module';
+import { createSwaggerDocument } from '@/config/swagger.config';
+import { PathUtil } from '@/shared/utils/path.util';
 import { NestApplicationOptions } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { SwaggerModule } from '@nestjs/swagger';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import * as prettier from 'prettier';
-import { AppModule } from '@/app.module';
-import { swaggerConfig } from '@/config/swagger.config';
-import { PathUtil } from '@/shared/utils/path.util';
 
 async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -16,8 +15,7 @@ async function bootstrap(): Promise<void> {
         logger: false,
     } as NestApplicationOptions);
 
-    const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api', app, document);
+    const document = createSwaggerDocument(app);
 
     const prettierConfig = await prettier.resolveConfig(process.cwd());
     const formattedDocument = await prettier.format(JSON.stringify(document), {

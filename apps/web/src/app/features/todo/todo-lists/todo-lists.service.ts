@@ -5,10 +5,10 @@ import { AddTodoList, RemoveTodoList } from '../../../core/models/todo-list.mode
 import { LoadingService } from '../../../core/services/loading.service';
 import { TodoListsDto } from '../../../shared/openapi-client';
 import { TodoListClient } from '../../../shared/openapi-client/api/todo-list.client';
-import { TodoList } from '../../../shared/openapi-client/model/todo-list';
+import { TodoListResponseDto } from '../../../shared/openapi-client/model/todo-list-response-dto';
 
 export interface TodoListsState {
-    todoLists: TodoList[];
+    todoLists: TodoListResponseDto[];
     loaded: boolean;
     error: string | null;
 }

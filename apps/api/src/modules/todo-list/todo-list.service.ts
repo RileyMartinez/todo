@@ -1,14 +1,14 @@
-import { ExceptionConstants } from '@/shared/constants/exception.constants';
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { validateOrReject } from 'class-validator';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { TodoListDto } from '@/modules/todo-list/dto/todo-list.dto';
 import { TodoListsDto } from '@/modules/todo-list/dto/todo-lists.dto';
 import { TodoSearchDto } from '@/modules/todo-list/dto/todo-search.dto';
 import { TodoDto } from '@/modules/todo-list/dto/todo.dto';
 import { TodoList } from '@/modules/todo-list/entities/todo-list.entity';
 import { Todo } from '@/modules/todo-list/entities/todo.entity';
+import { ExceptionConstants } from '@/shared/constants/exception.constants';
+import { validateDto } from '@/shared/utils/validate-dto.util';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class TodoListService {
@@ -28,14 +28,15 @@ export class TodoListService {
      * @throws {BadRequestException} If the user ID is invalid.
      */
     async saveTodoList(userId: string, todoListDto: TodoListDto): Promise<TodoList> {
-        await validateOrReject(todoListDto);
+        await validateDto(todoListDto);
 
         if (!userId) {
             this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ID);
         }
 
-        return await this.todolistRepository.save({ userId, ...todoListDto });
+        const entity = Object.assign(new TodoList(), { userId, ...todoListDto });
+        return await this.todolistRepository.save(entity);
     }
 
     /**
@@ -45,8 +46,9 @@ export class TodoListService {
      * @returns A promise that resolves to the saved todo item.
      */
     async saveTodoListItem(todoDto: TodoDto): Promise<Todo> {
-        await validateOrReject(todoDto);
-        return await this.todoRepository.save(todoDto);
+        await validateDto(todoDto);
+        const entity = Object.assign(new Todo(), todoDto);
+        return await this.todoRepository.save(entity);
     }
 
     /**
@@ -56,7 +58,7 @@ export class TodoListService {
      * @param todoListsDto - The todo lists to update.
      */
     async updateTodoListPositions(userId: string, todoListsDto: TodoListsDto): Promise<void> {
-        await validateOrReject(todoListsDto);
+        await validateDto(todoListsDto);
         const { todoLists } = todoListsDto;
 
         if (!userId) {
@@ -149,7 +151,7 @@ export class TodoListService {
      * @throws {BadRequestException} If the userId is invalid.
      */
     async searchTodoLists(userId: string, todoSearchDto: TodoSearchDto): Promise<TodoList[]> {
-        validateOrReject(todoSearchDto);
+        await validateDto(todoSearchDto);
 
         if (!userId) {
             this.logger.error({ userId }, ExceptionConstants.INVALID_USER_ID);

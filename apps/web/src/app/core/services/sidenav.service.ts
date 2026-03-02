@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { Todo } from '../../shared/openapi-client';
+import { TodoResponseDto } from '../../shared/openapi-client';
 
 export interface SidenavContent {
     type: 'details' | 'menu' | null;
@@ -23,7 +23,7 @@ export class SidenavService {
     public readonly sidenavContent = computed(() => this.state().content);
     public readonly sidenavOpen = computed(() => this.state().open);
 
-    public openDetails(todo: Todo): void {
+    public openDetails(todo: TodoResponseDto): void {
         this.state.set({
             content: { type: 'details', data: todo },
             open: true,

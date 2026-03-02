@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { apiResponseUnwrapInterceptor } from './core/interceptors/api-response-unwrap.interceptor';
 import { AuthService } from './core/services/auth.service';
 import { BASE_PATH } from './shared/openapi-client';
 
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(routes),
         provideAnimationsAsync(),
-        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClient(withInterceptors([apiResponseUnwrapInterceptor, authInterceptor])),
         provideAppInitializer(() => {
             const authService = inject(AuthService);
             authService.loadUserContext$.next();

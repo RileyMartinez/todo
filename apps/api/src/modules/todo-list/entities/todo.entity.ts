@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { TodoResponseDto } from '@/modules/todo-list/dto/todo-response.dto';
 import { TodoList } from '@/modules/todo-list/entities/todo-list.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Todo {
@@ -62,4 +63,19 @@ export class Todo {
         onDelete: 'CASCADE',
     })
     todoList!: TodoList;
+
+    /**
+     * Maps this Todo entity to a safe response DTO (excludes todoList back-reference).
+     */
+    toResponseDto(): TodoResponseDto {
+        const dto = new TodoResponseDto();
+        dto.id = this.id;
+        dto.title = this.title;
+        dto.description = this.description;
+        dto.completed = this.completed;
+        dto.dueDate = this.dueDate;
+        dto.order = this.order;
+        dto.todoListId = this.todoListId;
+        return dto;
+    }
 }

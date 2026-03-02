@@ -7,9 +7,10 @@ import { LoadingService } from '../../../core/services/loading.service';
 import { TodoDto } from '../../../shared/openapi-client';
 import { TodoListClient } from '../../../shared/openapi-client/api/todo-list.client';
 import { TodoList } from '../../../shared/openapi-client/model/todo-list';
+import { TodoListResponseDto } from '../../../shared/openapi-client/model/todo-list-response-dto';
 
 export interface TodoListState {
-    todoList: TodoList | undefined;
+    todoList: TodoListResponseDto | undefined;
     loaded: boolean;
     error: string | null;
 }
@@ -38,7 +39,7 @@ export class TodoListService {
     public readonly add$ = new Subject<AddTodo>();
     public readonly remove$ = new Subject<RemoveTodo>();
     public readonly update$ = new Subject<TodoDto>();
-    public readonly updateTodoPositions$ = new Subject<TodoList>();
+    public readonly updateTodoPositions$ = new Subject<TodoListResponseDto>();
 
     private readonly todoAdded$ = this.add$.pipe(
         concatMap((todo) =>
@@ -67,7 +68,7 @@ export class TodoListService {
     private readonly todoPositionsUpdated$ = this.updateTodoPositions$.pipe(
         concatMap((todoList) =>
             this.todoListClient
-                .todoListControllerUpdateTodoListItemPositions(todoList)
+                .todoListControllerUpdateTodoListItemPositions(todoList as unknown as TodoList)
                 .pipe(catchError((error) => this.handleError(error))),
         ),
     );

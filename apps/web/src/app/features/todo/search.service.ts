@@ -2,10 +2,10 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, EMPTY, Observable, Subject, switchMap, tap } from 'rxjs';
 import { LoadingService } from '../../core/services/loading.service';
-import { TodoList, TodoListClient } from '../../shared/openapi-client';
+import { TodoListClient, TodoListResponseDto } from '../../shared/openapi-client';
 
 export interface SearchState {
-    results: TodoList[];
+    results: TodoListResponseDto[];
     loaded: boolean;
     error: string | null;
 }

@@ -19,7 +19,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { ActivatedRoute } from '@angular/router';
 import { SidenavService } from '../../../core/services/sidenav.service';
-import { Todo } from '../../../shared/openapi-client';
+import { TodoResponseDto } from '../../../shared/openapi-client';
 import { TodoListService } from './todo-list.service';
 
 @Component({
@@ -58,14 +58,14 @@ export class TodoListComponent implements OnInit {
     readonly todos = this.todoList()?.todos ?? [];
     readonly incompleteTodos = computed(() => {
         const todoList = this.todoList();
-        if (!todoList) {
+        if (!todoList?.todos) {
             return [];
         }
         return todoList.todos.filter((todo) => !todo.completed).sort((a, b) => a.order - b.order);
     });
     readonly completedTodos = computed(() => {
         const todoList = this.todoList();
-        if (!todoList) {
+        if (!todoList?.todos) {
             return [];
         }
         return todoList.todos.filter((todo) => todo.completed).sort((a, b) => a.order - b.order);
@@ -87,17 +87,15 @@ export class TodoListComponent implements OnInit {
         this.todoFormControl.setErrors(null);
     }
 
-    updateTodoItemCompletion(item: Todo): void {
-        const { todoList, ...todo } = item;
-        todo.completed = !todo.completed;
-        this.todoListService.update$.next(todo);
+    updateTodoItemCompletion(item: TodoResponseDto): void {
+        this.todoListService.update$.next({ ...item, completed: !item.completed });
     }
 
     removeTodoItem(id: string): void {
         this.todoListService.remove$.next({ id });
     }
 
-    showDetails(item: Todo): void {
+    showDetails(item: TodoResponseDto): void {
         this.sidenavService.openDetails(item);
     }
 
@@ -115,10 +113,10 @@ export class TodoListComponent implements OnInit {
         }
     }
 
-    onDragDrop(event: CdkDragDrop<Todo[]>): void {
+    onDragDrop(event: CdkDragDrop<TodoResponseDto[]>): void {
         const todoList = this.todoList();
 
-        if (!todoList) {
+        if (!todoList?.todos) {
             return;
         }
 

@@ -28,6 +28,7 @@ import {
     ApiFoundResponse,
     ApiOkResponse,
     ApiTags,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CookieOptions, Response } from 'express';
 
@@ -188,6 +189,7 @@ export class AuthController {
     @ApiCookieAuth()
     @ApiOkResponse({ description: 'User logged out successfully.' })
     @ApiForbiddenResponse({ description: ExceptionConstants.INVALID_CREDENTIALS })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized' })
     @HttpCode(HttpStatus.OK)
     async logout(
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,

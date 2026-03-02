@@ -1,29 +1,53 @@
-import { ArgumentsHost, Catch } from '@nestjs/common';
-import { AbstractHttpAdapter, BaseExceptionFilter } from '@nestjs/core';
+import { RequestContext } from '@/common/context/request-context';
+import { ApiErrorResponse } from '@/common/dto/api-error-response.dto';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 /**
- * Global exception filter that catches all exceptions.
+ * Global catch-all exception filter that handles any exception NOT
+ * already caught by more specific filters (HttpExceptionsFilter,
+ * ValidationExceptionFilter).
+ *
+ * Ensures:
+ * - A generic 500 response is returned (never leaks internals)
+ * - Full error details are logged server-side with correlation ID
+ * - The correlation ID is included in the response for support tracing
  */
 @Catch()
-export class AllExceptionsFilter extends BaseExceptionFilter {
-    constructor(httpAdapter: AbstractHttpAdapter) {
-        super(httpAdapter);
-    }
+export class AllExceptionsFilter implements ExceptionFilter {
+    private readonly logger = new Logger(AllExceptionsFilter.name);
 
-    /**
-     * Catches and logs the exception using Nest's underlying ExceptionHandler.
-     * @param exception - The exception to be caught.
-     * @param host - The arguments host object containing the request and response objects.
-     * @todo Implement an injestion service to send the exception to a monitoring service.
-     */
-    catch(exception: unknown, host: ArgumentsHost) {
-        /*
-        if (exception instanceof Error) {
-            Do something with exceptiion.message and exception.stack
-        } else if (exception) {
-            Do something with exception as a string (e.g. JSON.stringify(exception))
-        }
-        */
-        super.catch(exception, host);
+    catch(exception: unknown, host: ArgumentsHost): void {
+        const ctx = host.switchToHttp();
+        const request = ctx.getRequest<Request>();
+        const response = ctx.getResponse<Response>();
+
+        // If this is actually an HttpException, let the HTTP filter handle it
+        // (this filter runs as a fallback when registered in the correct order)
+        const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+
+        const correlationId = RequestContext.getCorrelationId() ?? 'unknown';
+
+        this.logger.error(
+            {
+                correlationId,
+                method: request.method,
+                url: request.url,
+                statusCode: status,
+                err: exception instanceof Error ? exception : undefined,
+            },
+            exception instanceof Error ? exception.message : 'Unexpected error',
+        );
+
+        const body = new ApiErrorResponse(
+            status,
+            'Internal server error',
+            'Internal Server Error',
+            new Date().toISOString(),
+            request.url,
+            correlationId,
+        );
+
+        response.status(status).json(body);
     }
 }

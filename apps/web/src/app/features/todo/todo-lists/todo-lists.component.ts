@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { RouteConstants } from '../../../core/constants/route.constants';
 import { AddTodoList } from '../../../core/models/todo-list.model';
-import { TodoList } from '../../../shared/openapi-client';
+import { TodoListResponseDto } from '../../../shared/openapi-client';
 import { TodoListCreateDialog } from './todo-list-create.dialog';
 import { TodoListDeleteDialog } from './todo-list-delete.dialog';
 import { TodoListsService } from './todo-lists.service';
@@ -60,11 +60,11 @@ export class TodoListsComponent implements OnInit, OnDestroy {
             });
     }
 
-    openEditPage(todoList: TodoList): void {
+    openEditPage(todoList: TodoListResponseDto): void {
         this.router.navigate([RouteConstants.TODO, RouteConstants.LIST, todoList.id]);
     }
 
-    openDeleteDialog(todoList: TodoList, $event: Event): void {
+    openDeleteDialog(todoList: TodoListResponseDto, $event: Event): void {
         $event.stopPropagation();
 
         this.dialog
@@ -80,7 +80,7 @@ export class TodoListsComponent implements OnInit, OnDestroy {
             });
     }
 
-    onDragDrop(event: CdkDragDrop<TodoList[]>): void {
+    onDragDrop(event: CdkDragDrop<TodoListResponseDto[]>): void {
         const todoLists = event.container.data;
 
         if (!todoLists) {

@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, filter, Subject, takeUntil, tap } from 'rxjs';
 import { RouteConstants } from '../../core/constants/route.constants';
 import { SidenavService } from '../../core/services/sidenav.service';
-import { TodoList } from '../../shared/openapi-client';
+import { TodoListResponseDto } from '../../shared/openapi-client';
 import { SearchService } from './search.service';
 
 @Component({
@@ -37,7 +37,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private readonly sidenavService = inject(SidenavService);
     private readonly router = inject(Router);
     private readonly destroy$ = new Subject<void>();
-    readonly searchResults: Signal<TodoList[]> = this.searchService.results;
+    readonly searchResults: Signal<TodoListResponseDto[]> = this.searchService.results;
 
     searchFormControl!: FormControl;
 
@@ -59,12 +59,12 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
-    displayFn(todoList: TodoList): string {
+    displayFn(todoList: TodoListResponseDto): string {
         return todoList ? todoList.title : '';
     }
 
     async onOptionSelected(event: MatAutocompleteSelectedEvent): Promise<void> {
-        const todoList: TodoList = event.option.value;
+        const todoList: TodoListResponseDto = event.option.value;
 
         if (todoList && todoList.id) {
             const urlTree = this.router.createUrlTree([RouteConstants.TODO, RouteConstants.LIST, todoList.id]);

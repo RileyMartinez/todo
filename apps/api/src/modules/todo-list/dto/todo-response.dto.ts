@@ -1,59 +1,49 @@
-import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
-
-export class TodoDto {
+/**
+ * Safe response DTO for a Todo item.
+ *
+ * Excludes the `todoList` back-reference to prevent circular serialization
+ * and sensitive data exposure.
+ */
+export class TodoResponseDto {
     /**
-     * Todo item id (omit for creation, include for update)
+     * Todo item id
      * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
-    @IsUUID()
-    @IsOptional()
     id?: string;
 
     /**
      * Todo item title
      * @example 'Buy milk'
      */
-    @IsString()
-    @IsNotEmpty()
     title!: string;
 
     /**
      * Todo item description
      * @example '2% milk'
      */
-    @IsString()
-    @IsOptional()
     description?: string | null;
 
     /**
      * Todo item completion status
      * @example false
      */
-    @IsBoolean()
-    @IsOptional()
     completed: boolean = false;
 
     /**
      * Todo item due date
      * @example '2021-12-31T23:59:59.999Z'
      */
-    @IsDateString()
-    @IsOptional()
     dueDate?: Date | null;
 
     /**
      * Todo item order
      * @example 1
      */
-    @IsNumber()
-    @IsNotEmpty()
     order!: number;
 
     /**
-     * Todo list id that this item belongs to
+     * Todo list id
      * @example 'a1b2c3d4-1234-5678-90ab-cdef12345678'
      */
-    @IsUUID()
-    @IsNotEmpty()
     todoListId!: string;
 }

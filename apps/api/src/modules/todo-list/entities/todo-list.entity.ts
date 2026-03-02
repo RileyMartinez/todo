@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '@/modules/user/entities/user.entity';
+import { TodoListResponseDto } from '@/modules/todo-list/dto/todo-list-response.dto';
 import { Todo } from '@/modules/todo-list/entities/todo.entity';
+import { User } from '@/modules/user/entities/user.entity';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class TodoList {
@@ -50,4 +51,18 @@ export class TodoList {
      */
     @OneToMany(() => Todo, (todo) => todo.todoList)
     todos: Todo[] | undefined;
+
+    /**
+     * Maps this TodoList entity to a safe response DTO (excludes user relation).
+     */
+    toResponseDto(): TodoListResponseDto {
+        const dto = new TodoListResponseDto();
+        dto.id = this.id;
+        dto.title = this.title;
+        dto.icon = this.icon;
+        dto.order = this.order;
+        dto.userId = this.userId;
+        dto.todos = this.todos?.map((todo) => todo.toResponseDto());
+        return dto;
+    }
 }

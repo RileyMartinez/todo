@@ -1,5 +1,6 @@
 import { AppController } from '@/app.controller';
 import { CoreModule } from '@/common/core.module';
+import { CorrelationIdMiddleware } from '@/common/middleware/correlation-id.middleware';
 import { loggerConfig } from '@/config/logger.config';
 import { throttlerConfig } from '@/config/throttle.config';
 import { typeOrmConfig } from '@/config/typeorm.config';
@@ -8,7 +9,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { EmailModule } from '@/modules/email/email.module';
 import { TodoListModule } from '@/modules/todo-list/todo-list.module';
 import { UsersModule } from '@/modules/user/user.module';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -39,4 +40,8 @@ import { LoggerModule } from 'nestjs-pino';
         },
     ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer): void {
+        consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    }
+}

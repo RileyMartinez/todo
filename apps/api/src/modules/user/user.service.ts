@@ -3,10 +3,10 @@ import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
 import { UpdatePasswordDto } from '@/modules/user/dto/update-password.dto';
 import { User } from '@/modules/user/entities/user.entity';
 import { ExceptionConstants } from '@/shared/constants/exception.constants';
+import { validateDto } from '@/shared/utils/validate-dto.util';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
-import { validateOrReject } from 'class-validator';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class UserService {
      * @throws {InternalServerErrorException} If the user creation fails.
      */
     async createUser(createUserDto: CreateUserDto): Promise<User> {
-        await validateOrReject(createUserDto);
+        await validateDto(createUserDto);
         const user = this.userRepository.create(createUserDto);
         return await this.userRepository.save(user);
     }
@@ -72,7 +72,7 @@ export class UserService {
      * @throws {UnauthorizedException} If the current password is invalid.
      */
     async updateUserPassword(userId: string, updatePasswordDto: UpdatePasswordDto): Promise<UpdateResult> {
-        await validateOrReject(updatePasswordDto);
+        await validateDto(updatePasswordDto);
         const { currentPassword, newPassword, confirmPassword } = updatePasswordDto;
 
         if (!userId) {

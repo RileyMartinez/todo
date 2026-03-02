@@ -1,8 +1,9 @@
 import { GetCurrentUser } from '@/common/decorators/get-current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
-import { PasswordResetRequestDto } from '@/common/dto/password-reset-request.dto';
+import { DeleteResultResponseDto } from '@/common/dto/delete-result-response.dto';
 import { UserContextDto } from '@/common/dto/user-context.dto';
 import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
+import { PasswordResetRequestDto } from '@/modules/user/dto/password-reset-request.dto';
 import { ResetPasswordDto } from '@/modules/user/dto/reset-password.dto';
 import { SafeUserDto } from '@/modules/user/dto/safe-user.dto';
 import { UpdateDisplayNameDto } from '@/modules/user/dto/update-display-name.dto';
@@ -21,13 +22,14 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { DeleteResult } from 'typeorm';
 
 @Controller('user')
 @ApiTags('user')
 @ApiCookieAuth()
+@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 export class UserController {
     constructor(
         private readonly userService: UserService,
@@ -49,10 +51,11 @@ export class UserController {
      * Remove a user by their ID.
      */
     @Delete()
-    @ApiOkResponse({ type: Number, description: 'The number of users deleted' })
+    @ApiOkResponse({ type: DeleteResultResponseDto, description: 'The number of users deleted' })
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
-    async deleteUser(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<DeleteResult> {
-        return await this.userService.deleteUser(userId);
+    async deleteUser(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<DeleteResultResponseDto> {
+        const result = await this.userService.deleteUser(userId);
+        return new DeleteResultResponseDto(result.affected ?? 0);
     }
 
     @Get('context')

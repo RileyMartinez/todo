@@ -13,11 +13,11 @@ import { UserService } from '@/modules/user/user.service';
 import { ConfigConstants } from '@/shared/constants/config.constants';
 import { ExceptionConstants } from '@/shared/constants/exception.constants';
 import { EncryptionUtil } from '@/shared/utils/encryption.util';
+import { validateDto } from '@/shared/utils/validate-dto.util';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import { validateOrReject } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -64,7 +64,7 @@ export class AuthService {
         await this.userTokenService.updateUserToken(user.id, tokens.refreshToken);
 
         const result = new AuthResultDto(tokens, user.toUserContextDto());
-        await validateOrReject(result);
+        await validateDto(result);
         return result;
     }
 
@@ -96,7 +96,7 @@ export class AuthService {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_SECRET),
             });
             verifiedToken = new OtpTokenPayloadDto(payload.otp);
-            await validateOrReject(verifiedToken);
+            await validateDto(verifiedToken);
         } catch (error) {
             this.logger.error({ user, error }, ExceptionConstants.INVALID_TOKEN);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -111,7 +111,7 @@ export class AuthService {
         await this.userTokenService.updateUserToken(user.id, tokens.refreshToken);
 
         const result = new AuthResultDto(tokens, user.toUserContextDto());
-        await validateOrReject(result);
+        await validateDto(result);
         return result;
     }
 
@@ -138,7 +138,7 @@ export class AuthService {
         await this.userTokenService.updateUserToken(newUser.id, tokens.refreshToken);
 
         const result = new AuthResultDto(tokens, newUser.toUserContextDto());
-        await validateOrReject(result);
+        await validateDto(result);
         return result;
     }
 
@@ -166,7 +166,7 @@ export class AuthService {
         await this.userTokenService.updateUserToken(user.id, tokens.refreshToken);
 
         const result = new AuthResultDto(tokens, user.toUserContextDto());
-        await validateOrReject(result);
+        await validateDto(result);
         return result;
     }
 
@@ -213,7 +213,7 @@ export class AuthService {
                 secret: this.configService.getOrThrow<string>(ConfigConstants.JWT_REFRESH_SECRET),
             });
             verifiedToken = new RefreshTokenPayloadDto(payload.sub, payload.version);
-            await validateOrReject(verifiedToken);
+            await validateDto(verifiedToken);
         } catch (error) {
             this.logger.error({ user, error }, ExceptionConstants.INVALID_TOKEN);
             throw new ForbiddenException(ExceptionConstants.INVALID_CREDENTIALS);
@@ -229,7 +229,7 @@ export class AuthService {
         const accessToken = await this.issueAccessToken(user);
 
         const result = new AuthRefreshResultDto(accessToken, user.toUserContextDto());
-        await validateOrReject(result);
+        await validateDto(result);
         return result;
     }
 
@@ -268,7 +268,7 @@ export class AuthService {
         ]);
 
         const tokens = new AuthTokensDto(accessToken, refreshToken);
-        await validateOrReject(tokens);
+        await validateDto(tokens);
         return tokens;
     }
 
