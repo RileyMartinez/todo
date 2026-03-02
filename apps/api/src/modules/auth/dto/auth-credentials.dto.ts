@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
-export class AuthRegisterRequestDto {
+export class AuthCredentialsDto {
     /**
-     * Registration email address
+     * Email address
      * @example foo.bar@foobar.com
      */
     @IsString()
@@ -10,7 +10,7 @@ export class AuthRegisterRequestDto {
     email: string = '';
 
     /**
-     * Registration password
+     * Password
      * @example fooBar123!
      */
     @IsString()

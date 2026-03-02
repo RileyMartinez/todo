@@ -1,23 +1,27 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { User } from '@/modules/user/entities/user.entity';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UserContextDto {
-    @IsString()
+    /** @example a1b2c3d4-1234-5678-90ab-cdef12345678 */
+    @IsUUID()
     @IsNotEmpty()
     sub: string;
 
-    @IsString()
+    /** @example foo.bar@foobar.com */
+    @IsEmail()
     @IsNotEmpty()
     email: string;
 
+    /** @example John Doe */
     @IsString()
     @IsOptional()
     displayName: string | null;
 
+    /** @example true */
     @IsBoolean()
     @IsNotEmpty()
     isVerified: boolean;
 
+    /** @example https://www.example.com/avatar.jpg */
     @IsString()
     @IsOptional()
     avatar: string | null;
@@ -28,16 +32,5 @@ export class UserContextDto {
         this.displayName = displayName;
         this.isVerified = isVerified;
         this.avatar = avatar;
-    }
-
-    static from(obj: any): UserContextDto {
-        const className = obj?.constructor.name;
-
-        switch (className) {
-            case User.name:
-                return new UserContextDto(obj.id, obj.email, obj.displayName, obj.isVerified, obj.avatar);
-            default:
-                throw new Error(`Unknown class type: ${className}`);
-        }
     }
 }

@@ -1,12 +1,16 @@
-import { IsNotEmpty, IsNotEmptyObject, IsString } from 'class-validator';
-import { UserContextDto } from '@/modules/auth/dto/user-context.dto';
+import { UserContextDto } from '@/common/dto/user-context.dto';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 export class AuthRefreshResultDto {
+    /** @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... */
     @IsString()
     @IsNotEmpty()
     accessToken: string;
 
-    @IsNotEmptyObject()
+    @ValidateNested()
+    @Type(() => UserContextDto)
+    @IsNotEmpty()
     userContext: UserContextDto;
 
     constructor(accessToken: string, userContext: UserContextDto) {

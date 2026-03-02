@@ -1,12 +1,10 @@
+import { ConfigConstants } from '@/shared/constants/config.constants';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ConfigConstants } from '@/shared/constants/config.constants';
 
 @Injectable()
 export class UrlUtil {
-    constructor(private readonly configService: ConfigService) {
-        this.configService = configService;
-    }
+    constructor(private readonly configService: ConfigService) {}
 
     getServerUrl(): string {
         const basePath = this.configService.getOrThrow<string>(ConfigConstants.BASE_PATH);
@@ -30,7 +28,7 @@ export class UrlUtil {
         }
     }
 
-    getCallbackUrl(): string {
-        return `${this.getWebUrl()}/auth/callback`;
+    getCallbackUrl(path = '/auth/callback'): string {
+        return `${this.getWebUrl()}${path}`;
     }
 }

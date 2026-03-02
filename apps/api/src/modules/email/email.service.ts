@@ -1,12 +1,9 @@
+import { SESV2ClientFactory } from '@/modules/email/sesv2-client.factory';
+import { TemplatedEmailOptions } from '@/modules/email/templated-email-options.interface';
 import { ConfigConstants } from '@/shared/constants/config.constants';
-import { getFriendlyExpiration } from '@/shared/utils/string.util';
 import { SendEmailCommand } from '@aws-sdk/client-sesv2';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { validateOrReject } from 'class-validator';
-import { AccountVerificationEmailDto } from '@/modules/email/dto/account-verification-email.dto';
-import { PasswordResetEmailDto } from '@/modules/email/dto/password-reset-email.dto';
-import { SESV2ClientFactory } from '@/modules/email/sesv2-client.factory';
 
 @Injectable()
 export class EmailService {
@@ -18,85 +15,34 @@ export class EmailService {
     ) {}
 
     /**
-     * Sends a password reset email.
+     * Sends a templated email through AWS SES.
      *
-     * @param passwordResetEmailDto - The dto containing the email and otp.
+     * @param options - The recipient, template name, and template data.
      * @returns A promise that resolves when the email is sent successfully.
-     * @throws {ValidationError} If the password reset email request dto is invalid.
      */
-    async sendPasswordReset(passwordResetEmailDto: PasswordResetEmailDto): Promise<void> {
-        await validateOrReject(passwordResetEmailDto);
-
-        const { email, otp } = passwordResetEmailDto;
+    async sendTemplatedEmail(options: TemplatedEmailOptions): Promise<void> {
+        const { to, templateName, templateData } = options;
         const client = this.sesv2ClientFactory.createClient();
         const fromEmail = this.configService.getOrThrow<string>(ConfigConstants.AWS_SES_FROM_EMAIL);
-        const expiration = getFriendlyExpiration(this.configService.getOrThrow<string>(ConfigConstants.JWT_EXPIRATION));
-
-        const templateName = 'password-reset-v1';
 
         const command = new SendEmailCommand({
             FromEmailAddress: fromEmail,
             Destination: {
-                ToAddresses: [email],
+                ToAddresses: [to],
             },
             Content: {
                 Template: {
                     TemplateName: templateName,
-                    TemplateData: JSON.stringify({
-                        otp,
-                        expiration,
-                        year: new Date().getFullYear(),
-                    }),
+                    TemplateData: JSON.stringify(templateData),
                 },
             },
         });
 
         try {
             await client.send(command);
-            this.logger.debug({ email, templateName }, 'Password reset email sent successfully.');
+            this.logger.debug({ to, templateName }, 'Templated email sent successfully.');
         } catch (error) {
-            this.logger.error({ email, templateName, error }, 'Failed to send password reset email.');
-            throw error;
-        }
-    }
-
-    /**
-     * Sends an account verification email.
-     *
-     * @param accountVerificationEmailDto - The dto containing the email and confirmation pin.
-     * @returns A promise that resolves when the email is sent successfully.
-     * @throws {ValidationError} If the account verification dto is invalid.
-     */
-    async sendAccountVerification(accountVerificationEmailDto: AccountVerificationEmailDto): Promise<void> {
-        await validateOrReject(accountVerificationEmailDto);
-
-        const { email, confirmationPin } = accountVerificationEmailDto;
-        const client = this.sesv2ClientFactory.createClient();
-        const fromEmail = this.configService.getOrThrow<string>(ConfigConstants.AWS_SES_FROM_EMAIL);
-
-        const templateName = 'account-verification-v1';
-
-        const command = new SendEmailCommand({
-            FromEmailAddress: fromEmail,
-            Destination: {
-                ToAddresses: [email],
-            },
-            Content: {
-                Template: {
-                    TemplateName: templateName,
-                    TemplateData: JSON.stringify({
-                        confirmationPin,
-                        year: new Date().getFullYear(),
-                    }),
-                },
-            },
-        });
-
-        try {
-            await client.send(command);
-            this.logger.debug({ email, templateName }, 'Account verification email sent successfully.');
-        } catch (error) {
-            this.logger.error({ email, templateName, error }, 'Failed to send account verification email.');
+            this.logger.error({ to, templateName, error }, 'Failed to send templated email.');
             throw error;
         }
     }

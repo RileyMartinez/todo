@@ -1,3 +1,5 @@
+import { AuthService } from '@/modules/auth/auth.service';
+import { AuthResultDto } from '@/modules/auth/dto/auth-result.dto';
 import { AppConstants } from '@/shared/constants/app.constants';
 import { ConfigConstants } from '@/shared/constants/config.constants';
 import { UrlUtil } from '@/shared/utils/url.util';
@@ -5,9 +7,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-discord';
-import { AuthService } from '@/modules/auth/auth.service';
-import { AuthLoginResultDto } from '@/modules/auth/dto/auth-login-result.dto';
-import { PasswordlessLoginDto } from '@/modules/auth/dto/passwordless-login.dto';
 
 @Injectable()
 export class DiscordAuthStrategy extends PassportStrategy(Strategy, AppConstants.DISCORD_STRATEGY_NAME) {
@@ -24,7 +23,7 @@ export class DiscordAuthStrategy extends PassportStrategy(Strategy, AppConstants
         } as StrategyOptions);
     }
 
-    async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {
+    async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthResultDto | null> {
         if (!profile.email) {
             return null;
         }
@@ -34,6 +33,6 @@ export class DiscordAuthStrategy extends PassportStrategy(Strategy, AppConstants
             avatar = `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=256`;
         }
 
-        return await this.authService.passwordlessLoginOrRegister(new PasswordlessLoginDto(profile.email, avatar));
+        return await this.authService.passwordlessLoginOrRegister(profile.email, avatar);
     }
 }

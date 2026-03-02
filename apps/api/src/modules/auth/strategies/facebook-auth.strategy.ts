@@ -1,3 +1,5 @@
+import { AuthService } from '@/modules/auth/auth.service';
+import { AuthResultDto } from '@/modules/auth/dto/auth-result.dto';
 import { AppConstants } from '@/shared/constants/app.constants';
 import { ConfigConstants } from '@/shared/constants/config.constants';
 import { UrlUtil } from '@/shared/utils/url.util';
@@ -5,9 +7,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, StrategyOptions } from 'passport-facebook';
-import { AuthService } from '@/modules/auth/auth.service';
-import { AuthLoginResultDto } from '@/modules/auth/dto/auth-login-result.dto';
-import { PasswordlessLoginDto } from '@/modules/auth/dto/passwordless-login.dto';
 
 @Injectable()
 export class FacebookAuthStrategy extends PassportStrategy(Strategy, AppConstants.FACEBOOK_STRATEGY_NAME) {
@@ -24,13 +23,11 @@ export class FacebookAuthStrategy extends PassportStrategy(Strategy, AppConstant
         } as StrategyOptions);
     }
 
-    async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthLoginResultDto | null> {
+    async validate(_accessToken: string, _refreshToken: string, profile: Profile): Promise<AuthResultDto | null> {
         if (!profile.emails) {
             return null;
         }
 
-        return await this.authService.passwordlessLoginOrRegister(
-            new PasswordlessLoginDto(profile.emails[0].value, profile.photos?.[0].value),
-        );
+        return await this.authService.passwordlessLoginOrRegister(profile.emails[0].value, profile.photos?.[0].value);
     }
 }

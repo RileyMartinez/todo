@@ -1,5 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { UserContextDto } from '@/common/dto/user-context.dto';
 import { TodoList } from '@/modules/todo-list/entities/todo-list.entity';
+import { SafeUserDto } from '@/modules/user/dto/safe-user.dto';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['email'])
@@ -69,4 +71,18 @@ export class User {
         cascade: true,
     })
     todoLists!: TodoList[];
+
+    /**
+     * Maps this User entity to a UserContextDto.
+     */
+    toUserContextDto(): UserContextDto {
+        return new UserContextDto(this.id, this.email, this.displayName, this.isVerified, this.avatar);
+    }
+
+    /**
+     * Maps this User entity to a SafeUserDto (excludes sensitive fields).
+     */
+    toSafeUserDto(): SafeUserDto {
+        return new SafeUserDto(this);
+    }
 }

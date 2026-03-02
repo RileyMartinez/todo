@@ -1,12 +1,12 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class RefreshTokenDto {
+export class RefreshTokenPayloadDto {
     @IsString()
     @IsNotEmpty()
     sub: string;
 
     @IsNumber()
-    @Min(1)
+    @IsNotEmpty()
     version: number;
 
     constructor(sub: string, version: number) {

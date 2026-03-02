@@ -1,7 +1,18 @@
-import { DecoratorConstants } from '@/shared/constants/decorator.constants';
-import { ExceptionConstants } from '@/shared/constants/exception.constants';
 import { GetCurrentUser } from '@/common/decorators/get-current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
+import { PasswordResetRequestDto } from '@/common/dto/password-reset-request.dto';
+import { UserContextDto } from '@/common/dto/user-context.dto';
+import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
+import { ResetPasswordDto } from '@/modules/user/dto/reset-password.dto';
+import { SafeUserDto } from '@/modules/user/dto/safe-user.dto';
+import { UpdateDisplayNameDto } from '@/modules/user/dto/update-display-name.dto';
+import { UpdatePasswordDto } from '@/modules/user/dto/update-password.dto';
+import { VerifyUserRequestDto } from '@/modules/user/dto/verify-user-request.dto';
+import { UserNotificationService } from '@/modules/user/user-notification.service';
+import { UserProfileService } from '@/modules/user/user-profile.service';
+import { UserService } from '@/modules/user/user.service';
+import { DecoratorConstants } from '@/shared/constants/decorator.constants';
+import { ExceptionConstants } from '@/shared/constants/exception.constants';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Post } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
@@ -10,25 +21,19 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
-    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { DeleteResult } from 'typeorm';
-import { PasswordResetRequestDto } from '@/modules/auth/dto/password-reset-request.dto';
-import { UserContextDto } from '@/modules/auth/dto/user-context.dto';
-import { CreateUserDto } from '@/modules/user/dto/create-user.dto';
-import { ResetPasswordDto } from '@/modules/user/dto/reset-password.dto';
-import { SafeUserDto } from '@/modules/user/dto/safe-user.dto';
-import { UpdateDisplayNameDto } from '@/modules/user/dto/update-display-name.dto';
-import { UpdatePasswordDto } from '@/modules/user/dto/update-password.dto';
-import { VerifyUserRequestDto } from '@/modules/user/dto/verify-user-request.dto';
-import { UserService } from '@/modules/user/user.service';
 
 @Controller('user')
 @ApiTags('user')
 @ApiCookieAuth()
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly userProfileService: UserProfileService,
+        private readonly userNotificationService: UserNotificationService,
+    ) {}
 
     /**
      * Create a new user.
@@ -37,7 +42,7 @@ export class UserController {
     @ApiCreatedResponse({ type: SafeUserDto })
     async createUser(@Body() createUserDto: CreateUserDto): Promise<SafeUserDto> {
         const user = await this.userService.createUser(createUserDto);
-        return new SafeUserDto(user);
+        return user.toSafeUserDto();
     }
 
     /**
@@ -55,7 +60,12 @@ export class UserController {
     @ApiNotFoundResponse({ description: ExceptionConstants.USER_NOT_FOUND })
     async getUserContext(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<UserContextDto> {
         const user = await this.userService.findUserById(userId);
-        return UserContextDto.from(user);
+
+        if (!user) {
+            throw new NotFoundException(ExceptionConstants.USER_NOT_FOUND);
+        }
+
+        return user.toUserContextDto();
     }
 
     @Post('update-password')
@@ -97,7 +107,7 @@ export class UserController {
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
         @Body() updateDisplayNameDto: UpdateDisplayNameDto,
     ): Promise<void> {
-        await this.userService.updateUserDisplayName(userId, updateDisplayNameDto.displayName);
+        await this.userProfileService.updateUserDisplayName(userId, updateDisplayNameDto.displayName);
     }
 
     /**
@@ -112,7 +122,7 @@ export class UserController {
         @GetCurrentUser(DecoratorConstants.SUB) userId: string,
         @Body() verifyUserRequestDto: VerifyUserRequestDto,
     ): Promise<UserContextDto> {
-        return await this.userService.verifyUser(userId, verifyUserRequestDto.verificationCode);
+        return await this.userProfileService.verifyUser(userId, verifyUserRequestDto.verificationCode);
     }
 
     /**
@@ -127,7 +137,7 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
     @Throttle({ default: { limit: 3, ttl: 60000 } })
     async sendAccountVerification(@GetCurrentUser(DecoratorConstants.SUB) userId: string): Promise<void> {
-        return await this.userService.sendAccountVerificationMessage(userId);
+        return await this.userNotificationService.sendAccountVerificationMessage(userId);
     }
 
     /**
@@ -142,6 +152,6 @@ export class UserController {
     @ApiBadRequestResponse({ description: ExceptionConstants.INVALID_EMAIL })
     @HttpCode(HttpStatus.OK)
     async sendPasswordResetRequest(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
-        return await this.userService.sendPasswordResetMessage(passwordResetRequestDto.email);
+        return await this.userNotificationService.sendPasswordResetMessage(passwordResetRequestDto.email);
     }
 }
