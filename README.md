@@ -1,10 +1,19 @@
-# todo
+# nest-auth
 
-Todo list web app built with Postgres, NestJS, Angular, and Node.
+Nest auth project focused around JWT access token and refresh flows with Passport integrations for the following providers:
+  - Local Strategy
+  - Google
+  - Microsoft
+  - Facebook
+  - Discord
+  - GitHub
+  
+Application demonstrating the auth flow is a Todo list web app built with Angular, Material Components, Postgres, and Nest.
 
 ## Prereqs
 
 1. Docker
+2. 1password (secrets management/injection)
 
 ## Setup
 
